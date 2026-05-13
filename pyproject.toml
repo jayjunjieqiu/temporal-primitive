@@ -1,0 +1,25 @@
+[project]
+name = "temporal-primitive"
+version = "0.1.0"
+description = "Feasibility and prototype code for temporal primitive analysis in TSFMs."
+requires-python = ">=3.13,<3.14"
+dependencies = [
+  "accelerate>=0.34,<2",
+  "aeon>=1.4,<2",
+  "chronos-forecasting",
+  "numpy>=2,<3",
+  "pandas>=2,<3",
+  "pyts>=0.13,<1",
+  "ruptures>=1.1,<2",
+  "scikit-learn>=1.6,<2",
+  "stumpy>=1.14,<2",
+  "timesfm",
+  "torch>=2.2,<3",
+  "transformers>=4.49,<5",
+  "tslearn>=0.8,<1",
+  "umap-learn>=0.5,<1",
+]
+
+[tool.uv.sources]
+chronos-forecasting = { path = "external/chronos-forecasting", editable = true }
+timesfm = { path = "external/timesfm", editable = true }

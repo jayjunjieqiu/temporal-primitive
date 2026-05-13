@@ -1,0 +1,95 @@
+version: model_derived_taxonomy_v1_cross_model_validation
+status: pilot_validation_not_final_taxonomy
+source_report: docs/cross_model_taxonomy_v1_validation_report.md
+source_summary: outputs/cross_model_validation/cross_model_validation_summary.json
+prototype_bank: outputs/cross_model_validation/prototype_bank.json
+
+prototype_bank_spec:
+  source_model: TimesFM-2.5
+  source_layer: layer_10
+  source_split: domain_balanced internal split
+  medoids_per_concept: 20
+  high_confidence_neighbors_per_concept: 20
+  concepts:
+    - strong_rising_recovery
+    - strong_falling_transition
+    - smooth_falling_transition
+    - artifact_first_patch_behavior
+
+cross_model_mapping:
+  TimesFM-2.5:
+    source_patch_len: 32
+    target_patch_len: 32
+    mapping: exact same window_id and patch_index
+  Chronos-2:
+    source_patch_len: 32
+    target_patch_len: 16
+    mapping: TimesFM patch p maps to Chronos patches 2p and 2p+1
+  Chronos-2-small:
+    source_patch_len: 32
+    target_patch_len: 16
+    mapping: TimesFM patch p maps to Chronos patches 2p and 2p+1
+
+validated_concepts:
+  - name: strong_falling_transition
+    status: strongest_cross_model_candidate
+    evidence:
+      TimesFM-2.5_layer_10:
+        prototype_space_1nn_same_concept: 0.975
+        global_retrieval_shape_corr: 0.884
+      Chronos-2_layer_11:
+        prototype_space_1nn_same_concept: 0.750
+        global_retrieval_shape_corr: 0.626
+      Chronos-2-small_layer_5:
+        prototype_space_1nn_same_concept: 0.875
+        global_retrieval_shape_corr: 0.630
+    caveat:
+      - prototype domains are weather-heavy after source selection
+
+  - name: smooth_falling_transition
+    status: plausible_but_domain_weighted
+    evidence:
+      TimesFM-2.5_layer_10:
+        prototype_space_1nn_same_concept: 0.975
+        global_retrieval_shape_corr: 0.730
+      Chronos-2_layer_11:
+        prototype_space_1nn_same_concept: 0.950
+        global_retrieval_shape_corr: 0.491
+      Chronos-2-small_layer_5:
+        prototype_space_1nn_same_concept: 0.988
+        global_retrieval_shape_corr: 0.477
+    caveat:
+      - traffic-flow dominated prototype bank
+      - may merge with strong_falling_transition in a coarser taxonomy
+
+  - name: strong_rising_recovery
+    status: plausible_but_weaker_than_falling_concepts
+    evidence:
+      TimesFM-2.5_layer_10:
+        prototype_space_1nn_same_concept: 1.000
+        global_retrieval_shape_corr: 0.707
+      Chronos-2_layer_11:
+        prototype_space_1nn_same_concept: 0.950
+        global_retrieval_shape_corr: 0.477
+      Chronos-2-small_layer_5:
+        prototype_space_1nn_same_concept: 0.913
+        global_retrieval_shape_corr: 0.496
+    caveat:
+      - rising shape is partly fragmented when mapped from 32-step TimesFM patches to 16-step Chronos patches
+
+negative_controls:
+  - name: artifact_first_patch_behavior
+    status: still_negative_control
+    evidence:
+      TimesFM-2.5_layer_10:
+        prototype_space_1nn_same_concept: 1.000
+        global_retrieval_shape_corr: 0.877
+      Chronos-2_layer_11:
+        prototype_space_1nn_same_concept: 0.788
+        global_retrieval_shape_corr: 0.380
+      Chronos-2-small_layer_5:
+        prototype_space_1nn_same_concept: 0.825
+        global_retrieval_shape_corr: 0.332
+    interpretation:
+      - high prototype-space coherence can be caused by position/context effects
+      - concept claims must include artifact audit

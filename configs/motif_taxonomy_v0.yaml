@@ -1,0 +1,121 @@
+version: motif_taxonomy_v0
+scope: patch-level temporal primitive labels for TSFM representation analysis
+patch_lengths:
+  chronos_2_small: 16
+  chronos_2: 16
+  timesfm_2_5: 32
+normalization_policy:
+  default: robust z-normalization inside each patch for shape labels
+  keep_raw_std: true
+  note: flat_low_information still depends on low raw variance after preprocessing.
+confidence_policy:
+  high: top detector score is clearly above threshold and no competing detector fires
+  medium: detector fires but one weak competing family is present
+  low: weak evidence or boundary-sensitive detection
+  uncertain_label: mixed_uncertain
+  mixed_rule: assign mixed_uncertain when two or more non-flat motif detectors fire with comparable evidence
+classes:
+  - name: flat_low_information
+    short_definition: nearly constant local segment with little usable temporal structure
+    primary_detector: deterministic_statistics
+    operational_rule: raw standard deviation and raw range below thresholds
+    default_thresholds:
+      raw_std_max: 0.08
+      raw_range_max: 0.30
+    robust_at_patch_lengths: [16, 32]
+    notes: Useful as a control label; should not be forced into trend or level_shift.
+  - name: trend
+    short_definition: local monotonic increase or decrease that is well approximated by a line
+    primary_detector: linear_fit
+    operational_rule: high absolute slope and high R2 after robust normalization, without spike or change-point evidence
+    default_thresholds:
+      abs_slope_min: 0.75
+      r2_min: 0.70
+      max_spike_count: 1
+    robust_at_patch_lengths: [16, 32]
+    notes: Merge weak trend into mixed_uncertain when a level shift or impulse dominates the same patch.
+  - name: oscillation
+    short_definition: repeated local up-down pattern or short seasonality fragment
+    primary_detector: spectral_concentration
+    operational_rule: dominant nonzero FFT component has high power ratio and at least about 1.5 cycles within the patch
+    default_thresholds:
+      dominant_power_ratio_min: 0.42
+      min_zero_crossings: 3
+      min_cycles_16: 1.0
+      min_cycles_32: 1.5
+    robust_at_patch_lengths: [32]
+    partially_robust_at_patch_lengths: [16]
+    notes: Patch length 16 is boundary-sensitive; use medium confidence unless cycles are clear.
+  - name: impulse_spike
+    short_definition: one or two isolated extreme observations on an otherwise local background
+    primary_detector: robust_outlier_count
+    operational_rule: very high robust z-score with at most two active points or one very short active run
+    default_thresholds:
+      max_robust_z_min: 4.0
+      active_z_min: 3.0
+      max_active_points: 2
+      max_longest_run: 2
+    robust_at_patch_lengths: [16, 32]
+    notes: Prototype-only soft label for the first stage; wider impulses should be considered burst_event rather than impulse_spike.
+  - name: burst_event
+    short_definition: short dense cluster of high-energy deviations or events
+    primary_detector: active_run_statistics
+    operational_rule: moderate active-point ratio with a contiguous active run longer than an impulse but shorter than the patch
+    default_thresholds:
+      active_z_min: 2.0
+      active_ratio_min: 0.15
+      active_ratio_max: 0.60
+      longest_run_min_ratio: 0.12
+    robust_at_patch_lengths: [32]
+    partially_robust_at_patch_lengths: [16]
+    notes: Prototype-only soft label for the first stage; boundary alignment can split a burst across patches, so nearby-patch context should be retained.
+  - name: level_shift
+    short_definition: step-like change in local mean level within the patch
+    primary_detector: change_point_mean
+    operational_rule: best two-segment mean difference is large relative to pooled within-segment variation
+    default_thresholds:
+      mean_change_score_min: 1.45
+      min_segment_ratio: 0.25
+      trend_r2_max: 0.86
+    robust_at_patch_lengths: [32]
+    partially_robust_at_patch_lengths: [16]
+    notes: Long smooth ramps should be trend; abrupt steps should be level_shift.
+  - name: volatility_shift
+    short_definition: local variance or volatility changes while the mean is comparatively stable
+    primary_detector: change_point_variance
+    operational_rule: two halves or best split have a large standard-deviation ratio without a large mean shift
+    default_thresholds:
+      std_ratio_min: 2.2
+      mean_change_score_max: 1.25
+    robust_at_patch_lengths: [32]
+    partially_robust_at_patch_lengths: [16]
+    notes: Needs enough points per segment; treat short 16-step cases cautiously.
+  - name: intermittent
+    short_definition: sparse repeated nonzero or high-activity events separated by quiet gaps
+    primary_detector: sparse_run_statistics
+    operational_rule: multiple separated active runs, low-to-moderate active ratio, and no single dominant impulse
+    default_thresholds:
+      active_z_min: 2.0
+      min_active_runs: 2
+      active_ratio_min: 0.08
+      active_ratio_max: 0.40
+      max_longest_run_ratio: 0.20
+    robust_at_patch_lengths: [32]
+    partially_robust_at_patch_lengths: [16]
+    notes: A single event is impulse_spike or burst_event; multiple separated events are intermittent.
+  - name: mixed_uncertain
+    short_definition: composite, boundary-cut, low-confidence, or detector-conflicting patch
+    primary_detector: conflict_and_margin_policy
+    operational_rule: fallback class when no detector is confident or multiple detectors fire with comparable scores
+    default_thresholds:
+      competing_score_margin_max: 0.18
+      min_confidence_for_hard_label: 0.55
+    robust_at_patch_lengths: [16, 32]
+    notes: This is a necessary class, not a failure; it protects retrieval and clustering analyses from false hard labels.
+recommended_pipeline:
+  - generate synthetic calibration patches for every class and patch length
+  - apply deterministic rule detectors and record confidence
+  - run Matrix Profile or prototype nearest-neighbor checks for repeated motifs
+  - run change-point detection for level_shift and volatility_shift candidates
+  - manually inspect high-confidence prototypes before labeling real data
+  - propagate labels by prototype-bank nearest neighbor and keep mixed_uncertain

@@ -1,0 +1,134 @@
+version: model_derived_taxonomy_v1_pilot
+status: candidate_inventory_not_final_taxonomy
+source_report: docs/taxonomy_v1_pilot_report.md
+source_summary: outputs/taxonomy_v1_pilot/taxonomy_v1_pilot_summary.json
+inclusion_rule:
+  required:
+    - cross_domain_mean_shape_correlation >= 0.25
+    - cross_domain_same_patch_index_mean_shape_correlation >= 0.25
+    - no severe patch_position_risk unless explicitly labeled artifact
+  preferred:
+    - cross_domain_same_frequency_mean_shape_correlation >= 0.25
+    - top_patch_index_share < 0.75
+    - top_domain_share < 0.65
+    - top_frequency_share < 0.75
+  caveat: thresholds are working filters for pilot validation, not statistical significance tests
+
+candidate_concepts:
+  - name: strong_rising_recovery
+    status: primary_candidate
+    source:
+      model: TimesFM-2.5
+      layer: layer_10
+      parent_cluster: c8
+      subcluster: s0
+    operational_description: sustained upward patch trajectory, often recovery or rising transition
+    evidence:
+      cross_domain_shape: 0.642
+      cross_domain_same_patch_index_shape: 0.619
+      cross_domain_same_frequency_shape: 0.289
+    known_risks:
+      - moderate traffic-flow share
+    next_validation:
+      - build prototype bank
+      - test cross-model retrieval in Chronos-2-small and Chronos-2
+
+  - name: strong_falling_transition
+    status: primary_candidate
+    source:
+      model: TimesFM-2.5
+      layer: layer_10
+      parent_cluster: c5
+      subcluster: s1
+    operational_description: sustained strong downward patch trajectory
+    evidence:
+      cross_domain_shape: 0.869
+      cross_domain_same_patch_index_shape: 0.840
+      cross_domain_same_frequency_shape: 0.796
+    known_risks: []
+    next_validation:
+      - build prototype bank
+      - verify it is not reverse-scale or normalization artifact
+      - test cross-model retrieval in Chronos-2-small and Chronos-2
+
+  - name: smooth_falling_transition
+    status: primary_candidate
+    source:
+      model: TimesFM-2.5
+      layer: layer_10
+      parent_cluster: c5
+      subcluster: s0
+    operational_description: smoother and weaker downward transition than strong_falling_transition
+    evidence:
+      cross_domain_shape: 0.465
+      cross_domain_same_patch_index_shape: 0.404
+      cross_domain_same_frequency_shape: 0.283
+    known_risks:
+      - may merge with strong_falling_transition after cross-model validation
+    next_validation:
+      - compare against strong_falling_transition prototype bank
+      - test cross-model retrieval in Chronos-2-small and Chronos-2
+
+  - name: broad_smooth_rising_transition
+    status: secondary_candidate
+    source:
+      model: TimesFM-2.5
+      layer: layer_10
+      parent_cluster: c8
+      subcluster: s1
+    operational_description: broad rising-transition pool with lower cross-frequency robustness
+    evidence:
+      cross_domain_shape: 0.377
+      cross_domain_same_patch_index_shape: 0.343
+      cross_domain_same_frequency_shape: 0.143
+    known_risks:
+      - frequency_sensitive
+      - broad heterogeneous pool
+
+  - name: traffic_weighted_rising_transition
+    status: secondary_candidate_with_risk
+    source:
+      model: TimesFM-2.5
+      layer: layer_10
+      parent_cluster: c8
+      subcluster: s2
+    operational_description: rising transition with strong traffic-flow and frequency composition
+    evidence:
+      cross_domain_shape: 0.452
+      cross_domain_same_patch_index_shape: 0.421
+      cross_domain_same_frequency_shape: 0.269
+    known_risks:
+      - frequency_risk
+      - traffic_flow_weighted
+
+artifact_or_exclusion_labels:
+  - name: artifact_first_patch_behavior
+    status: negative_control
+    source:
+      model: TimesFM-2.5
+      layer: layer_10
+      parent_cluster: c4
+    operational_description: highly coherent first-patch behavior dominated by patch_index=0
+    reason: patch-position artifact, not temporal concept
+
+  - name: artifact_synthetic_noise
+    status: negative_control
+    source:
+      model: Chronos-2
+      layer: layer_6
+      parent_cluster: c7
+    operational_description: simulated Gaussian data dominated cluster
+    reason: synthetic-domain artifact, not temporal concept
+
+  - name: uncertain_mixed_transition_pool
+    status: exclusion_or_needs_split
+    sources:
+      - model: TimesFM-2.5
+        layer: layer_10
+        parent_cluster: c5
+        subcluster: s2
+      - model: Chronos-2
+        layer: layer_11
+        parent_cluster: c6
+        subcluster: s0
+    reason: controlled retrieval does not support a clean concept

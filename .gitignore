@@ -1,0 +1,54 @@
+# Python / uv environment
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Local model weights and large checkpoints
+*.safetensors
+*.bin
+*.pt
+*.pth
+*.ckpt
+.hfd/
+
+# External cloned reference repositories
+external/
+
+# Runtime scratch files
+*.log
+*.tmp
+
+# Output policy:
+# ignore generated outputs by default, then explicitly keep compact summaries
+# and report-linked evidence figures that are useful for discussion.
+outputs/**
+!outputs/
+!outputs/*.json
+!outputs/cluster_cards/
+!outputs/cluster_cards/cluster_card_summary.json
+!outputs/cluster_cards/cards/
+!outputs/cluster_cards/cards/*.png
+!outputs/cluster_cards/retrieval/
+!outputs/cluster_cards/retrieval/*.png
+!outputs/cluster_validation/
+!outputs/cluster_validation/cluster_level_validation_summary.json
+!outputs/cluster_validation/figures/
+!outputs/cluster_validation/figures/*.png
+!outputs/taxonomy_v1_pilot/
+!outputs/taxonomy_v1_pilot/taxonomy_v1_pilot_summary.json
+!outputs/taxonomy_v1_pilot/figures/
+!outputs/taxonomy_v1_pilot/figures/*.png
+!outputs/cross_model_validation/
+!outputs/cross_model_validation/cross_model_validation_summary.json
+!outputs/cross_model_validation/prototype_bank.json
+!outputs/cross_model_validation/figures/
+!outputs/cross_model_validation/figures/*.png
+!outputs/ppt_raw_assets/
+!outputs/ppt_raw_assets/*.json
+!outputs/ppt_raw_assets/*.png
+!outputs/ppt_assets/
+!outputs/ppt_assets/*.json
+!outputs/ppt_assets/*.png
