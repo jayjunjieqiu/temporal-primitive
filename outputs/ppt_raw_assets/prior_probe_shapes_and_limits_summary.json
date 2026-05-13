@@ -1,0 +1,35 @@
+{
+  "purpose": "Slide 3 evidence that the prior-guided motif probe is an interpretable weak probe, not ground truth",
+  "motif_classes": [
+    "flat / low information",
+    "trend",
+    "oscillation",
+    "spike",
+    "burst",
+    "level shift",
+    "volatility shift",
+    "intermittent",
+    "mixed / uncertain"
+  ],
+  "nmi_metrics": {
+    "TimesFM-2.5 layer 10": {
+      "prior probe": 0.19781072180983927,
+      "domain": 0.4171214529366191,
+      "frequency": 0.36495901083507715,
+      "patch index": 0.2638587854361657
+    },
+    "Chronos-2 layer 11": {
+      "prior probe": 0.17109459875613675,
+      "domain": 0.4018189562212593,
+      "frequency": 0.3381617066823228,
+      "patch index": 0.009862219902529952
+    },
+    "Chronos-2-small layer 5": {
+      "prior probe": 0.17001920357645048,
+      "domain": 0.38369931736508917,
+      "frequency": 0.32181946969358666,
+      "patch index": 0.007908043681105556
+    }
+  },
+  "interpretation": "prior-probe NMI is modest and not uniquely dominant across models; clusters also encode domain/frequency/position confounders"
+}

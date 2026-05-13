@@ -1,0 +1,21 @@
+{
+  "purpose": "raw images for manual PPT layout; no full-slide text blocks",
+  "paths": [
+    "outputs/ppt_raw_assets/fig_hypothesis_evidence_map.png",
+    "outputs/ppt_raw_assets/fig_evidence_gap_audit.png",
+    "outputs/ppt_raw_assets/fig_discover_first_protocol_flow.png",
+    "outputs/ppt_raw_assets/fig_prior_probe_literature_map.png",
+    "outputs/ppt_raw_assets/fig_prior_probe_shapes_and_limits.png",
+    "outputs/ppt_raw_assets/fig_prior_probe_prototype_shapes.png",
+    "outputs/ppt_raw_assets/fig_prior_probe_alignment_evidence.png",
+    "outputs/ppt_raw_assets/fig_prior_probe_distribution_real_patch_bank.png",
+    "outputs/ppt_raw_assets/fig_timesfm_clustering_triptych_labeled.png",
+    "outputs/ppt_raw_assets/fig_domain_balanced_falling_family.png",
+    "outputs/ppt_raw_assets/fig_model_native_candidate_patches_redrawn.png",
+    "outputs/ppt_raw_assets/fig_cluster_outcome_gallery_v2.png",
+    "outputs/ppt_raw_assets/fig_lineage_metric_story.png",
+    "outputs/ppt_raw_assets/fig_controlled_retrieval_heatmap_readable.png",
+    "outputs/ppt_raw_assets/fig_negative_control_artifact.png",
+    "outputs/ppt_raw_assets/fig_cross_model_validation_story.png"
+  ]
+}

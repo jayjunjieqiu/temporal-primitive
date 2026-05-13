@@ -96,3 +96,22 @@ Markdown 图片链接检查通过：`docs/ppt_material_pack_advisor_meeting.md` 
 当前更适合明天汇报的说法：
 
 > We have reproducible final evidence assets for the meeting, but the raw-asset generation pipeline still depends on intermediate second-pilot figures that should be versioned or regenerated in the next cleanup.
+
+## 2026-05-13 恢复备注
+
+项目误删恢复后，已经重新运行以下脚本并恢复 PPT material 所需的关键图片/数据：
+
+- `scripts/run_second_pilot_discovery.py`
+- `scripts/run_cluster_level_validation.py`
+- `scripts/run_taxonomy_v1_pilot.py`
+- `scripts/run_cross_model_concept_validation.py`
+- `scripts/run_input_embedding_ablation.py`
+- `scripts/build_ppt_raw_assets.py`
+- `scripts/build_ppt_assets.py`
+
+同时 `.gitignore` 已加入下面的复现性例外：
+
+- `outputs/figures/second_pilot/*.png`
+- `outputs/input_embedding_ablation/input_embedding_ablation_summary.json`
+
+因此，本文档中提到的 clean clone 缺少 second-pilot 中间图和 lineage summary 的风险已被缓解。模型权重、external repositories 和 `.venv` 仍然不纳入 git，需要按 `docs/local_model_download.md` 和 `pyproject.toml` 重新恢复。

@@ -1,0 +1,223 @@
+{
+  "purpose": "advisor-meeting native candidate evidence; not final taxonomy",
+  "selection_rule": "choose visually interpretable transition-like clusters from each model's own domain-balanced second-pilot clustering",
+  "candidates": [
+    {
+      "model": "TimesFM-2.5",
+      "layer": "layer 10",
+      "cluster": 5,
+      "temporary_name": "smooth transition-like family",
+      "size": 667,
+      "top_domains": [
+        {
+          "value": "traffic flow",
+          "count": 220
+        },
+        {
+          "value": "weather",
+          "count": 115
+        },
+        {
+          "value": "Beijing air quality",
+          "count": 93
+        },
+        {
+          "value": "electricity transformer temperature",
+          "count": 90
+        },
+        {
+          "value": "exchange rate",
+          "count": 88
+        }
+      ],
+      "top_taxonomy_labels": [
+        {
+          "value": "mixed_uncertain",
+          "count": 229
+        },
+        {
+          "value": "level_shift",
+          "count": 224
+        },
+        {
+          "value": "trend",
+          "count": 140
+        },
+        {
+          "value": "volatility_shift",
+          "count": 21
+        },
+        {
+          "value": "flat_low_information",
+          "count": 21
+        }
+      ],
+      "top_patch_indices": [
+        {
+          "value": "1",
+          "count": 233
+        },
+        {
+          "value": "3",
+          "count": 225
+        },
+        {
+          "value": "2",
+          "count": 209
+        }
+      ],
+      "mean_abs_robust_slope": 1.4979053133813383,
+      "note": "native candidate from second-pilot domain-balanced hidden-space clustering"
+    },
+    {
+      "model": "Chronos-2",
+      "layer": "layer 11",
+      "cluster": 10,
+      "temporary_name": "sharp transition-like family",
+      "size": 265,
+      "top_domains": [
+        {
+          "value": "electricity consumption",
+          "count": 126
+        },
+        {
+          "value": "road occupancy rates",
+          "count": 110
+        },
+        {
+          "value": "electricity transformer temperature",
+          "count": 14
+        },
+        {
+          "value": "Beijing air quality",
+          "count": 7
+        },
+        {
+          "value": "illness data",
+          "count": 6
+        }
+      ],
+      "top_taxonomy_labels": [
+        {
+          "value": "level_shift",
+          "count": 114
+        },
+        {
+          "value": "mixed_uncertain",
+          "count": 92
+        },
+        {
+          "value": "flat_low_information",
+          "count": 17
+        },
+        {
+          "value": "impulse_spike",
+          "count": 14
+        },
+        {
+          "value": "volatility_shift",
+          "count": 8
+        }
+      ],
+      "top_patch_indices": [
+        {
+          "value": "1",
+          "count": 40
+        },
+        {
+          "value": "4",
+          "count": 40
+        },
+        {
+          "value": "7",
+          "count": 36
+        },
+        {
+          "value": "2",
+          "count": 35
+        },
+        {
+          "value": "5",
+          "count": 33
+        }
+      ],
+      "mean_abs_robust_slope": 1.8364062221782467,
+      "note": "native candidate from second-pilot domain-balanced hidden-space clustering"
+    },
+    {
+      "model": "Chronos-2-small",
+      "layer": "layer 5",
+      "cluster": 8,
+      "temporary_name": "falling transition-like family",
+      "size": 690,
+      "top_domains": [
+        {
+          "value": "road occupancy rates",
+          "count": 209
+        },
+        {
+          "value": "electricity consumption",
+          "count": 196
+        },
+        {
+          "value": "illness data",
+          "count": 147
+        },
+        {
+          "value": "electricity transformer temperature",
+          "count": 67
+        },
+        {
+          "value": "traffic flow",
+          "count": 33
+        }
+      ],
+      "top_taxonomy_labels": [
+        {
+          "value": "level_shift",
+          "count": 268
+        },
+        {
+          "value": "mixed_uncertain",
+          "count": 186
+        },
+        {
+          "value": "trend",
+          "count": 182
+        },
+        {
+          "value": "impulse_spike",
+          "count": 16
+        },
+        {
+          "value": "intermittent",
+          "count": 11
+        }
+      ],
+      "top_patch_indices": [
+        {
+          "value": "7",
+          "count": 92
+        },
+        {
+          "value": "1",
+          "count": 89
+        },
+        {
+          "value": "5",
+          "count": 89
+        },
+        {
+          "value": "6",
+          "count": 88
+        },
+        {
+          "value": "2",
+          "count": 87
+        }
+      ],
+      "mean_abs_robust_slope": 1.7063611670051748,
+      "note": "native candidate from second-pilot domain-balanced hidden-space clustering"
+    }
+  ]
+}

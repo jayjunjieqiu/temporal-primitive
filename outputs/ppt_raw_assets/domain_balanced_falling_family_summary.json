@@ -1,0 +1,25 @@
+{
+  "concept": "strong falling transition",
+  "full_count": 40,
+  "display_count": 18,
+  "selection_rule": "per-domain cap of 5 for display; full-bank counts retained for risk statement",
+  "full_domain_counts": {
+    "weather": 22,
+    "traffic flow": 9,
+    "electricity transformer temperature": 6,
+    "exchange rate": 2,
+    "traffic speed": 1
+  },
+  "display_domain_counts": {
+    "electricity transformer temperature": 5,
+    "traffic flow": 5,
+    "weather": 5,
+    "exchange rate": 2,
+    "traffic speed": 1
+  },
+  "display_patch_position_counts": {
+    "p1": 1,
+    "p2": 6,
+    "p3": 11
+  }
+}

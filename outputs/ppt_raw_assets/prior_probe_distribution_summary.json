@@ -1,0 +1,54 @@
+{
+  "purpose": "distribution of prior-guided motif probe labels on the domain-balanced real patch bank",
+  "models": [
+    {
+      "model": "TimesFM-2.5",
+      "patch_length": "patch length 32",
+      "total": 5270,
+      "counts": {
+        "flat / low information": 362,
+        "trend": 375,
+        "oscillation": 0,
+        "spike": 91,
+        "burst": 145,
+        "level shift": 1136,
+        "volatility shift": 641,
+        "intermittent": 292,
+        "mixed / uncertain": 2228
+      }
+    },
+    {
+      "model": "Chronos-2",
+      "patch_length": "patch length 16",
+      "total": 7636,
+      "counts": {
+        "flat / low information": 713,
+        "trend": 872,
+        "oscillation": 243,
+        "spike": 153,
+        "burst": 0,
+        "level shift": 2016,
+        "volatility shift": 711,
+        "intermittent": 261,
+        "mixed / uncertain": 2667
+      }
+    },
+    {
+      "model": "Chronos-2-small",
+      "patch_length": "patch length 16",
+      "total": 7636,
+      "counts": {
+        "flat / low information": 713,
+        "trend": 872,
+        "oscillation": 243,
+        "spike": 153,
+        "burst": 0,
+        "level shift": 2016,
+        "volatility shift": 711,
+        "intermittent": 261,
+        "mixed / uncertain": 2667
+      }
+    }
+  ],
+  "interpretation": "mixed/uncertain and level-shift-like patches dominate the weak probe distribution; this reinforces that prior-guided labels are probes rather than balanced supervision."
+}

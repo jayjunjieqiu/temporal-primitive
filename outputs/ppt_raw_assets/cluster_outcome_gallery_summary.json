@@ -1,0 +1,398 @@
+{
+  "purpose": "show non-cherry-picked cluster outcomes for advisor meeting",
+  "note": "clusters are examples from domain-balanced second-pilot hidden-space clustering; labels are temporary descriptions",
+  "clusters": [
+    {
+      "role": "Clean candidate",
+      "temporary_name": "transition-like",
+      "model": "TimesFM-2.5",
+      "layer": "layer 10 · cluster 5",
+      "cluster": 5,
+      "size": 667,
+      "top_domains": [
+        {
+          "value": "traffic flow",
+          "count": 220
+        },
+        {
+          "value": "weather",
+          "count": 115
+        },
+        {
+          "value": "Beijing air quality",
+          "count": 93
+        },
+        {
+          "value": "electricity transformer temperature",
+          "count": 90
+        },
+        {
+          "value": "exchange rate",
+          "count": 88
+        }
+      ],
+      "top_taxonomy_labels": [
+        {
+          "value": "mixed_uncertain",
+          "count": 229
+        },
+        {
+          "value": "level_shift",
+          "count": 224
+        },
+        {
+          "value": "trend",
+          "count": 140
+        },
+        {
+          "value": "volatility_shift",
+          "count": 21
+        },
+        {
+          "value": "flat_low_information",
+          "count": 21
+        }
+      ],
+      "top_patch_indices": [
+        {
+          "value": "1",
+          "count": 233
+        },
+        {
+          "value": "3",
+          "count": 225
+        },
+        {
+          "value": "2",
+          "count": 209
+        }
+      ]
+    },
+    {
+      "role": "Clean candidate",
+      "temporary_name": "falling transition-like",
+      "model": "Chronos-2",
+      "layer": "layer 11 · cluster 9",
+      "cluster": 9,
+      "size": 446,
+      "top_domains": [
+        {
+          "value": "road occupancy rates",
+          "count": 130
+        },
+        {
+          "value": "illness data",
+          "count": 129
+        },
+        {
+          "value": "electricity consumption",
+          "count": 88
+        },
+        {
+          "value": "electricity transformer temperature",
+          "count": 45
+        },
+        {
+          "value": "Beijing air quality",
+          "count": 25
+        }
+      ],
+      "top_taxonomy_labels": [
+        {
+          "value": "trend",
+          "count": 163
+        },
+        {
+          "value": "level_shift",
+          "count": 160
+        },
+        {
+          "value": "mixed_uncertain",
+          "count": 95
+        },
+        {
+          "value": "oscillation",
+          "count": 7
+        },
+        {
+          "value": "impulse_spike",
+          "count": 7
+        }
+      ],
+      "top_patch_indices": [
+        {
+          "value": "5",
+          "count": 62
+        },
+        {
+          "value": "3",
+          "count": 58
+        },
+        {
+          "value": "1",
+          "count": 58
+        },
+        {
+          "value": "6",
+          "count": 57
+        },
+        {
+          "value": "0",
+          "count": 57
+        }
+      ]
+    },
+    {
+      "role": "Broad mixed control",
+      "temporary_name": "flat representatives",
+      "model": "TimesFM-2.5",
+      "layer": "layer 10 · cluster 2",
+      "cluster": 2,
+      "size": 1031,
+      "top_domains": [
+        {
+          "value": "traffic speed",
+          "count": 429
+        },
+        {
+          "value": "electricity transformer temperature",
+          "count": 232
+        },
+        {
+          "value": "traffic flow",
+          "count": 105
+        },
+        {
+          "value": "exchange rate",
+          "count": 76
+        },
+        {
+          "value": "weather",
+          "count": 70
+        }
+      ],
+      "top_taxonomy_labels": [
+        {
+          "value": "mixed_uncertain",
+          "count": 482
+        },
+        {
+          "value": "level_shift",
+          "count": 216
+        },
+        {
+          "value": "flat_low_information",
+          "count": 97
+        },
+        {
+          "value": "intermittent",
+          "count": 86
+        },
+        {
+          "value": "volatility_shift",
+          "count": 83
+        }
+      ],
+      "top_patch_indices": [
+        {
+          "value": "3",
+          "count": 347
+        },
+        {
+          "value": "2",
+          "count": 342
+        },
+        {
+          "value": "1",
+          "count": 323
+        },
+        {
+          "value": "0",
+          "count": 19
+        }
+      ]
+    },
+    {
+      "role": "Event-like control",
+      "temporary_name": "spike / volatility",
+      "model": "TimesFM-2.5",
+      "layer": "layer 10 · cluster 0",
+      "cluster": 0,
+      "size": 416,
+      "top_domains": [
+        {
+          "value": "simulated pulse data",
+          "count": 400
+        },
+        {
+          "value": "electricity transformer temperature",
+          "count": 9
+        },
+        {
+          "value": "weather",
+          "count": 4
+        },
+        {
+          "value": "road occupancy rates",
+          "count": 2
+        },
+        {
+          "value": "Beijing air quality",
+          "count": 1
+        }
+      ],
+      "top_taxonomy_labels": [
+        {
+          "value": "volatility_shift",
+          "count": 398
+        },
+        {
+          "value": "mixed_uncertain",
+          "count": 17
+        },
+        {
+          "value": "flat_low_information",
+          "count": 1
+        }
+      ],
+      "top_patch_indices": [
+        {
+          "value": "0",
+          "count": 109
+        },
+        {
+          "value": "2",
+          "count": 104
+        },
+        {
+          "value": "3",
+          "count": 102
+        },
+        {
+          "value": "1",
+          "count": 101
+        }
+      ]
+    },
+    {
+      "role": "Position-confounded cluster",
+      "temporary_name": "noisy first-patch mix",
+      "model": "TimesFM-2.5",
+      "layer": "layer 10 · cluster 3",
+      "cluster": 3,
+      "size": 327,
+      "top_domains": [
+        {
+          "value": "traffic speed",
+          "count": 106
+        },
+        {
+          "value": "simulated Gaussian data",
+          "count": 103
+        },
+        {
+          "value": "electricity transformer temperature",
+          "count": 55
+        },
+        {
+          "value": "traffic flow",
+          "count": 37
+        },
+        {
+          "value": "exchange rate",
+          "count": 10
+        }
+      ],
+      "top_taxonomy_labels": [
+        {
+          "value": "mixed_uncertain",
+          "count": 238
+        },
+        {
+          "value": "intermittent",
+          "count": 41
+        },
+        {
+          "value": "impulse_spike",
+          "count": 19
+        },
+        {
+          "value": "volatility_shift",
+          "count": 16
+        },
+        {
+          "value": "flat_low_information",
+          "count": 7
+        }
+      ],
+      "top_patch_indices": [
+        {
+          "value": "0",
+          "count": 324
+        },
+        {
+          "value": "1",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "role": "Confounded cluster",
+      "temporary_name": "first-patch behavior",
+      "model": "TimesFM-2.5",
+      "layer": "layer 10 · cluster 4",
+      "cluster": 4,
+      "size": 294,
+      "top_domains": [
+        {
+          "value": "traffic flow",
+          "count": 54
+        },
+        {
+          "value": "illness data",
+          "count": 46
+        },
+        {
+          "value": "exchange rate",
+          "count": 45
+        },
+        {
+          "value": "electricity transformer temperature",
+          "count": 41
+        },
+        {
+          "value": "weather",
+          "count": 40
+        }
+      ],
+      "top_taxonomy_labels": [
+        {
+          "value": "level_shift",
+          "count": 136
+        },
+        {
+          "value": "mixed_uncertain",
+          "count": 93
+        },
+        {
+          "value": "trend",
+          "count": 36
+        },
+        {
+          "value": "flat_low_information",
+          "count": 9
+        },
+        {
+          "value": "volatility_shift",
+          "count": 8
+        }
+      ],
+      "top_patch_indices": [
+        {
+          "value": "0",
+          "count": 294
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1147 @@
+{
+  "objective": "cross-model validation of TimesFM-derived taxonomy v1 pilot concepts",
+  "num_windows": 2200,
+  "windows_per_dataset": 100,
+  "context_len": 128,
+  "seed": 47,
+  "domain_balanced_patches_per_domain": 700,
+  "top_k": 10,
+  "prototype_bank": {
+    "path": "outputs/cross_model_validation/prototype_bank.json",
+    "num_items": 160,
+    "counts_by_concept": {
+      "strong_rising_recovery": 40,
+      "strong_falling_transition": 40,
+      "smooth_falling_transition": 40,
+      "artifact_first_patch_behavior": 40
+    },
+    "counts_by_source": {
+      "medoid": 80,
+      "high_confidence_neighbor": 80
+    },
+    "source_model": "TimesFM-2.5 layer_10 domain-balanced internal splits"
+  },
+  "dataset_summary": [
+    {
+      "dataset": "BeijingAirQuality",
+      "domain": "Beijing air quality",
+      "frequency_minutes": 60,
+      "shape": [
+        36000,
+        7,
+        3
+      ],
+      "accepted_windows": 100,
+      "attempts": 100,
+      "status": "ok"
+    },
+    {
+      "dataset": "CA",
+      "domain": "traffic flow",
+      "frequency_minutes": 15,
+      "shape": [
+        35040,
+        8600,
+        3
+      ],
+      "accepted_windows": 100,
+      "attempts": 100,
+      "status": "ok"
+    },
+    {
+      "dataset": "ETTh1",
+      "domain": "electricity transformer temperature",
+      "frequency_minutes": 60,
+      "shape": [
+        14400,
+        7,
+        5
+      ],
+      "accepted_windows": 100,
+      "attempts": 100,
+      "status": "ok"
+    },
+    {
+      "dataset": "ETTh2",
+      "domain": "electricity transformer temperature",
+      "frequency_minutes": 60,
+      "shape": [
+        14400,
+        7,
+        5
+      ],
+      "accepted_windows": 100,
+      "attempts": 102,
+      "status": "ok"
+    },
+    {
+      "dataset": "ETTm1",
+      "domain": "electricity transformer temperature",
+      "frequency_minutes": 15,
+      "shape": [
+        57600,
+        7,
+        5
+      ],
+      "accepted_windows": 100,
+      "attempts": 100,
+      "status": "ok"
+    },
+    {
+      "dataset": "ETTm2",
+      "domain": "electricity transformer temperature",
+      "frequency_minutes": 15,
+      "shape": [
+        57600,
+        7,
+        5
+      ],
+      "accepted_windows": 100,
+      "attempts": 104,
+      "status": "ok"
+    },
+    {
+      "dataset": "Electricity",
+      "domain": "electricity consumption",
+      "frequency_minutes": 60,
+      "shape": [
+        26304,
+        321,
+        5
+      ],
+      "accepted_windows": 100,
+      "attempts": 100,
+      "status": "ok"
+    },
+    {
+      "dataset": "ExchangeRate",
+      "domain": "exchange rate",
+      "frequency_minutes": 1440,
+      "shape": [
+        7588,
+        8,
+        5
+      ],
+      "accepted_windows": 100,
+      "attempts": 100,
+      "status": "ok"
+    },
+    {
+      "dataset": "GBA",
+      "domain": "traffic flow",
+      "frequency_minutes": 15,
+      "shape": [
+        35040,
+        2352,
+        3
+      ],
+      "accepted_windows": 100,
+      "attempts": 101,
+      "status": "ok"
+    },
+    {
+      "dataset": "GLA",
+      "domain": "traffic flow",
+      "frequency_minutes": 15,
+      "shape": [
+        35040,
+        3834,
+        3
+      ],
+      "accepted_windows": 100,
+      "attempts": 100,
+      "status": "ok"
+    },
+    {
+      "dataset": "Gaussian",
+      "domain": "simulated Gaussian data",
+      "frequency_minutes": null,
+      "shape": [
+        10000,
+        1,
+        1
+      ],
+      "accepted_windows": 100,
+      "attempts": 100,
+      "status": "ok"
+    },
+    {
+      "dataset": "Illness",
+      "domain": "illness data",
+      "frequency_minutes": 10080.0,
+      "shape": [
+        966,
+        7,
+        5
+      ],
+      "accepted_windows": 100,
+      "attempts": 100,
+      "status": "ok"
+    },
+    {
+      "dataset": "METR-LA",
+      "domain": "traffic speed",
+      "frequency_minutes": 5,
+      "shape": [
+        34272,
+        207,
+        3
+      ],
+      "accepted_windows": 100,
+      "attempts": 104,
+      "status": "ok"
+    },
+    {
+      "dataset": "PEMS-BAY",
+      "domain": "traffic speed",
+      "frequency_minutes": 5,
+      "shape": [
+        52116,
+        325,
+        3
+      ],
+      "accepted_windows": 100,
+      "attempts": 100,
+      "status": "ok"
+    },
+    {
+      "dataset": "PEMS03",
+      "domain": "traffic flow",
+      "frequency_minutes": 5,
+      "shape": [
+        26208,
+        358,
+        3
+      ],
+      "accepted_windows": 100,
+      "attempts": 100,
+      "status": "ok"
+    },
+    {
+      "dataset": "PEMS04",
+      "domain": "traffic flow",
+      "frequency_minutes": 5,
+      "shape": [
+        16992,
+        307,
+        3
+      ],
+      "accepted_windows": 100,
+      "attempts": 100,
+      "status": "ok"
+    },
+    {
+      "dataset": "PEMS07",
+      "domain": "traffic flow",
+      "frequency_minutes": 5,
+      "shape": [
+        28224,
+        883,
+        3
+      ],
+      "accepted_windows": 100,
+      "attempts": 100,
+      "status": "ok"
+    },
+    {
+      "dataset": "PEMS08",
+      "domain": "traffic flow",
+      "frequency_minutes": 5,
+      "shape": [
+        17856,
+        170,
+        3
+      ],
+      "accepted_windows": 100,
+      "attempts": 100,
+      "status": "ok"
+    },
+    {
+      "dataset": "Pulse",
+      "domain": "simulated pulse data",
+      "frequency_minutes": null,
+      "shape": [
+        20000,
+        1,
+        1
+      ],
+      "accepted_windows": 100,
+      "attempts": 100,
+      "status": "ok"
+    },
+    {
+      "dataset": "SD",
+      "domain": "traffic flow",
+      "frequency_minutes": 15,
+      "shape": [
+        35040,
+        716,
+        3
+      ],
+      "accepted_windows": 100,
+      "attempts": 101,
+      "status": "ok"
+    },
+    {
+      "dataset": "Traffic",
+      "domain": "road occupancy rates",
+      "frequency_minutes": 60,
+      "shape": [
+        17544,
+        862,
+        5
+      ],
+      "accepted_windows": 100,
+      "attempts": 100,
+      "status": "ok"
+    },
+    {
+      "dataset": "Weather",
+      "domain": "weather",
+      "frequency_minutes": 10,
+      "shape": [
+        52696,
+        21,
+        5
+      ],
+      "accepted_windows": 100,
+      "attempts": 102,
+      "status": "ok"
+    }
+  ],
+  "concept_specs": [
+    {
+      "name": "strong_rising_recovery",
+      "kind": "candidate",
+      "parent_cluster": 8,
+      "subcluster": 0,
+      "parent_k": 3,
+      "temporary_definition": "sustained upward patch trajectory, often recovery or rising transition"
+    },
+    {
+      "name": "strong_falling_transition",
+      "kind": "candidate",
+      "parent_cluster": 5,
+      "subcluster": 1,
+      "parent_k": 4,
+      "temporary_definition": "sustained strong downward patch trajectory"
+    },
+    {
+      "name": "smooth_falling_transition",
+      "kind": "candidate",
+      "parent_cluster": 5,
+      "subcluster": 0,
+      "parent_k": 4,
+      "temporary_definition": "smoother and weaker downward transition"
+    },
+    {
+      "name": "artifact_first_patch_behavior",
+      "kind": "negative_control",
+      "parent_cluster": 4,
+      "subcluster": null,
+      "parent_k": null,
+      "temporary_definition": "TimesFM first-patch position artifact"
+    }
+  ],
+  "model_results": [
+    {
+      "model": "timesfm_2_5",
+      "layer": "layer_10",
+      "display": "TimesFM-2.5 layer_10",
+      "evaluation_split": "full_equal_per_dataset",
+      "num_embeddings": 8800,
+      "num_mapped_prototype_patches": 160,
+      "mapped_concept_counts": {
+        "strong_rising_recovery": 40,
+        "strong_falling_transition": 40,
+        "smooth_falling_transition": 40,
+        "artifact_first_patch_behavior": 40
+      },
+      "prototype_space": {
+        "status": "ok",
+        "num_mapped": 160,
+        "num_concepts": 4,
+        "pca_dim": 20,
+        "silhouette_by_concept": 0.3087116777896881,
+        "mean_1nn_same_concept": 0.9875,
+        "mean_top5_same_concept": 0.98125,
+        "mean_1nn_same_kind": 1.0,
+        "mean_1nn_shape_correlation": 0.8022941934728237,
+        "concepts": [
+          {
+            "concept": "artifact_first_patch_behavior",
+            "num_mapped": 40,
+            "top_domains": [
+              {
+                "value": "exchange rate",
+                "count": 10
+              },
+              {
+                "value": "electricity transformer temperature",
+                "count": 8
+              },
+              {
+                "value": "traffic flow",
+                "count": 6
+              },
+              {
+                "value": "Beijing air quality",
+                "count": 5
+              },
+              {
+                "value": "illness data",
+                "count": 4
+              },
+              {
+                "value": "traffic speed",
+                "count": 3
+              }
+            ],
+            "top_patch_indices": [
+              {
+                "value": "0",
+                "count": 40
+              }
+            ],
+            "mean_1nn_same_concept": 1.0,
+            "mean_top5_same_concept": 1.0,
+            "mean_1nn_shape_correlation": 0.8855456117219344
+          },
+          {
+            "concept": "smooth_falling_transition",
+            "num_mapped": 40,
+            "top_domains": [
+              {
+                "value": "traffic flow",
+                "count": 34
+              },
+              {
+                "value": "traffic speed",
+                "count": 3
+              },
+              {
+                "value": "exchange rate",
+                "count": 2
+              },
+              {
+                "value": "electricity transformer temperature",
+                "count": 1
+              }
+            ],
+            "top_patch_indices": [
+              {
+                "value": "3",
+                "count": 18
+              },
+              {
+                "value": "2",
+                "count": 15
+              },
+              {
+                "value": "1",
+                "count": 7
+              }
+            ],
+            "mean_1nn_same_concept": 0.975,
+            "mean_top5_same_concept": 0.985,
+            "mean_1nn_shape_correlation": 0.697502917847474
+          },
+          {
+            "concept": "strong_falling_transition",
+            "num_mapped": 40,
+            "top_domains": [
+              {
+                "value": "weather",
+                "count": 22
+              },
+              {
+                "value": "traffic flow",
+                "count": 9
+              },
+              {
+                "value": "electricity transformer temperature",
+                "count": 6
+              },
+              {
+                "value": "exchange rate",
+                "count": 2
+              },
+              {
+                "value": "traffic speed",
+                "count": 1
+              }
+            ],
+            "top_patch_indices": [
+              {
+                "value": "3",
+                "count": 18
+              },
+              {
+                "value": "2",
+                "count": 17
+              },
+              {
+                "value": "1",
+                "count": 5
+              }
+            ],
+            "mean_1nn_same_concept": 0.975,
+            "mean_top5_same_concept": 0.945,
+            "mean_1nn_shape_correlation": 0.9098896648403508
+          },
+          {
+            "concept": "strong_rising_recovery",
+            "num_mapped": 40,
+            "top_domains": [
+              {
+                "value": "traffic flow",
+                "count": 29
+              },
+              {
+                "value": "weather",
+                "count": 8
+              },
+              {
+                "value": "Beijing air quality",
+                "count": 1
+              },
+              {
+                "value": "exchange rate",
+                "count": 1
+              },
+              {
+                "value": "traffic speed",
+                "count": 1
+              }
+            ],
+            "top_patch_indices": [
+              {
+                "value": "2",
+                "count": 17
+              },
+              {
+                "value": "1",
+                "count": 14
+              },
+              {
+                "value": "3",
+                "count": 9
+              }
+            ],
+            "mean_1nn_same_concept": 1.0,
+            "mean_top5_same_concept": 0.9949999999999999,
+            "mean_1nn_shape_correlation": 0.7162385794815361
+          }
+        ]
+      },
+      "global_retrieval": {
+        "strong_rising_recovery": {
+          "mean_shape_correlation": 0.7067510001659884,
+          "prototype_hit_rate": 0.1575,
+          "same_concept_hit_rate": 0.1575,
+          "same_kind_hit_rate": 0.1575,
+          "domain_diversity": 1.825,
+          "frequency_diversity": 1.725,
+          "patch_index_diversity": 2.275,
+          "num_queries": 40
+        },
+        "artifact_first_patch_behavior": {
+          "mean_shape_correlation": 0.8766745152474098,
+          "prototype_hit_rate": 0.36500000000000005,
+          "same_concept_hit_rate": 0.36500000000000005,
+          "same_kind_hit_rate": 0.36500000000000005,
+          "domain_diversity": 4.075,
+          "frequency_diversity": 3.7,
+          "patch_index_diversity": 1.0,
+          "num_queries": 40
+        },
+        "strong_falling_transition": {
+          "mean_shape_correlation": 0.8844033280186305,
+          "prototype_hit_rate": 0.28500000000000003,
+          "same_concept_hit_rate": 0.28500000000000003,
+          "same_kind_hit_rate": 0.28500000000000003,
+          "domain_diversity": 2.525,
+          "frequency_diversity": 2.125,
+          "patch_index_diversity": 2.2,
+          "num_queries": 40
+        },
+        "smooth_falling_transition": {
+          "mean_shape_correlation": 0.7300553424658174,
+          "prototype_hit_rate": 0.155,
+          "same_concept_hit_rate": 0.15250000000000002,
+          "same_kind_hit_rate": 0.155,
+          "domain_diversity": 1.4,
+          "frequency_diversity": 1.25,
+          "patch_index_diversity": 1.975,
+          "num_queries": 40
+        }
+      },
+      "matched_random_baseline": {
+        "num_queries": 160,
+        "mean_shape_correlation": 0.49823955654232144,
+        "prototype_hit_rate": 0.02375
+      }
+    },
+    {
+      "model": "chronos_2",
+      "layer": "layer_11",
+      "display": "Chronos-2 layer_11",
+      "evaluation_split": "full_equal_per_dataset",
+      "num_embeddings": 17600,
+      "num_mapped_prototype_patches": 320,
+      "mapped_concept_counts": {
+        "strong_rising_recovery": 80,
+        "strong_falling_transition": 80,
+        "smooth_falling_transition": 80,
+        "artifact_first_patch_behavior": 80
+      },
+      "prototype_space": {
+        "status": "ok",
+        "num_mapped": 320,
+        "num_concepts": 4,
+        "pca_dim": 20,
+        "silhouette_by_concept": 0.07780148088932037,
+        "mean_1nn_same_concept": 0.859375,
+        "mean_top5_same_concept": 0.778125,
+        "mean_1nn_same_kind": 0.915625,
+        "mean_1nn_shape_correlation": 0.49851046573859803,
+        "concepts": [
+          {
+            "concept": "artifact_first_patch_behavior",
+            "num_mapped": 80,
+            "top_domains": [
+              {
+                "value": "exchange rate",
+                "count": 20
+              },
+              {
+                "value": "electricity transformer temperature",
+                "count": 16
+              },
+              {
+                "value": "traffic flow",
+                "count": 12
+              },
+              {
+                "value": "Beijing air quality",
+                "count": 10
+              },
+              {
+                "value": "illness data",
+                "count": 8
+              },
+              {
+                "value": "traffic speed",
+                "count": 6
+              }
+            ],
+            "top_patch_indices": [
+              {
+                "value": "0",
+                "count": 40
+              },
+              {
+                "value": "1",
+                "count": 40
+              }
+            ],
+            "mean_1nn_same_concept": 0.7875,
+            "mean_top5_same_concept": 0.725,
+            "mean_1nn_shape_correlation": 0.43515263802733817
+          },
+          {
+            "concept": "smooth_falling_transition",
+            "num_mapped": 80,
+            "top_domains": [
+              {
+                "value": "traffic flow",
+                "count": 68
+              },
+              {
+                "value": "traffic speed",
+                "count": 6
+              },
+              {
+                "value": "exchange rate",
+                "count": 4
+              },
+              {
+                "value": "electricity transformer temperature",
+                "count": 2
+              }
+            ],
+            "top_patch_indices": [
+              {
+                "value": "6",
+                "count": 18
+              },
+              {
+                "value": "7",
+                "count": 18
+              },
+              {
+                "value": "4",
+                "count": 15
+              },
+              {
+                "value": "5",
+                "count": 15
+              },
+              {
+                "value": "2",
+                "count": 7
+              },
+              {
+                "value": "3",
+                "count": 7
+              }
+            ],
+            "mean_1nn_same_concept": 0.95,
+            "mean_top5_same_concept": 0.905,
+            "mean_1nn_shape_correlation": 0.46220330585389585
+          },
+          {
+            "concept": "strong_falling_transition",
+            "num_mapped": 80,
+            "top_domains": [
+              {
+                "value": "weather",
+                "count": 44
+              },
+              {
+                "value": "traffic flow",
+                "count": 18
+              },
+              {
+                "value": "electricity transformer temperature",
+                "count": 12
+              },
+              {
+                "value": "exchange rate",
+                "count": 4
+              },
+              {
+                "value": "traffic speed",
+                "count": 2
+              }
+            ],
+            "top_patch_indices": [
+              {
+                "value": "6",
+                "count": 18
+              },
+              {
+                "value": "7",
+                "count": 18
+              },
+              {
+                "value": "4",
+                "count": 17
+              },
+              {
+                "value": "5",
+                "count": 17
+              },
+              {
+                "value": "2",
+                "count": 5
+              },
+              {
+                "value": "3",
+                "count": 5
+              }
+            ],
+            "mean_1nn_same_concept": 0.75,
+            "mean_top5_same_concept": 0.6925000000000001,
+            "mean_1nn_shape_correlation": 0.6239013166375837
+          },
+          {
+            "concept": "strong_rising_recovery",
+            "num_mapped": 80,
+            "top_domains": [
+              {
+                "value": "traffic flow",
+                "count": 58
+              },
+              {
+                "value": "weather",
+                "count": 16
+              },
+              {
+                "value": "Beijing air quality",
+                "count": 2
+              },
+              {
+                "value": "exchange rate",
+                "count": 2
+              },
+              {
+                "value": "traffic speed",
+                "count": 2
+              }
+            ],
+            "top_patch_indices": [
+              {
+                "value": "4",
+                "count": 17
+              },
+              {
+                "value": "5",
+                "count": 17
+              },
+              {
+                "value": "2",
+                "count": 14
+              },
+              {
+                "value": "3",
+                "count": 14
+              },
+              {
+                "value": "6",
+                "count": 9
+              },
+              {
+                "value": "7",
+                "count": 9
+              }
+            ],
+            "mean_1nn_same_concept": 0.95,
+            "mean_top5_same_concept": 0.7899999999999999,
+            "mean_1nn_shape_correlation": 0.4727846024355742
+          }
+        ]
+      },
+      "global_retrieval": {
+        "strong_rising_recovery": {
+          "mean_shape_correlation": 0.4769937903031468,
+          "prototype_hit_rate": 0.09125000000000001,
+          "same_concept_hit_rate": 0.08375,
+          "same_kind_hit_rate": 0.085,
+          "domain_diversity": 2.5625,
+          "frequency_diversity": 2.6,
+          "patch_index_diversity": 4.2625,
+          "num_queries": 80
+        },
+        "artifact_first_patch_behavior": {
+          "mean_shape_correlation": 0.38009903505360065,
+          "prototype_hit_rate": 0.05500000000000001,
+          "same_concept_hit_rate": 0.043750000000000004,
+          "same_kind_hit_rate": 0.043750000000000004,
+          "domain_diversity": 3.15,
+          "frequency_diversity": 2.85,
+          "patch_index_diversity": 4.6875,
+          "num_queries": 80
+        },
+        "strong_falling_transition": {
+          "mean_shape_correlation": 0.6255296185059706,
+          "prototype_hit_rate": 0.10500000000000001,
+          "same_concept_hit_rate": 0.09375,
+          "same_kind_hit_rate": 0.10375000000000001,
+          "domain_diversity": 2.7625,
+          "frequency_diversity": 2.6375,
+          "patch_index_diversity": 4.15,
+          "num_queries": 80
+        },
+        "smooth_falling_transition": {
+          "mean_shape_correlation": 0.4909714567194743,
+          "prototype_hit_rate": 0.14625,
+          "same_concept_hit_rate": 0.13125,
+          "same_kind_hit_rate": 0.14625,
+          "domain_diversity": 1.675,
+          "frequency_diversity": 1.6375,
+          "patch_index_diversity": 2.6125,
+          "num_queries": 80
+        }
+      },
+      "matched_random_baseline": {
+        "num_queries": 320,
+        "mean_shape_correlation": 0.4180529018625876,
+        "prototype_hit_rate": 0.0159375
+      }
+    },
+    {
+      "model": "chronos_2_small",
+      "layer": "layer_5",
+      "display": "Chronos-2-small layer_5",
+      "evaluation_split": "full_equal_per_dataset",
+      "num_embeddings": 17600,
+      "num_mapped_prototype_patches": 320,
+      "mapped_concept_counts": {
+        "strong_rising_recovery": 80,
+        "strong_falling_transition": 80,
+        "smooth_falling_transition": 80,
+        "artifact_first_patch_behavior": 80
+      },
+      "prototype_space": {
+        "status": "ok",
+        "num_mapped": 320,
+        "num_concepts": 4,
+        "pca_dim": 20,
+        "silhouette_by_concept": 0.07884684205055237,
+        "mean_1nn_same_concept": 0.9,
+        "mean_top5_same_concept": 0.8099999999999999,
+        "mean_1nn_same_kind": 0.93125,
+        "mean_1nn_shape_correlation": 0.5437790026342755,
+        "concepts": [
+          {
+            "concept": "artifact_first_patch_behavior",
+            "num_mapped": 80,
+            "top_domains": [
+              {
+                "value": "exchange rate",
+                "count": 20
+              },
+              {
+                "value": "electricity transformer temperature",
+                "count": 16
+              },
+              {
+                "value": "traffic flow",
+                "count": 12
+              },
+              {
+                "value": "Beijing air quality",
+                "count": 10
+              },
+              {
+                "value": "illness data",
+                "count": 8
+              },
+              {
+                "value": "traffic speed",
+                "count": 6
+              }
+            ],
+            "top_patch_indices": [
+              {
+                "value": "0",
+                "count": 40
+              },
+              {
+                "value": "1",
+                "count": 40
+              }
+            ],
+            "mean_1nn_same_concept": 0.825,
+            "mean_top5_same_concept": 0.6824999999999999,
+            "mean_1nn_shape_correlation": 0.41523203818263993
+          },
+          {
+            "concept": "smooth_falling_transition",
+            "num_mapped": 80,
+            "top_domains": [
+              {
+                "value": "traffic flow",
+                "count": 68
+              },
+              {
+                "value": "traffic speed",
+                "count": 6
+              },
+              {
+                "value": "exchange rate",
+                "count": 4
+              },
+              {
+                "value": "electricity transformer temperature",
+                "count": 2
+              }
+            ],
+            "top_patch_indices": [
+              {
+                "value": "6",
+                "count": 18
+              },
+              {
+                "value": "7",
+                "count": 18
+              },
+              {
+                "value": "4",
+                "count": 15
+              },
+              {
+                "value": "5",
+                "count": 15
+              },
+              {
+                "value": "2",
+                "count": 7
+              },
+              {
+                "value": "3",
+                "count": 7
+              }
+            ],
+            "mean_1nn_same_concept": 0.9875,
+            "mean_top5_same_concept": 0.9174999999999999,
+            "mean_1nn_shape_correlation": 0.5085313552753995
+          },
+          {
+            "concept": "strong_falling_transition",
+            "num_mapped": 80,
+            "top_domains": [
+              {
+                "value": "weather",
+                "count": 44
+              },
+              {
+                "value": "traffic flow",
+                "count": 18
+              },
+              {
+                "value": "electricity transformer temperature",
+                "count": 12
+              },
+              {
+                "value": "exchange rate",
+                "count": 4
+              },
+              {
+                "value": "traffic speed",
+                "count": 2
+              }
+            ],
+            "top_patch_indices": [
+              {
+                "value": "6",
+                "count": 18
+              },
+              {
+                "value": "7",
+                "count": 18
+              },
+              {
+                "value": "4",
+                "count": 17
+              },
+              {
+                "value": "5",
+                "count": 17
+              },
+              {
+                "value": "2",
+                "count": 5
+              },
+              {
+                "value": "3",
+                "count": 5
+              }
+            ],
+            "mean_1nn_same_concept": 0.875,
+            "mean_top5_same_concept": 0.8175000000000001,
+            "mean_1nn_shape_correlation": 0.7289872200155465
+          },
+          {
+            "concept": "strong_rising_recovery",
+            "num_mapped": 80,
+            "top_domains": [
+              {
+                "value": "traffic flow",
+                "count": 58
+              },
+              {
+                "value": "weather",
+                "count": 16
+              },
+              {
+                "value": "Beijing air quality",
+                "count": 2
+              },
+              {
+                "value": "exchange rate",
+                "count": 2
+              },
+              {
+                "value": "traffic speed",
+                "count": 2
+              }
+            ],
+            "top_patch_indices": [
+              {
+                "value": "4",
+                "count": 17
+              },
+              {
+                "value": "5",
+                "count": 17
+              },
+              {
+                "value": "2",
+                "count": 14
+              },
+              {
+                "value": "3",
+                "count": 14
+              },
+              {
+                "value": "6",
+                "count": 9
+              },
+              {
+                "value": "7",
+                "count": 9
+              }
+            ],
+            "mean_1nn_same_concept": 0.9125,
+            "mean_top5_same_concept": 0.8225,
+            "mean_1nn_shape_correlation": 0.522365397063516
+          }
+        ]
+      },
+      "global_retrieval": {
+        "strong_rising_recovery": {
+          "mean_shape_correlation": 0.4963963609890795,
+          "prototype_hit_rate": 0.11374999999999999,
+          "same_concept_hit_rate": 0.10625,
+          "same_kind_hit_rate": 0.1075,
+          "domain_diversity": 2.4875,
+          "frequency_diversity": 2.5,
+          "patch_index_diversity": 4.2375,
+          "num_queries": 80
+        },
+        "artifact_first_patch_behavior": {
+          "mean_shape_correlation": 0.3321802267039748,
+          "prototype_hit_rate": 0.041249999999999995,
+          "same_concept_hit_rate": 0.035,
+          "same_kind_hit_rate": 0.035,
+          "domain_diversity": 3.025,
+          "frequency_diversity": 2.7875,
+          "patch_index_diversity": 4.575,
+          "num_queries": 80
+        },
+        "strong_falling_transition": {
+          "mean_shape_correlation": 0.6304227579124999,
+          "prototype_hit_rate": 0.10999999999999999,
+          "same_concept_hit_rate": 0.09375,
+          "same_kind_hit_rate": 0.10874999999999999,
+          "domain_diversity": 2.9625,
+          "frequency_diversity": 2.8625,
+          "patch_index_diversity": 4.375,
+          "num_queries": 80
+        },
+        "smooth_falling_transition": {
+          "mean_shape_correlation": 0.47739893983623294,
+          "prototype_hit_rate": 0.1975,
+          "same_concept_hit_rate": 0.1875,
+          "same_kind_hit_rate": 0.1975,
+          "domain_diversity": 1.625,
+          "frequency_diversity": 1.55,
+          "patch_index_diversity": 3.075,
+          "num_queries": 80
+        }
+      },
+      "matched_random_baseline": {
+        "num_queries": 320,
+        "mean_shape_correlation": 0.3949329215851455,
+        "prototype_hit_rate": 0.018437500000000002
+      }
+    }
+  ],
+  "figures": {
+    "prototype_curves": "outputs/cross_model_validation/figures/cross_model_prototype_curves.png",
+    "prototype_space_agreement": "outputs/cross_model_validation/figures/cross_model_prototype_space_agreement.png",
+    "global_retrieval_shape": "outputs/cross_model_validation/figures/cross_model_global_retrieval_shape.png"
+  }
+}

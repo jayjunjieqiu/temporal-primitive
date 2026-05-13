@@ -7,8 +7,10 @@ dependencies = [
   "accelerate>=0.34,<2",
   "aeon>=1.4,<2",
   "chronos-forecasting",
+  "matplotlib>=3.10.9",
   "numpy>=2,<3",
   "pandas>=2,<3",
+  "pillow>=12.2.0",
   "pyts>=0.13,<1",
   "ruptures>=1.1,<2",
   "scikit-learn>=1.6,<2",
@@ -23,3 +25,7 @@ dependencies = [
 [tool.uv.sources]
 chronos-forecasting = { path = "external/chronos-forecasting", editable = true }
 timesfm = { path = "external/timesfm", editable = true }
+
+[[tool.uv.index]]
+url = "https://pypi.tuna.tsinghua.edu.cn/simple"
+default = true

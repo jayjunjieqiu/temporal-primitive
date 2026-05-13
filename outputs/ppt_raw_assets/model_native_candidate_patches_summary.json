@@ -1,0 +1,216 @@
+{
+  "purpose": "raw PPT figure source; model-native second-pilot candidates only",
+  "candidates": [
+    {
+      "model": "TimesFM-2.5",
+      "layer": "layer 10",
+      "cluster": 5,
+      "temporary_name": "smooth transition-like",
+      "size": 667,
+      "top_domains": [
+        {
+          "value": "traffic flow",
+          "count": 220
+        },
+        {
+          "value": "weather",
+          "count": 115
+        },
+        {
+          "value": "Beijing air quality",
+          "count": 93
+        },
+        {
+          "value": "electricity transformer temperature",
+          "count": 90
+        },
+        {
+          "value": "exchange rate",
+          "count": 88
+        }
+      ],
+      "top_taxonomy_labels": [
+        {
+          "value": "mixed_uncertain",
+          "count": 229
+        },
+        {
+          "value": "level_shift",
+          "count": 224
+        },
+        {
+          "value": "trend",
+          "count": 140
+        },
+        {
+          "value": "volatility_shift",
+          "count": 21
+        },
+        {
+          "value": "flat_low_information",
+          "count": 21
+        }
+      ],
+      "top_patch_indices": [
+        {
+          "value": "1",
+          "count": 233
+        },
+        {
+          "value": "3",
+          "count": 225
+        },
+        {
+          "value": "2",
+          "count": 209
+        }
+      ]
+    },
+    {
+      "model": "Chronos-2",
+      "layer": "layer 11",
+      "cluster": 9,
+      "temporary_name": "falling transition-like",
+      "size": 446,
+      "top_domains": [
+        {
+          "value": "road occupancy rates",
+          "count": 130
+        },
+        {
+          "value": "illness data",
+          "count": 129
+        },
+        {
+          "value": "electricity consumption",
+          "count": 88
+        },
+        {
+          "value": "electricity transformer temperature",
+          "count": 45
+        },
+        {
+          "value": "Beijing air quality",
+          "count": 25
+        }
+      ],
+      "top_taxonomy_labels": [
+        {
+          "value": "trend",
+          "count": 163
+        },
+        {
+          "value": "level_shift",
+          "count": 160
+        },
+        {
+          "value": "mixed_uncertain",
+          "count": 95
+        },
+        {
+          "value": "oscillation",
+          "count": 7
+        },
+        {
+          "value": "impulse_spike",
+          "count": 7
+        }
+      ],
+      "top_patch_indices": [
+        {
+          "value": "5",
+          "count": 62
+        },
+        {
+          "value": "3",
+          "count": 58
+        },
+        {
+          "value": "1",
+          "count": 58
+        },
+        {
+          "value": "6",
+          "count": 57
+        },
+        {
+          "value": "0",
+          "count": 57
+        }
+      ]
+    },
+    {
+      "model": "Chronos-2-small",
+      "layer": "layer 5",
+      "cluster": 13,
+      "temporary_name": "rising transition-like",
+      "size": 457,
+      "top_domains": [
+        {
+          "value": "road occupancy rates",
+          "count": 175
+        },
+        {
+          "value": "electricity consumption",
+          "count": 156
+        },
+        {
+          "value": "illness data",
+          "count": 51
+        },
+        {
+          "value": "electricity transformer temperature",
+          "count": 50
+        },
+        {
+          "value": "Beijing air quality",
+          "count": 16
+        }
+      ],
+      "top_taxonomy_labels": [
+        {
+          "value": "level_shift",
+          "count": 199
+        },
+        {
+          "value": "mixed_uncertain",
+          "count": 154
+        },
+        {
+          "value": "trend",
+          "count": 43
+        },
+        {
+          "value": "impulse_spike",
+          "count": 12
+        },
+        {
+          "value": "volatility_shift",
+          "count": 11
+        }
+      ],
+      "top_patch_indices": [
+        {
+          "value": "6",
+          "count": 66
+        },
+        {
+          "value": "5",
+          "count": 66
+        },
+        {
+          "value": "0",
+          "count": 59
+        },
+        {
+          "value": "3",
+          "count": 58
+        },
+        {
+          "value": "1",
+          "count": 56
+        }
+      ]
+    }
+  ]
+}

@@ -30,6 +30,11 @@ external/
 outputs/**
 !outputs/
 !outputs/*.json
+!outputs/figures/
+!outputs/figures/second_pilot/
+!outputs/figures/second_pilot/*.png
+!outputs/input_embedding_ablation/
+!outputs/input_embedding_ablation/input_embedding_ablation_summary.json
 !outputs/cluster_cards/
 !outputs/cluster_cards/cluster_card_summary.json
 !outputs/cluster_cards/cards/

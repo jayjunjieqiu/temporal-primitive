@@ -1,0 +1,22 @@
+{
+  "purpose": "advisor meeting PPT assets",
+  "style": "publication-style white background, consistent panel labels, Chinese-English labels",
+  "paths": [
+    "outputs/ppt_assets/ppt_slide01_story_question.png",
+    "outputs/ppt_assets/ppt_slide02_gap_and_question.png",
+    "outputs/ppt_assets/ppt_slide03_research_hypotheses.png",
+    "outputs/ppt_assets/ppt_slide04_prior_motif_probe_math.png",
+    "outputs/ppt_assets/ppt_backup_prior_probe_full_math.png",
+    "outputs/ppt_assets/ppt_slide05_discovery_protocol.png",
+    "outputs/ppt_assets/ppt_slide06_timesfm_clustering_evidence.png",
+    "outputs/ppt_assets/ppt_slide07_representative_falling_evidence.png",
+    "outputs/ppt_assets/ppt_backup_candidate_prototype_quality.png",
+    "outputs/ppt_assets/ppt_slide08_native_model_evidence.png",
+    "outputs/ppt_assets/ppt_slide08_representation_lineage.png",
+    "outputs/ppt_assets/ppt_slide09_artifact_negative_control.png",
+    "outputs/ppt_assets/ppt_slide10_candidate_family_inventory.png",
+    "outputs/ppt_assets/ppt_slide11_controlled_retrieval.png",
+    "outputs/ppt_assets/ppt_slide12_cross_model_validation.png",
+    "outputs/ppt_assets/ppt_backup_layer_choice.png"
+  ]
+}

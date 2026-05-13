@@ -13,16 +13,33 @@
 
 ## 未完全恢复
 
-- 本地模型权重目录：`chronos-2/`、`chronos-2-small/`、`timesfm-2.5-200m-pytorch/`
 - external 代码库：`external/chronos-forecasting`、`external/timesfm`
 - 运行产物与图片：`outputs/`
 - `.venv`
 - 原始 `.git` 历史
 
+## 本地权重恢复
+
+本地模型权重已重新下载到：
+
+- `chronos-2/`
+- `chronos-2-small/`
+- `timesfm-2.5-200m-pytorch/`
+
+默认下载方式见 `docs/local_model_download.md`。核心原则是使用 `hf-mirror` 的 `hfd.sh`，并在下载命令中显式：
+
+- `HF_ENDPOINT=https://hf-mirror.com`
+- `unset`/`env -u` 所有 `http_proxy`、`https_proxy`、`HTTP_PROXY`、`HTTPS_PROXY`、`ALL_PROXY`、`all_proxy`
+
+其中 `Chronos-2-small` 的 repo id 是 `autogluon/chronos-2-small`。
+
 ## 验证状态
 
 - 已对关键脚本执行 `python -m py_compile`，语法检查通过。
-- 由于 outputs 和模型权重未恢复，PPT 图片重生成与 TSFM 实验脚本需要重新准备依赖后再运行。
+- 模型权重已恢复。
+- `external/chronos-forecasting` 和 `external/timesfm` 已重新 clone。
+- `.venv` 已通过无 proxy 的 `uv sync` 恢复；`sklearn` import 由 `scikit-learn` 提供。
+- PPT 图片重生成仍需要重跑中间 `outputs/`。
 
 ## 建议
 
