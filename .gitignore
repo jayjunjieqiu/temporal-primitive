@@ -7,6 +7,9 @@ __pycache__/
 .mypy_cache/
 
 # Local model weights and large checkpoints
+chronos-2/
+chronos-2-small/
+timesfm-2.5-200m-pytorch/
 *.safetensors
 *.bin
 *.pt
