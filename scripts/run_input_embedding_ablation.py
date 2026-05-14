@@ -355,7 +355,7 @@ def save_figures(
             item = int(chosen[col])
             ax.plot(robust_z(patches[item]), linewidth=1.2)
             m = meta[item]
-            ax.set_title(f"c{cid} {m['dataset']} p{m['patch_index']} {m['taxonomy_label']}", fontsize=6)
+            ax.set_title(f"C{cid} nearest {col + 1}\n{m['dataset']} p{m['patch_index']}", fontsize=6)
             ax.set_xticks([])
             ax.set_yticks([])
     fig.tight_layout()

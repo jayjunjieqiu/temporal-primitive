@@ -486,7 +486,7 @@ def save_prototype_panels(
                 ax.plot(patch, linewidth=1.2)
                 meta = metadata[item]
                 ax.set_title(
-                    f"c{cid} {meta['dataset']} p{meta['patch_index']} {meta['taxonomy_label']}",
+                    f"C{cid} nearest {col + 1}\n{meta['dataset']} p{meta['patch_index']}",
                     fontsize=6,
                 )
                 ax.set_xticks([])
