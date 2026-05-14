@@ -1,5 +1,22 @@
 # Chronos-2 Layer Effect Report: 聚类和 motif 空间如何随层变化
 
+## 0. 导师真正想回答的问题
+
+这份报告后续要服务的不是“多画一些 cluster 图”，而是 Yuxuan Liang 老师在 meeting 中反复追问的几个机制问题：
+
+1. **Single patch 是否仍然有信息**：一个 patch 被放进 Chronos-2 的 whole context sentence 之后，是否还保留相对独立的 local temporal information？
+2. **不同层在学什么**：`projection`、`layer_0`、`layer_6`、`layer_11` 是否分别对应 pre-contextual patch token、early local vocabulary、contextual mixing、more contextualized representation？
+3. **早层是不是更适合看 motif**：老师的直觉是 early layers 更保留 spike、oscillation、trend 等 local information；middle layers 开始融合 context；top layer 更全局。这个直觉需要用 evidence 支撑，而不是只凭可视化印象。
+4. **聚类中心在原空间长什么样**：老师希望使用 KMeans center 作为 cluster center，并用离 center 最近的真实 raw patches 作为 examples，而不是随便挑样本。
+5. **是否存在跨领域语义**：nearest examples 不能只来自 1-2 个 dataset。需要检查同一个 cluster center 是否能在多个 macro-domain 中找到可信原空间 patch。
+6. **K 是否合理**：K 的选择必须有定量依据，不能只靠经验公式或哪张图好看。
+7. **prior-guided motif 的边界**：human-prior motif 可以帮助解释，但不是 ground truth；KMeans cluster 不能直接用 prior-guided motif 名字命名。
+8. **主证据和诊断证据要分开**：好看的图如果 confounder 高，只能作为 diagnostic/failure case；主报告图必须通过稳定性、跨领域性、原空间一致性和 confounder audit。
+
+因此，下一版报告应围绕一个更严格的问题组织：
+
+> Chronos-2 的 patch representation 在 projection、early、middle、late layers 中，是否保留 local temporal primitives，并如何把这些 primitives 重组为 contextualized cross-domain temporal concepts？
+
 ## 1. 这次只回答一个问题
 
 老师的直觉是对的：如果我们想知道 **single patch 是否仍然保留局部信息**，Chronos-2 的 early layers 应该优先看。  
@@ -217,13 +234,17 @@ t-SNE view：
 
 ## 6. 我们接下来该怎么做
 
-下一步不应该再只看一个 cluster 图，而是按下面的顺序做：
+下一步不应该再只看一个 cluster 图，也不应该只追求“画得更好看”。应该按老师关心的问题，把实验升级为一个可复现的 multi-layer validation：
 
-1. 以 `layer_0` 为主，建立 Chronos-native local patch vocabulary baseline。
-2. 以 KMeans center 为锚点，系统导出每个 cluster 的 nearest examples。
-3. 对 `layer_0 -> layer_6 -> layer_11` 做 lineage tracing，判断哪些 motif family 被保留，哪些被上下文化重组。
-4. 对“原空间能解释、早层能保留、深层还能复现”的 cluster，才考虑进入 candidate motif family。
+1. 覆盖 `projection`、`layer_0`、`layer_6`、`layer_11`，不要只看 `layer_0`。
+2. 把当前 `100 windows/dataset` pilot 扩展到更稳的 `500 windows/dataset`，必要时做 `1000 windows/dataset` sanity check。
+3. 从 source-domain balanced 改成 macro-domain balanced，并限制 macro-domain 内单个 dataset 的最大贡献。
+4. 用 K sweep 选择 final K setting，综合 silhouette、Calinski-Harabasz、Davies-Bouldin、seed stability、KMeans vs Agglomerative NMI、cluster size、confounder NMI 和 original-space interpretability。
+5. 以 KMeans center 为锚点，系统导出 center-nearest raw patch examples。
+6. 生成 confidence-filtered macro-domain examples：没有可信 match 的 cell 留空或标记 no confident match，不再强行展示弱样本。
+7. 把 prior-guided motif 作为 audit probe，检查 model-derived clusters 和 human-prior motif 是否错位，但不把它作为 ground truth。
+8. 把主证据图和 diagnostic/failure-case 图分开：主证据必须稳定、跨领域、原空间可解释、confounder 风险低。
 
 一句话版本：
 
-> 如果我们要证明 single patch 仍然带着局部语义，Chronos-2 的 early layer 是最应该看的；如果我们要看 context 如何重组 motif，才往中后层走。
+> 如果我们要证明 single patch 仍然带着局部语义，需要看 projection 和 early layer；如果我们要解释 context 如何重组 motif，则必须同时看 layer_6 和 layer_11，并用严格的 K selection、macro-domain validation 和 original-space evidence 支撑结论。
