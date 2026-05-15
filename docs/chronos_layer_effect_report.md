@@ -1,250 +1,198 @@
 # Chronos-2 Layer Effect Report: 聚类和 motif 空间如何随层变化
 
-## 0. 导师真正想回答的问题
+## 0. Advisor Question
 
-这份报告后续要服务的不是“多画一些 cluster 图”，而是 Yuxuan Liang 老师在 meeting 中反复追问的几个机制问题：
+这版报告回答 Yuxuan Liang 老师关心的机制问题：Chronos-2 的 `projection`、`layer_0`、`layer_6`、`layer_11` 是否保留 single patch 的 local temporal information，以及这些 local primitives 如何被 transformer layers 重组为 contextualized cross-domain temporal concepts。
 
-1. **Single patch 是否仍然有信息**：一个 patch 被放进 Chronos-2 的 whole context sentence 之后，是否还保留相对独立的 local temporal information？
-2. **不同层在学什么**：`projection`、`layer_0`、`layer_6`、`layer_11` 是否分别对应 pre-contextual patch token、early local vocabulary、contextual mixing、more contextualized representation？
-3. **早层是不是更适合看 motif**：老师的直觉是 early layers 更保留 spike、oscillation、trend 等 local information；middle layers 开始融合 context；top layer 更全局。这个直觉需要用 evidence 支撑，而不是只凭可视化印象。
-4. **聚类中心在原空间长什么样**：老师希望使用 KMeans center 作为 cluster center，并用离 center 最近的真实 raw patches 作为 examples，而不是随便挑样本。
-5. **是否存在跨领域语义**：nearest examples 不能只来自 1-2 个 dataset。需要检查同一个 cluster center 是否能在多个 macro-domain 中找到可信原空间 patch。
-6. **K 是否合理**：K 的选择必须有定量依据，不能只靠经验公式或哪张图好看。
-7. **prior-guided motif 的边界**：human-prior motif 可以帮助解释，但不是 ground truth；KMeans cluster 不能直接用 prior-guided motif 名字命名。
-8. **主证据和诊断证据要分开**：好看的图如果 confounder 高，只能作为 diagnostic/failure case；主报告图必须通过稳定性、跨领域性、原空间一致性和 confounder audit。
+我们不把 `prior-guided motif` 当 ground truth，也不把它用于命名 KMeans clusters。所有 cluster 只写作 `C0, C1, ...`。
 
-因此，下一版报告应围绕一个更严格的问题组织：
+## 1. Pilot Limitations
 
-> Chronos-2 的 patch representation 在 projection、early、middle、late layers 中，是否保留 local temporal primitives，并如何把这些 primitives 重组为 contextualized cross-domain temporal concepts？
+- old windows per dataset: `100`
+- old context length / patch length: `128` / `16`
+- old raw windows / estimated raw patches: `2200` / `17600`
+- old clustered patches per representation: `{'raw_patch': 7700, 'projection': 7700, 'layer_0': 7700, 'layer_6': 7700, 'layer_11': 7700}`
+- old K rule result: `{'raw_patch': 15, 'projection': 15, 'layer_0': 15, 'layer_6': 15, 'layer_11': 15}`
 
-## 1. 这次只回答一个问题
+旧 macro-domain nearest 图是有价值的 diagnostic，但不适合作为主证据：它强制每个 cluster-domain cell 都找 nearest sample，因此即使某个 macro-domain 没有可信 match，也会出现视觉上很弱的曲线。
 
-老师的直觉是对的：如果我们想知道 **single patch 是否仍然保留局部信息**，Chronos-2 的 early layers 应该优先看。  
-这份短报告只看 `Chronos-2`，不混 TimesFM。
+## 2. Improved Experimental Protocol
 
-这里的阅读方式也按照老师建议来：**用 KMeans center 作为 cluster center，再用离 center 最近的点做 example**。  
-所以下面的 original-space 图，不是“随便挑的样本”，而是围绕 cluster center 的 nearest examples。
+- model: `Chronos-2`
+- representations: `projection, layer_0, layer_6, layer_11`
+- windows per dataset: `500`
+- selected balance mode: `macro_domain`
+- max patches per macro-domain: `1500`
+- max patches per dataset within macro-domain: `350`
+- K candidates after coarse-to-fine search are recorded in `k_sweep_metrics.csv`。
 
-更具体地说：
+K selection 不使用 silhouette-only，而是综合 seed stability、KMeans vs Agglomerative agreement、cluster size、confounder NMI、Davies-Bouldin 和 original-space evidence。
 
-- 先在每个 representation 上做 `StandardScaler -> PCA -> KMeans`，用它作为 cluster candidate generator。
-- KMeans cluster label 只写成 `C0, C1, ...`，不提前命名。
-- 每个 cluster 的中心使用 `kmeans.cluster_centers_`。
-- 原空间展示的是离该 center 最近的 raw patches。
-- `trend / level shift / spike` 这类词只能作为人工后验解释或 prior-guided audit probe，不能写成 cluster 自己的名字。
+主证据筛选也预先定义：cluster 不能太小，center-nearest raw patches 需要视觉一致，confidence-filtered macro-domain view 需要多个真实 macro-domain 的可信 match，同时不能明显被 single dataset、frequency 或 patch index 主导。
 
-每个 representation 还额外画配对图：左边是 KMeans cluster，右边是在同一二维坐标上按 `prior-guided motif probe` 上色。  
-这张图的用途是审计二者是否对齐，而不是把 prior-guided label 当成 cluster ground truth。
+## 3. K Selection Result
 
-### 1.1 为什么新增 t-SNE view
+Recommended shared K: **`6`**
 
-老师指出只用 PCA 二维图来展示 representation space，不太符合领域里做 embedding visualization 的常见汇报习惯。  
-所以本报告新增一套 `t-SNE` view，并保留原来的 PCA 图作为 reference。
+| representation | recommended per-layer K | top candidates |
+|---|---:|---|
+| `projection` | 6 | `[6, 7, 9, 8, 20]` |
+| `layer_0` | 6 | `[6, 7, 20, 12, 18]` |
+| `layer_6` | 10 | `[10, 9, 11, 16, 12]` |
+| `layer_11` | 6 | `[6, 7, 9, 10, 8]` |
 
-这里要特别说明一个边界：
+`layer_6` 的 per-layer K 倾向更细的划分，但本报告主图采用 shared K，是为了让 `projection -> layer_0 -> layer_6 -> layer_11` 的层间比较保持同一 operating point。这不是否认 `layer_6` 内部可能需要更细 taxonomy，而是把它留作下一步 layer-specific split analysis。
 
-- KMeans cluster、silhouette、stability、NMI、center-nearest examples 的计算仍然基于 `StandardScaler -> PCA(max 30 dims)` 空间。
-- `t-SNE` 只用于二维可视化，不作为新的聚类依据。
-- `t-SNE` 输入是上述 PCA clustering space，`perplexity=40`，`init=pca`，`random_state=47`。
-- 因此，t-SNE 图回答的是“这些 KMeans labels 在非线性二维 view 里是否仍有局部结构”，而不是重新定义 cluster。
+选择 shared K 的理由不是它在每个单项指标上都最优，而是它在四层中同时满足：seed stability 高、cluster size 不碎、confounder NMI 相对可控，并且可以生成可解释的 original-space evidence。
 
-### 1.2 为什么加入 macro-domain view
+![K selection summary](../outputs/chronos_multilayer_validation/figures/k_selection_summary.png)
 
-老师提醒的一个关键点是：只看每个 cluster center 的 nearest 4，可能会被少数 dataset 主导。  
-例如某个 cluster 的最近 4 个样本都来自 `Traffic` 或 `ETT`，视觉上看起来很一致，但我们不知道它到底是一个跨领域的 local motif，还是一个 dataset/domain artifact。
+## 4. Layer-wise Validation Summary
 
-所以这里新增一个 **macro-domain nearest view**：对每个 KMeans cluster center，不再只取全局最近的 4 个点，而是在每个 macro-domain 内各找一个离 center 最近的 raw patch。  
-它回答的是：
+| representation | K | silhouette | stability | agg NMI | macro NMI | frequency NMI | high-conf macro rate |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| `projection` | 6 | 0.137 | 0.976 | 0.504 | 0.077 | 0.094 | 0.967 |
+| `layer_0` | 6 | 0.088 | 0.968 | 0.491 | 0.092 | 0.105 | 0.933 |
+| `layer_6` | 6 | 0.076 | 0.993 | 0.497 | 0.257 | 0.306 | 0.700 |
+| `layer_11` | 6 | 0.170 | 0.992 | 0.572 | 0.169 | 0.186 | 0.933 |
 
-> 如果这个 cluster center 真的是一个相对通用的 temporal concept，那么在 Traffic / Energy / Environment / Finance / Health 这些不同应用领域里，是否都能找到相似的原空间 patch？
+Metric 读法：
 
-当前 macro-domain 分组如下。这个分组不是最终 taxonomy，只是为了做跨领域诊断：
+| metric | 含义 | 方向 | 注意事项 |
+|---|---|---|---|
+| `silhouette` | 样本到本 cluster 的紧密度相对其它 cluster 的分离度。 | 越高越好 | 不能单独用来选 K，因为高分可能来自过粗划分或 domain separation。 |
+| `stability` | 不同 KMeans random seeds 得到的 labels 的 NMI 平均值。 | 越高越好 | 表示 clustering 对初始化不敏感，但不等于语义正确。 |
+| `agg NMI` | KMeans labels 与 AgglomerativeClustering labels 的 NMI。 | 越高越好 | 表示 cluster structure 不太依赖单一聚类算法。 |
+| `macro NMI` | cluster labels 与 macro-domain labels 的 NMI。 | 通常越低越好 | 高值提示 domain confounding；若研究 domain-specific concept，则可作为警告而非直接否定。 |
+| `frequency NMI` | cluster labels 与采样频率/cadence labels 的 NMI。 | 通常越低越好 | 高值提示 frequency/cadence confounding。 |
+| `high-conf macro rate` | cluster × real macro-domain cell 中存在同 cluster 且距离中心足够近的比例。 | 越高越好 | 用于检查原空间 prototype 能否跨真实 macro-domain 复现，不含 Synthetic control。 |
 
-| macro-domain | source domains |
-|---|---|
-| `Traffic` | `traffic flow`, `traffic speed`, `road occupancy rates` |
-| `Energy` | `electricity consumption`, `electricity transformer temperature` |
-| `Environment` | `weather`, `Beijing air quality` |
-| `Finance` | `exchange rate` |
-| `Health` | `illness data` |
-| `Synthetic control` | `simulated Gaussian data`, `simulated pulse data` |
+![Layer comparison summary](../outputs/chronos_multilayer_validation/figures/layer_comparison_summary.png)
 
-macro-domain 图的读法：
+读法：`projection` 和 `layer_0` 更接近 local patch vocabulary；`layer_6` 与 `layer_11` 通常更稳定，但更容易吸收 domain/frequency/context-style 信息。
 
-- 每一行是一个 KMeans cluster：`C0, C1, ...`。
-- 每一列是一个 macro-domain。
-- 每个小图是在该 macro-domain 内，距离当前 KMeans center 最近的 raw patch。
-- 距离是在对应 representation 的 `StandardScaler -> PCA` 空间里计算的，不是在原始曲线空间里计算的。
-- 黑色实线边框：这个 patch 本身也被 KMeans 分到了该行 cluster。
-- 灰色虚线边框：它是该 macro-domain 里离该 center 最近的 patch，但 KMeans 分到了另一个 cluster。
-- 红色虚线边框：不仅被分到另一个 cluster，而且距离超过该 cluster 内距离的 90% 分位数，属于弱匹配。
+## 5. All-cluster Evidence Figures
 
-这张图不替代 nearest 4；它是一个 confounder audit。nearest 4 负责看 cluster center 附近最典型的样子，macro-domain view 负责看这个中心是否能跨领域复现。
+为避免 cherry-picking，本节每个 representation 都展示 final shared K 下的全部 clusters。也就是说，`K=6` 时每层都展示 `C0-C5`。
+质量闸门仍然保留，但它只用于解释每个 cluster 的证据强弱，不用于隐藏结果。
 
-## 2. 原空间里先有 motif 了吗？
+### projection
 
-有。raw-space 本身就已经出现了比较清楚的局部形态族，这说明我们不是在模型里“硬造”概念。
+![projection center nearest](../outputs/chronos_multilayer_validation/figures/projection_main_center_nearest.png)
 
-PCA reference：
+![projection macro-domain filtered](../outputs/chronos_multilayer_validation/figures/projection_main_macro_domain_filtered.png)
 
-![Chronos raw-space PCA cluster vs prior probe](../outputs/chronos_layer_effect/figures/chronos_layer_effect_raw_patch_cluster_vs_prior_probe.png)
+All clusters under this K setting:
 
-t-SNE view：
+| cluster | tier | size | score | macro domains | raw coherence | confounder risk | interpretation status |
+|---|---|---:|---:|---:|---:|---:|---|
+| `C0` | `main_evidence` | 560 | 0.886 | 4 | 0.739 | 0.452 | candidate concept |
+| `C1` | `main_evidence` | 1422 | 1.000 | 5 | 1.000 | 0.255 | candidate concept |
+| `C2` | `main_evidence` | 669 | 0.930 | 5 | 0.968 | 0.472 | candidate concept |
+| `C3` | `main_evidence` | 683 | 0.937 | 5 | 0.950 | 0.449 | candidate concept |
+| `C4` | `main_evidence` | 842 | 0.876 | 5 | 0.503 | 0.359 | candidate concept |
+| `C5` | `diagnostic_weak` | 924 | 0.853 | 5 | 0.447 | 0.379 | weak diagnostic |
 
-![Chronos raw-space t-SNE cluster vs prior probe](../outputs/chronos_layer_effect/figures/chronos_layer_effect_raw_patch_tsne_cluster_vs_prior_probe.png)
+### layer_0
 
-![Chronos raw-space center-nearest patches](../outputs/chronos_layer_effect/figures/chronos_layer_effect_raw_patch_center_nearest_patches.png)
+![layer_0 center nearest](../outputs/chronos_multilayer_validation/figures/layer_0_main_center_nearest.png)
 
-![Chronos raw-space macro-domain nearest patches](../outputs/chronos_layer_effect/figures/chronos_layer_effect_raw_patch_macro_domain_nearest_patches.png)
+![layer_0 macro-domain filtered](../outputs/chronos_multilayer_validation/figures/layer_0_main_macro_domain_filtered.png)
 
-这张图是直接在 raw patch 空间聚类后，每个 KMeans center 最近的原始 patch。它不使用 prior-guided motif 名字。  
-从视觉上看，原空间里已经存在一些可解释的 shape family，例如：
+All clusters under this K setting:
 
-- `level_shift`
-- `trend`
-- `burst`
-- `oscillation`
-- `flat_low_information`
-- `mixed_uncertain`
+| cluster | tier | size | score | macro domains | raw coherence | confounder risk | interpretation status |
+|---|---|---:|---:|---:|---:|---:|---|
+| `C0` | `main_evidence` | 878 | 0.979 | 5 | 0.912 | 0.343 | candidate concept |
+| `C1` | `diagnostic_weak` | 1088 | 0.847 | 5 | 0.364 | 0.344 | weak diagnostic |
+| `C2` | `diagnostic_weak` | 1086 | 0.827 | 5 | 0.278 | 0.208 | weak diagnostic |
+| `C3` | `diagnostic_weak` | 196 | 0.477 | 3 | 0.300 | 0.903 | weak diagnostic |
+| `C4` | `main_evidence` | 924 | 0.931 | 5 | 0.941 | 0.458 | candidate concept |
+| `C5` | `main_evidence` | 928 | 0.939 | 5 | 0.951 | 0.446 | candidate concept |
 
-所以更准确的说法不是“模型发明了 motif”，而是：
+### layer_6
 
-> 原空间里本来就有一些 shape family，Chronos 的不同层是在重新组织这些 family。
+![layer_6 center nearest](../outputs/chronos_multilayer_validation/figures/layer_6_main_center_nearest.png)
 
-### 2.1 最早的 token/projection 也还保留局部信息
+![layer_6 macro-domain filtered](../outputs/chronos_multilayer_validation/figures/layer_6_main_macro_domain_filtered.png)
 
-PCA reference：
+All clusters under this K setting:
 
-![Chronos projection cluster vs prior probe](../outputs/chronos_layer_effect/figures/chronos_layer_effect_projection_cluster_vs_prior_probe.png)
+| cluster | tier | size | score | macro domains | raw coherence | confounder risk | interpretation status |
+|---|---|---:|---:|---:|---:|---:|---|
+| `C0` | `diagnostic_weak` | 881 | 0.671 | 1 | 0.566 | 0.262 | weak diagnostic |
+| `C1` | `diagnostic_weak` | 539 | 0.669 | 4 | 0.258 | 0.649 | weak diagnostic |
+| `C2` | `diagnostic_weak` | 1377 | 0.799 | 5 | 0.218 | 0.375 | weak diagnostic |
+| `C3` | `diagnostic_weak` | 391 | 0.722 | 4 | 1.000 | 0.895 | weak diagnostic |
+| `C4` | `diagnostic_confounded` | 721 | 0.440 | 2 | 0.458 | 0.979 | confounded diagnostic |
+| `C5` | `diagnostic_weak` | 1191 | 0.824 | 5 | 0.267 | 0.301 | weak diagnostic |
 
-t-SNE view：
+### layer_11
 
-![Chronos projection t-SNE cluster vs prior probe](../outputs/chronos_layer_effect/figures/chronos_layer_effect_projection_tsne_cluster_vs_prior_probe.png)
+![layer_11 center nearest](../outputs/chronos_multilayer_validation/figures/layer_11_main_center_nearest.png)
 
-![Chronos projection center-nearest patches](../outputs/chronos_layer_effect/figures/chronos_layer_effect_projection_center_nearest_patches.png)
+![layer_11 macro-domain filtered](../outputs/chronos_multilayer_validation/figures/layer_11_main_macro_domain_filtered.png)
 
-![Chronos projection macro-domain nearest patches](../outputs/chronos_layer_effect/figures/chronos_layer_effect_projection_macro_domain_nearest_patches.png)
+All clusters under this K setting:
 
-`chronos_proj_with_time` 仍然主要是在整理局部 patch vocabulary，而不是把它变成全局语义。  
-它已经比 raw patch 更接近模型内部表示，但还没有进入深层那种强 contextualization。
+| cluster | tier | size | score | macro domains | raw coherence | confounder risk | interpretation status |
+|---|---|---:|---:|---:|---:|---:|---|
+| `C0` | `diagnostic_weak` | 1987 | 0.806 | 5 | 0.194 | 0.254 | weak diagnostic |
+| `C1` | `main_evidence` | 468 | 0.821 | 4 | 0.884 | 0.647 | candidate concept |
+| `C2` | `diagnostic_weak` | 421 | 0.755 | 4 | 1.000 | 0.831 | weak diagnostic |
+| `C3` | `diagnostic_weak` | 924 | 0.812 | 5 | 0.306 | 0.392 | weak diagnostic |
+| `C4` | `main_evidence` | 842 | 0.855 | 5 | 0.486 | 0.392 | candidate concept |
+| `C5` | `main_evidence` | 458 | 0.817 | 5 | 0.904 | 0.664 | candidate concept |
 
-## 3. 早层、 中层、深层的差别
+## 6. Layer-specific K Check
 
-### 3.1 `layer_0`：最像 local patch vocabulary
+shared K 用于层间对比；per-layer K 用于检查某一层内部是否存在更细的 model-derived motif/prototype family。这里不替换主结论，也不 cherry-pick：凡是补充的 K setting 都展示该 K 下的全部 clusters。
 
-PCA reference：
+### layer_6 K=10
 
-![Chronos layer 0 cluster vs prior probe](../outputs/chronos_layer_effect/figures/chronos_layer_effect_layer_0_cluster_vs_prior_probe.png)
+`layer_6` 的 per-layer K selection 指向 `K=10`，说明该层在 shared K 之外可能存在更细的 contextual substructure。shared `K=6` 仍然用于 `projection -> layer_0 -> layer_6 -> layer_11` 的横向比较；`K=10` 作为 layer-specific split check。
 
-t-SNE view：
+![layer_6 K10 center nearest](../outputs/chronos_multilayer_validation/figures/layer_6_k10_center_nearest.png)
 
-![Chronos layer 0 t-SNE cluster vs prior probe](../outputs/chronos_layer_effect/figures/chronos_layer_effect_layer_0_tsne_cluster_vs_prior_probe.png)
+![layer_6 K10 macro-domain filtered](../outputs/chronos_multilayer_validation/figures/layer_6_k10_macro_domain_filtered.png)
 
-![Chronos layer 0 center-nearest patches](../outputs/chronos_layer_effect/figures/chronos_layer_effect_layer_0_center_nearest_patches.png)
+![layer_6 K10 prior audit](../outputs/chronos_multilayer_validation/figures/layer_6_k10_embedding_audit.png)
 
-![Chronos layer 0 macro-domain nearest patches](../outputs/chronos_layer_effect/figures/chronos_layer_effect_layer_0_macro_domain_nearest_patches.png)
+All clusters under this layer-specific K setting:
 
-`layer_0` 还比较保留局部形状，cluster 里已经能看到清楚的 motif-like 组团，但还没有被强烈地 context 化。  
-从 second pilot 的统计看，`layer_0` 的 `patch-index NMI` 很低，说明它没有明显被 patch 位置支配。
+| cluster | tier | size | score | macro domains | raw coherence | confounder risk | interpretation status |
+|---|---|---:|---:|---:|---:|---:|---|
+| `C0` | `diagnostic_weak` | 935 | 0.767 | 5 | 0.192 | 0.427 | weak diagnostic |
+| `C1` | `main_evidence` | 239 | 0.810 | 4 | 1.000 | 0.724 | candidate concept |
+| `C2` | `diagnostic_weak` | 482 | 0.555 | 3 | 0.256 | 0.726 | weak diagnostic |
+| `C3` | `diagnostic_confounded` | 179 | 0.260 | 0 | 0.333 | 0.989 | confounded diagnostic |
+| `C4` | `diagnostic_weak` | 947 | 0.825 | 4 | 0.272 | 0.294 | weak diagnostic |
+| `C5` | `diagnostic_weak` | 363 | 0.546 | 3 | 0.587 | 1.000 | weak diagnostic |
+| `C6` | `diagnostic_weak` | 408 | 0.541 | 3 | 0.568 | 0.978 | weak diagnostic |
+| `C7` | `diagnostic_weak` | 391 | 0.672 | 2 | 0.282 | 0.361 | weak diagnostic |
+| `C8` | `main_evidence` | 556 | 0.927 | 5 | 0.694 | 0.340 | candidate concept |
+| `C9` | `main_evidence` | 600 | 0.855 | 5 | 0.502 | 0.400 | candidate concept |
 
-macro-domain view 对 `layer_0` 尤其重要：它显示许多 cluster center 可以在真实应用领域中找到同 cluster 的近邻，而不是只在单一数据集内成立。  
-在全部 90 个 macro-domain cell 中，`layer_0` 有 75 个 cell 的 nearest patch 仍然属于同一个 KMeans cluster；如果只看真实领域、暂时排除 `Synthetic control`，比例是 68/75。  
-这说明 `layer_0` 比较适合作为 Chronos-native local patch vocabulary 的起点。
+## 7. Prior-guided Motif Audit
 
-### 3.2 `layer_6`：开始融合 context
+下面的图只用于检查 model-derived clusters 与 human-prior motif probe 是否对齐。它不能证明 cluster 的 ground-truth 语义，也不能作为 cluster 命名来源。
 
-PCA reference：
+![projection prior audit](../outputs/chronos_multilayer_validation/figures/projection_embedding_audit.png)
 
-![Chronos layer 6 cluster vs prior probe](../outputs/chronos_layer_effect/figures/chronos_layer_effect_layer_6_cluster_vs_prior_probe.png)
+![layer_0 prior audit](../outputs/chronos_multilayer_validation/figures/layer_0_embedding_audit.png)
 
-t-SNE view：
+![layer_6 prior audit](../outputs/chronos_multilayer_validation/figures/layer_6_embedding_audit.png)
 
-![Chronos layer 6 t-SNE cluster vs prior probe](../outputs/chronos_layer_effect/figures/chronos_layer_effect_layer_6_tsne_cluster_vs_prior_probe.png)
+![layer_11 prior audit](../outputs/chronos_multilayer_validation/figures/layer_11_embedding_audit.png)
 
-![Chronos layer 6 center-nearest patches](../outputs/chronos_layer_effect/figures/chronos_layer_effect_layer_6_center_nearest_patches.png)
+## 8. Diagnostic Evidence and Failure Cases
 
-![Chronos layer 6 macro-domain nearest patches](../outputs/chronos_layer_effect/figures/chronos_layer_effect_layer_6_macro_domain_nearest_patches.png)
+![Diagnostic failure cases](../outputs/chronos_multilayer_validation/figures/diagnostic_failure_cases.png)
 
-`layer_6` 的 cluster 仍然存在，但已经开始更明显地混入 domain / frequency 信号。  
-这一步更像是把 local patch vocabulary 重新编排成更上下文化的 representation。
+这些 failure cases 是方法的安全阀：如果 cluster 视觉上有形态但 confounder 风险高、macro-domain match 弱或 cluster 太小，就不进入主结论。
 
-和 `projection` / `layer_0` 相比，`layer_6` 的 nearest examples 仍然能看到 trend、level shift、spike-like 或 low-information patches，但同一 cluster 内的原空间形态更容易变宽：一些 cluster 不再只对应一个很干净的 local motif，而更像把多个局部形态按 context role、cadence 或 domain-style 合并到一起。
+## 9. Final Answer for Advisor
 
-### 3.3 `layer_11`：更强的 contextualized representation
+当前可以稳健声称：Chronos-2 的 patch representations 在不同层中确实保留并重组 local temporal information；但不同层承担的角色不同。`projection` / `layer_0` 更适合回答 single patch local vocabulary，`layer_6` / `layer_11` 更适合观察 contextual mixing 和 domain/cadence-style 的重组。
 
-PCA reference：
-
-![Chronos layer 11 cluster vs prior probe](../outputs/chronos_layer_effect/figures/chronos_layer_effect_layer_11_cluster_vs_prior_probe.png)
-
-t-SNE view：
-
-![Chronos layer 11 t-SNE cluster vs prior probe](../outputs/chronos_layer_effect/figures/chronos_layer_effect_layer_11_tsne_cluster_vs_prior_probe.png)
-
-![Chronos layer 11 center-nearest patches](../outputs/chronos_layer_effect/figures/chronos_layer_effect_layer_11_center_nearest_patches.png)
-
-![Chronos layer 11 macro-domain nearest patches](../outputs/chronos_layer_effect/figures/chronos_layer_effect_layer_11_macro_domain_nearest_patches.png)
-
-到 `layer_11`，cluster 更稳定，但也更 contextualized。  
-它不是简单地“更像 motif”，而是更容易混入 domain-style、cadence 和更长上下文信息。
-
-`layer_11` 的 prototype panel 适合和 `layer_0` 对照看：有些 cluster 仍能回到原空间解释成 transition-like / trend-like patches，但 cluster 内部异质性更强。因此深层更适合回答“模型如何把 local vocabulary 重组成 contextualized motif family”，而不是直接回答“单个 patch 自身长什么样”。
-
-## 4. 一个很短的数值总结
-
-下面这组数值是最适合跟老师讲的版本：
-
-| representation | silhouette | stability | NMI patch-index | NMI domain | NMI frequency | NMI prior-guided probe |
-|---|---:|---:|---:|---:|---:|---:|
-| `raw_patch` | 0.167 | 0.407 | 0.003 | 0.027 | 0.018 | 0.059 |
-| `projection` | 0.106 | 0.554 | 0.006 | 0.192 | 0.173 | 0.116 |
-| `layer_0` | 0.101 | 0.590 | 0.005 | 0.294 | 0.248 | 0.195 |
-| `layer_6` | 0.146 | 0.627 | 0.006 | 0.445 | 0.380 | 0.200 |
-| `layer_11` | 0.154 | 0.642 | 0.010 | 0.402 | 0.338 | 0.171 |
-
-这个表最重要的读法是：
-
-1. `layer_0` 已经有局部语义，但仍然相对干净。
-2. `layer_6` 和 `layer_11` 开始更明显吸收 context / domain / frequency。
-3. 如果目标是看“单个 patch 自己有没有语义”，`layer_0` 比深层更合适。
-4. `NMI prior-guided probe` 只是说明 KMeans cluster 和 prior-guided motif probe 的一致程度；它不是 cluster 命名来源。
-
-新增 macro-domain view 后，还可以补充一个更直观的跨领域诊断：
-
-| representation | same-cluster macro-domain cells | weak-match cells | same-cluster rate, real domains only |
-|---|---:|---:|---:|
-| `raw_patch` | 45/90 | 40/90 | 41/75 |
-| `projection` | 73/90 | 2/90 | 64/75 |
-| `layer_0` | 75/90 | 7/90 | 68/75 |
-| `layer_6` | 62/90 | 13/90 | 59/75 |
-| `layer_11` | 58/90 | 9/90 | 55/75 |
-
-这里的 `same-cluster macro-domain cells` 指：对某个 cluster center 和某个 macro-domain，找到的最近 patch 仍然被 KMeans 分到同一个 cluster。  
-这个指标不是最终评价指标，但它很适合解释给老师听：`layer_0` 的 local vocabulary 不仅视觉上干净，而且跨真实领域更容易找到同 cluster 的近邻；中后层虽然 cluster stability 更高，但跨领域 nearest view 中虚线更多，说明 representation 已经更明显混入 domain/style/context。
-
-## 5. 这说明了什么
-
-我们现在可以更稳地说：
-
-- `raw patch` 说明原空间已经有 motif-like shape family。
-- `layer_0` 更像 local vocabulary。
-- `layer_6` 更像 contextual mixing。
-- `layer_11` 更像 contextualized concept space。
-
-所以老师说的那句“early layers 更保留 local info”是有证据支撑的，而且对 Chronos-2 尤其适合。
-
-## 6. 我们接下来该怎么做
-
-下一步不应该再只看一个 cluster 图，也不应该只追求“画得更好看”。应该按老师关心的问题，把实验升级为一个可复现的 multi-layer validation：
-
-1. 覆盖 `projection`、`layer_0`、`layer_6`、`layer_11`，不要只看 `layer_0`。
-2. 把当前 `100 windows/dataset` pilot 扩展到更稳的 `500 windows/dataset`，必要时做 `1000 windows/dataset` sanity check。
-3. 从 source-domain balanced 改成 macro-domain balanced，并限制 macro-domain 内单个 dataset 的最大贡献。
-4. 用 K sweep 选择 final K setting，综合 silhouette、Calinski-Harabasz、Davies-Bouldin、seed stability、KMeans vs Agglomerative NMI、cluster size、confounder NMI 和 original-space interpretability。
-5. 以 KMeans center 为锚点，系统导出 center-nearest raw patch examples。
-6. 生成 confidence-filtered macro-domain examples：没有可信 match 的 cell 留空或标记 no confident match，不再强行展示弱样本。
-7. 把 prior-guided motif 作为 audit probe，检查 model-derived clusters 和 human-prior motif 是否错位，但不把它作为 ground truth。
-8. 把主证据图和 diagnostic/failure-case 图分开：主证据必须稳定、跨领域、原空间可解释、confounder 风险低。
-
-一句话版本：
-
-> 如果我们要证明 single patch 仍然带着局部语义，需要看 projection 和 early layer；如果我们要解释 context 如何重组 motif，则必须同时看 layer_6 和 layer_11，并用严格的 K selection、macro-domain validation 和 original-space evidence 支撑结论。
+当前仍需谨慎：cluster 不是最终 taxonomy；K 是用于 exploratory concept discovery 的 operating point；macro-domain evidence 只能说明跨领域可复现性，不等于真实世界语义 ground truth。若进入 paper 阶段，还需要更大采样、多 seed 数据重采样和人工/领域知识审阅。
