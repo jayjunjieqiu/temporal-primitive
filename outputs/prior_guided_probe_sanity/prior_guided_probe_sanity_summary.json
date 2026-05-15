@@ -1,0 +1,1345 @@
+{
+  "script": "scripts/run_prior_guided_probe_sanity_check.py",
+  "data_root": "/data/junjieqiu/datasets/basicts_datasets",
+  "patch_len": 16,
+  "context_len": 128,
+  "windows_per_dataset": 250,
+  "seed": 20260515,
+  "dataset_summary": [
+    {
+      "dataset": "BeijingAirQuality",
+      "source_domain": "Beijing air quality",
+      "macro_domain": "Environment",
+      "frequency_minutes": 60,
+      "accepted_windows": 250,
+      "accepted_patches": 2000,
+      "attempts": 250,
+      "status": "ok"
+    },
+    {
+      "dataset": "CA",
+      "source_domain": "traffic flow",
+      "macro_domain": "Traffic",
+      "frequency_minutes": 15,
+      "accepted_windows": 250,
+      "accepted_patches": 2000,
+      "attempts": 254,
+      "status": "ok"
+    },
+    {
+      "dataset": "ETTh1",
+      "source_domain": "electricity transformer temperature",
+      "macro_domain": "Energy",
+      "frequency_minutes": 60,
+      "accepted_windows": 250,
+      "accepted_patches": 2000,
+      "attempts": 252,
+      "status": "ok"
+    },
+    {
+      "dataset": "ETTh2",
+      "source_domain": "electricity transformer temperature",
+      "macro_domain": "Energy",
+      "frequency_minutes": 60,
+      "accepted_windows": 250,
+      "accepted_patches": 2000,
+      "attempts": 254,
+      "status": "ok"
+    },
+    {
+      "dataset": "ETTm1",
+      "source_domain": "electricity transformer temperature",
+      "macro_domain": "Energy",
+      "frequency_minutes": 15,
+      "accepted_windows": 250,
+      "accepted_patches": 2000,
+      "attempts": 252,
+      "status": "ok"
+    },
+    {
+      "dataset": "ETTm2",
+      "source_domain": "electricity transformer temperature",
+      "macro_domain": "Energy",
+      "frequency_minutes": 15,
+      "accepted_windows": 250,
+      "accepted_patches": 2000,
+      "attempts": 256,
+      "status": "ok"
+    },
+    {
+      "dataset": "Electricity",
+      "source_domain": "electricity consumption",
+      "macro_domain": "Energy",
+      "frequency_minutes": 60,
+      "accepted_windows": 250,
+      "accepted_patches": 2000,
+      "attempts": 250,
+      "status": "ok"
+    },
+    {
+      "dataset": "ExchangeRate",
+      "source_domain": "exchange rate",
+      "macro_domain": "Finance",
+      "frequency_minutes": 1440,
+      "accepted_windows": 250,
+      "accepted_patches": 2000,
+      "attempts": 251,
+      "status": "ok"
+    },
+    {
+      "dataset": "GBA",
+      "source_domain": "traffic flow",
+      "macro_domain": "Traffic",
+      "frequency_minutes": 15,
+      "accepted_windows": 250,
+      "accepted_patches": 2000,
+      "attempts": 251,
+      "status": "ok"
+    },
+    {
+      "dataset": "GLA",
+      "source_domain": "traffic flow",
+      "macro_domain": "Traffic",
+      "frequency_minutes": 15,
+      "accepted_windows": 250,
+      "accepted_patches": 2000,
+      "attempts": 251,
+      "status": "ok"
+    },
+    {
+      "dataset": "Gaussian",
+      "source_domain": "simulated Gaussian data",
+      "macro_domain": "Synthetic control",
+      "frequency_minutes": null,
+      "accepted_windows": 250,
+      "accepted_patches": 2000,
+      "attempts": 253,
+      "status": "ok"
+    },
+    {
+      "dataset": "Illness",
+      "source_domain": "illness data",
+      "macro_domain": "Health",
+      "frequency_minutes": 10080.0,
+      "accepted_windows": 250,
+      "accepted_patches": 2000,
+      "attempts": 253,
+      "status": "ok"
+    },
+    {
+      "dataset": "METR-LA",
+      "source_domain": "traffic speed",
+      "macro_domain": "Traffic",
+      "frequency_minutes": 5,
+      "accepted_windows": 250,
+      "accepted_patches": 2000,
+      "attempts": 254,
+      "status": "ok"
+    },
+    {
+      "dataset": "PEMS-BAY",
+      "source_domain": "traffic speed",
+      "macro_domain": "Traffic",
+      "frequency_minutes": 5,
+      "accepted_windows": 250,
+      "accepted_patches": 2000,
+      "attempts": 251,
+      "status": "ok"
+    },
+    {
+      "dataset": "PEMS03",
+      "source_domain": "traffic flow",
+      "macro_domain": "Traffic",
+      "frequency_minutes": 5,
+      "accepted_windows": 250,
+      "accepted_patches": 2000,
+      "attempts": 250,
+      "status": "ok"
+    },
+    {
+      "dataset": "PEMS04",
+      "source_domain": "traffic flow",
+      "macro_domain": "Traffic",
+      "frequency_minutes": 5,
+      "accepted_windows": 250,
+      "accepted_patches": 2000,
+      "attempts": 250,
+      "status": "ok"
+    },
+    {
+      "dataset": "PEMS07",
+      "source_domain": "traffic flow",
+      "macro_domain": "Traffic",
+      "frequency_minutes": 5,
+      "accepted_windows": 250,
+      "accepted_patches": 2000,
+      "attempts": 251,
+      "status": "ok"
+    },
+    {
+      "dataset": "PEMS08",
+      "source_domain": "traffic flow",
+      "macro_domain": "Traffic",
+      "frequency_minutes": 5,
+      "accepted_windows": 250,
+      "accepted_patches": 2000,
+      "attempts": 250,
+      "status": "ok"
+    },
+    {
+      "dataset": "Pulse",
+      "source_domain": "simulated pulse data",
+      "macro_domain": "Synthetic control",
+      "frequency_minutes": null,
+      "accepted_windows": 250,
+      "accepted_patches": 2000,
+      "attempts": 251,
+      "status": "ok"
+    },
+    {
+      "dataset": "SD",
+      "source_domain": "traffic flow",
+      "macro_domain": "Traffic",
+      "frequency_minutes": 15,
+      "accepted_windows": 250,
+      "accepted_patches": 2000,
+      "attempts": 256,
+      "status": "ok"
+    },
+    {
+      "dataset": "Traffic",
+      "source_domain": "road occupancy rates",
+      "macro_domain": "Traffic",
+      "frequency_minutes": 60,
+      "accepted_windows": 250,
+      "accepted_patches": 2000,
+      "attempts": 250,
+      "status": "ok"
+    },
+    {
+      "dataset": "Weather",
+      "source_domain": "weather",
+      "macro_domain": "Environment",
+      "frequency_minutes": 10,
+      "accepted_windows": 250,
+      "accepted_patches": 2000,
+      "attempts": 262,
+      "status": "ok"
+    }
+  ],
+  "real_patch_summary": {
+    "num_real_patches": 44000,
+    "label_distribution": [
+      {
+        "value": "mixed_uncertain",
+        "count": 17441
+      },
+      {
+        "value": "level_shift",
+        "count": 11344
+      },
+      {
+        "value": "trend",
+        "count": 5831
+      },
+      {
+        "value": "volatility_shift",
+        "count": 2979
+      },
+      {
+        "value": "flat_low_information",
+        "count": 2280
+      },
+      {
+        "value": "intermittent",
+        "count": 1596
+      },
+      {
+        "value": "oscillation",
+        "count": 1317
+      },
+      {
+        "value": "impulse_spike",
+        "count": 857
+      },
+      {
+        "value": "burst_event",
+        "count": 355
+      }
+    ],
+    "high_confidence_threshold": 0.65,
+    "high_confidence_counts": {
+      "flat_low_information": 2256,
+      "trend": 5830,
+      "oscillation": 491,
+      "impulse_spike": 533,
+      "burst_event": 180,
+      "level_shift": 9233,
+      "volatility_shift": 2543,
+      "intermittent": 786,
+      "mixed_uncertain": 0
+    },
+    "mixed_uncertain_rate": 0.39638636363636365,
+    "by_macro_domain": {
+      "Energy": {
+        "mixed_uncertain": 3832,
+        "level_shift": 3504,
+        "oscillation": 397,
+        "impulse_spike": 195,
+        "burst_event": 139,
+        "volatility_shift": 522,
+        "intermittent": 399,
+        "flat_low_information": 401,
+        "trend": 611
+      },
+      "Environment": {
+        "oscillation": 155,
+        "mixed_uncertain": 1296,
+        "impulse_spike": 54,
+        "level_shift": 1258,
+        "volatility_shift": 155,
+        "trend": 743,
+        "intermittent": 82,
+        "flat_low_information": 206,
+        "burst_event": 51
+      },
+      "Finance": {
+        "mixed_uncertain": 379,
+        "level_shift": 762,
+        "flat_low_information": 421,
+        "trend": 189,
+        "impulse_spike": 40,
+        "intermittent": 52,
+        "oscillation": 85,
+        "volatility_shift": 59,
+        "burst_event": 13
+      },
+      "Health": {
+        "impulse_spike": 46,
+        "mixed_uncertain": 687,
+        "trend": 650,
+        "level_shift": 508,
+        "oscillation": 48,
+        "intermittent": 23,
+        "volatility_shift": 29,
+        "burst_event": 9
+      },
+      "Synthetic control": {
+        "volatility_shift": 1267,
+        "impulse_spike": 30,
+        "mixed_uncertain": 1502,
+        "intermittent": 154,
+        "level_shift": 28,
+        "oscillation": 61,
+        "burst_event": 1,
+        "flat_low_information": 957
+      },
+      "Traffic": {
+        "level_shift": 5284,
+        "mixed_uncertain": 9745,
+        "trend": 3638,
+        "oscillation": 571,
+        "intermittent": 886,
+        "volatility_shift": 947,
+        "impulse_spike": 492,
+        "flat_low_information": 295,
+        "burst_event": 142
+      }
+    },
+    "by_dataset": {
+      "BeijingAirQuality": {
+        "oscillation": 101,
+        "mixed_uncertain": 697,
+        "impulse_spike": 39,
+        "level_shift": 789,
+        "volatility_shift": 97,
+        "trend": 183,
+        "intermittent": 37,
+        "flat_low_information": 18,
+        "burst_event": 39
+      },
+      "CA": {
+        "level_shift": 436,
+        "mixed_uncertain": 734,
+        "trend": 655,
+        "oscillation": 40,
+        "intermittent": 46,
+        "volatility_shift": 48,
+        "impulse_spike": 35,
+        "flat_low_information": 3,
+        "burst_event": 3
+      },
+      "ETTh1": {
+        "mixed_uncertain": 747,
+        "level_shift": 886,
+        "oscillation": 111,
+        "impulse_spike": 34,
+        "burst_event": 23,
+        "volatility_shift": 84,
+        "intermittent": 45,
+        "flat_low_information": 22,
+        "trend": 48
+      },
+      "ETTh2": {
+        "mixed_uncertain": 813,
+        "level_shift": 596,
+        "intermittent": 120,
+        "flat_low_information": 155,
+        "trend": 61,
+        "volatility_shift": 134,
+        "oscillation": 54,
+        "burst_event": 32,
+        "impulse_spike": 35
+      },
+      "ETTm1": {
+        "mixed_uncertain": 828,
+        "level_shift": 646,
+        "trend": 197,
+        "oscillation": 80,
+        "intermittent": 90,
+        "impulse_spike": 42,
+        "flat_low_information": 37,
+        "volatility_shift": 69,
+        "burst_event": 11
+      },
+      "ETTm2": {
+        "level_shift": 467,
+        "mixed_uncertain": 721,
+        "intermittent": 91,
+        "volatility_shift": 170,
+        "flat_low_information": 180,
+        "burst_event": 50,
+        "trend": 217,
+        "oscillation": 78,
+        "impulse_spike": 26
+      },
+      "Electricity": {
+        "level_shift": 909,
+        "mixed_uncertain": 723,
+        "impulse_spike": 58,
+        "trend": 88,
+        "oscillation": 74,
+        "volatility_shift": 65,
+        "intermittent": 53,
+        "burst_event": 23,
+        "flat_low_information": 7
+      },
+      "ExchangeRate": {
+        "mixed_uncertain": 379,
+        "level_shift": 762,
+        "flat_low_information": 421,
+        "trend": 189,
+        "impulse_spike": 40,
+        "intermittent": 52,
+        "oscillation": 85,
+        "volatility_shift": 59,
+        "burst_event": 13
+      },
+      "GBA": {
+        "intermittent": 54,
+        "mixed_uncertain": 779,
+        "trend": 607,
+        "level_shift": 428,
+        "oscillation": 35,
+        "impulse_spike": 38,
+        "volatility_shift": 49,
+        "burst_event": 4,
+        "flat_low_information": 6
+      },
+      "GLA": {
+        "oscillation": 54,
+        "level_shift": 431,
+        "intermittent": 47,
+        "mixed_uncertain": 702,
+        "trend": 671,
+        "impulse_spike": 35,
+        "volatility_shift": 50,
+        "flat_low_information": 4,
+        "burst_event": 6
+      },
+      "Gaussian": {
+        "volatility_shift": 224,
+        "impulse_spike": 30,
+        "mixed_uncertain": 1502,
+        "intermittent": 154,
+        "level_shift": 28,
+        "oscillation": 61,
+        "burst_event": 1
+      },
+      "Illness": {
+        "impulse_spike": 46,
+        "mixed_uncertain": 687,
+        "trend": 650,
+        "level_shift": 508,
+        "oscillation": 48,
+        "intermittent": 23,
+        "volatility_shift": 29,
+        "burst_event": 9
+      },
+      "METR-LA": {
+        "impulse_spike": 117,
+        "mixed_uncertain": 1203,
+        "intermittent": 121,
+        "level_shift": 199,
+        "volatility_shift": 214,
+        "flat_low_information": 83,
+        "oscillation": 39,
+        "burst_event": 20,
+        "trend": 4
+      },
+      "PEMS-BAY": {
+        "level_shift": 458,
+        "mixed_uncertain": 1050,
+        "burst_event": 16,
+        "trend": 69,
+        "intermittent": 115,
+        "oscillation": 102,
+        "volatility_shift": 143,
+        "impulse_spike": 36,
+        "flat_low_information": 11
+      },
+      "PEMS03": {
+        "mixed_uncertain": 1075,
+        "level_shift": 521,
+        "oscillation": 48,
+        "intermittent": 122,
+        "volatility_shift": 81,
+        "trend": 99,
+        "impulse_spike": 42,
+        "burst_event": 10,
+        "flat_low_information": 2
+      },
+      "PEMS04": {
+        "mixed_uncertain": 1123,
+        "trend": 127,
+        "level_shift": 461,
+        "intermittent": 110,
+        "volatility_shift": 104,
+        "oscillation": 38,
+        "impulse_spike": 31,
+        "burst_event": 4,
+        "flat_low_information": 2
+      },
+      "PEMS07": {
+        "trend": 249,
+        "mixed_uncertain": 1002,
+        "level_shift": 468,
+        "oscillation": 54,
+        "intermittent": 95,
+        "volatility_shift": 85,
+        "impulse_spike": 39,
+        "flat_low_information": 2,
+        "burst_event": 6
+      },
+      "PEMS08": {
+        "mixed_uncertain": 1083,
+        "trend": 162,
+        "level_shift": 471,
+        "volatility_shift": 75,
+        "intermittent": 110,
+        "oscillation": 61,
+        "impulse_spike": 34,
+        "burst_event": 4
+      },
+      "Pulse": {
+        "flat_low_information": 957,
+        "volatility_shift": 1043
+      },
+      "SD": {
+        "mixed_uncertain": 619,
+        "oscillation": 66,
+        "trend": 761,
+        "level_shift": 467,
+        "intermittent": 32,
+        "impulse_spike": 22,
+        "volatility_shift": 31,
+        "burst_event": 2
+      },
+      "Traffic": {
+        "level_shift": 944,
+        "mixed_uncertain": 375,
+        "flat_low_information": 182,
+        "trend": 234,
+        "volatility_shift": 67,
+        "impulse_spike": 63,
+        "oscillation": 34,
+        "burst_event": 67,
+        "intermittent": 34
+      },
+      "Weather": {
+        "level_shift": 469,
+        "trend": 560,
+        "mixed_uncertain": 599,
+        "flat_low_information": 188,
+        "intermittent": 45,
+        "oscillation": 54,
+        "volatility_shift": 58,
+        "impulse_spike": 15,
+        "burst_event": 12
+      }
+    },
+    "by_patch_index": {
+      "0": {
+        "oscillation": 160,
+        "mixed_uncertain": 2187,
+        "trend": 714,
+        "intermittent": 198,
+        "level_shift": 1419,
+        "volatility_shift": 402,
+        "burst_event": 50,
+        "impulse_spike": 98,
+        "flat_low_information": 272
+      },
+      "1": {
+        "mixed_uncertain": 2168,
+        "oscillation": 169,
+        "trend": 737,
+        "level_shift": 1408,
+        "volatility_shift": 367,
+        "burst_event": 33,
+        "impulse_spike": 115,
+        "intermittent": 195,
+        "flat_low_information": 308
+      },
+      "2": {
+        "mixed_uncertain": 2178,
+        "volatility_shift": 369,
+        "level_shift": 1394,
+        "trend": 741,
+        "oscillation": 155,
+        "impulse_spike": 125,
+        "flat_low_information": 290,
+        "burst_event": 46,
+        "intermittent": 202
+      },
+      "3": {
+        "impulse_spike": 100,
+        "volatility_shift": 357,
+        "mixed_uncertain": 2167,
+        "trend": 752,
+        "level_shift": 1412,
+        "oscillation": 173,
+        "intermittent": 203,
+        "burst_event": 48,
+        "flat_low_information": 288
+      },
+      "4": {
+        "mixed_uncertain": 2123,
+        "level_shift": 1465,
+        "intermittent": 202,
+        "trend": 721,
+        "volatility_shift": 380,
+        "oscillation": 164,
+        "impulse_spike": 127,
+        "burst_event": 41,
+        "flat_low_information": 277
+      },
+      "5": {
+        "level_shift": 1390,
+        "mixed_uncertain": 2241,
+        "oscillation": 167,
+        "burst_event": 54,
+        "trend": 701,
+        "flat_low_information": 278,
+        "intermittent": 184,
+        "volatility_shift": 378,
+        "impulse_spike": 107
+      },
+      "6": {
+        "level_shift": 1444,
+        "oscillation": 175,
+        "mixed_uncertain": 2186,
+        "volatility_shift": 353,
+        "trend": 709,
+        "flat_low_information": 296,
+        "intermittent": 191,
+        "burst_event": 49,
+        "impulse_spike": 97
+      },
+      "7": {
+        "mixed_uncertain": 2191,
+        "level_shift": 1412,
+        "trend": 756,
+        "oscillation": 154,
+        "volatility_shift": 373,
+        "impulse_spike": 88,
+        "burst_event": 34,
+        "intermittent": 221,
+        "flat_low_information": 271
+      }
+    },
+    "feature_summary_by_label": {
+      "flat_low_information": {
+        "mean_confidence": 0.9717303133374009,
+        "median_raw_std": 0.0,
+        "median_raw_range": 0.0,
+        "top_macro_domains": [
+          {
+            "value": "Synthetic control",
+            "count": 957
+          },
+          {
+            "value": "Finance",
+            "count": 421
+          },
+          {
+            "value": "Energy",
+            "count": 401
+          },
+          {
+            "value": "Traffic",
+            "count": 295
+          },
+          {
+            "value": "Environment",
+            "count": 206
+          }
+        ],
+        "top_datasets": [
+          {
+            "value": "Pulse",
+            "count": 957
+          },
+          {
+            "value": "ExchangeRate",
+            "count": 421
+          },
+          {
+            "value": "Weather",
+            "count": 188
+          },
+          {
+            "value": "Traffic",
+            "count": 182
+          },
+          {
+            "value": "ETTm2",
+            "count": 180
+          }
+        ]
+      },
+      "trend": {
+        "mean_confidence": 0.8407874443874023,
+        "median_raw_std": 33.073544941539,
+        "median_raw_range": 108.0,
+        "top_macro_domains": [
+          {
+            "value": "Traffic",
+            "count": 3638
+          },
+          {
+            "value": "Environment",
+            "count": 743
+          },
+          {
+            "value": "Health",
+            "count": 650
+          },
+          {
+            "value": "Energy",
+            "count": 611
+          },
+          {
+            "value": "Finance",
+            "count": 189
+          }
+        ],
+        "top_datasets": [
+          {
+            "value": "SD",
+            "count": 761
+          },
+          {
+            "value": "GLA",
+            "count": 671
+          },
+          {
+            "value": "CA",
+            "count": 655
+          },
+          {
+            "value": "Illness",
+            "count": 650
+          },
+          {
+            "value": "GBA",
+            "count": 607
+          }
+        ]
+      },
+      "oscillation": {
+        "mean_confidence": 0.6438764031232351,
+        "median_raw_std": 2.1190265637693333,
+        "median_raw_range": 7.0370025634765625,
+        "top_macro_domains": [
+          {
+            "value": "Traffic",
+            "count": 571
+          },
+          {
+            "value": "Energy",
+            "count": 397
+          },
+          {
+            "value": "Environment",
+            "count": 155
+          },
+          {
+            "value": "Finance",
+            "count": 85
+          },
+          {
+            "value": "Synthetic control",
+            "count": 61
+          }
+        ],
+        "top_datasets": [
+          {
+            "value": "ETTh1",
+            "count": 111
+          },
+          {
+            "value": "PEMS-BAY",
+            "count": 102
+          },
+          {
+            "value": "BeijingAirQuality",
+            "count": 101
+          },
+          {
+            "value": "ExchangeRate",
+            "count": 85
+          },
+          {
+            "value": "ETTm1",
+            "count": 80
+          }
+        ]
+      },
+      "impulse_spike": {
+        "mean_confidence": 0.7453522902810273,
+        "median_raw_std": 4.508685524070411,
+        "median_raw_range": 17.819442749023438,
+        "top_macro_domains": [
+          {
+            "value": "Traffic",
+            "count": 492
+          },
+          {
+            "value": "Energy",
+            "count": 195
+          },
+          {
+            "value": "Environment",
+            "count": 54
+          },
+          {
+            "value": "Health",
+            "count": 46
+          },
+          {
+            "value": "Finance",
+            "count": 40
+          }
+        ],
+        "top_datasets": [
+          {
+            "value": "METR-LA",
+            "count": 117
+          },
+          {
+            "value": "Traffic",
+            "count": 63
+          },
+          {
+            "value": "Electricity",
+            "count": 58
+          },
+          {
+            "value": "Illness",
+            "count": 46
+          },
+          {
+            "value": "ETTm1",
+            "count": 42
+          }
+        ]
+      },
+      "burst_event": {
+        "mean_confidence": 0.6669391348088533,
+        "median_raw_std": 0.8383177139931104,
+        "median_raw_range": 2.8470005989074707,
+        "top_macro_domains": [
+          {
+            "value": "Traffic",
+            "count": 142
+          },
+          {
+            "value": "Energy",
+            "count": 139
+          },
+          {
+            "value": "Environment",
+            "count": 51
+          },
+          {
+            "value": "Finance",
+            "count": 13
+          },
+          {
+            "value": "Health",
+            "count": 9
+          }
+        ],
+        "top_datasets": [
+          {
+            "value": "Traffic",
+            "count": 67
+          },
+          {
+            "value": "ETTm2",
+            "count": 50
+          },
+          {
+            "value": "BeijingAirQuality",
+            "count": 39
+          },
+          {
+            "value": "ETTh2",
+            "count": 32
+          },
+          {
+            "value": "ETTh1",
+            "count": 23
+          }
+        ]
+      },
+      "level_shift": {
+        "mean_confidence": 0.8442484029432399,
+        "median_raw_std": 5.627693445999907,
+        "median_raw_range": 18.24924898147583,
+        "top_macro_domains": [
+          {
+            "value": "Traffic",
+            "count": 5284
+          },
+          {
+            "value": "Energy",
+            "count": 3504
+          },
+          {
+            "value": "Environment",
+            "count": 1258
+          },
+          {
+            "value": "Finance",
+            "count": 762
+          },
+          {
+            "value": "Health",
+            "count": 508
+          }
+        ],
+        "top_datasets": [
+          {
+            "value": "Traffic",
+            "count": 944
+          },
+          {
+            "value": "Electricity",
+            "count": 909
+          },
+          {
+            "value": "ETTh1",
+            "count": 886
+          },
+          {
+            "value": "BeijingAirQuality",
+            "count": 789
+          },
+          {
+            "value": "ExchangeRate",
+            "count": 762
+          }
+        ]
+      },
+      "volatility_shift": {
+        "mean_confidence": 0.8964761653465849,
+        "median_raw_std": 0.5472223404983739,
+        "median_raw_range": 2.0250000953674316,
+        "top_macro_domains": [
+          {
+            "value": "Synthetic control",
+            "count": 1267
+          },
+          {
+            "value": "Traffic",
+            "count": 947
+          },
+          {
+            "value": "Energy",
+            "count": 522
+          },
+          {
+            "value": "Environment",
+            "count": 155
+          },
+          {
+            "value": "Finance",
+            "count": 59
+          }
+        ],
+        "top_datasets": [
+          {
+            "value": "Pulse",
+            "count": 1043
+          },
+          {
+            "value": "Gaussian",
+            "count": 224
+          },
+          {
+            "value": "METR-LA",
+            "count": 214
+          },
+          {
+            "value": "ETTm2",
+            "count": 170
+          },
+          {
+            "value": "PEMS-BAY",
+            "count": 143
+          }
+        ]
+      },
+      "intermittent": {
+        "mean_confidence": 0.6955278822055138,
+        "median_raw_std": 2.3774294886426883,
+        "median_raw_range": 8.953999757766724,
+        "top_macro_domains": [
+          {
+            "value": "Traffic",
+            "count": 886
+          },
+          {
+            "value": "Energy",
+            "count": 399
+          },
+          {
+            "value": "Synthetic control",
+            "count": 154
+          },
+          {
+            "value": "Environment",
+            "count": 82
+          },
+          {
+            "value": "Finance",
+            "count": 52
+          }
+        ],
+        "top_datasets": [
+          {
+            "value": "Gaussian",
+            "count": 154
+          },
+          {
+            "value": "PEMS03",
+            "count": 122
+          },
+          {
+            "value": "METR-LA",
+            "count": 121
+          },
+          {
+            "value": "ETTh2",
+            "count": 120
+          },
+          {
+            "value": "PEMS-BAY",
+            "count": 115
+          }
+        ]
+      },
+      "mixed_uncertain": {
+        "mean_confidence": 0.24693076783477136,
+        "median_raw_std": 5.63713967806369,
+        "median_raw_range": 20.0,
+        "top_macro_domains": [
+          {
+            "value": "Traffic",
+            "count": 9745
+          },
+          {
+            "value": "Energy",
+            "count": 3832
+          },
+          {
+            "value": "Synthetic control",
+            "count": 1502
+          },
+          {
+            "value": "Environment",
+            "count": 1296
+          },
+          {
+            "value": "Health",
+            "count": 687
+          }
+        ],
+        "top_datasets": [
+          {
+            "value": "Gaussian",
+            "count": 1502
+          },
+          {
+            "value": "METR-LA",
+            "count": 1203
+          },
+          {
+            "value": "PEMS04",
+            "count": 1123
+          },
+          {
+            "value": "PEMS08",
+            "count": 1083
+          },
+          {
+            "value": "PEMS03",
+            "count": 1075
+          }
+        ]
+      }
+    }
+  },
+  "synthetic_summary": {
+    "16": {
+      "num_patches": 1620,
+      "accuracy_including_mixed": 0.38580246913580246,
+      "non_uncertain_coverage": 0.6382716049382716,
+      "per_true_label": {
+        "flat_low_information": {
+          "n": 180,
+          "recall": 0.23333333333333334,
+          "uncertain_rate": 0.5388888888888889,
+          "pred_distribution": {
+            "volatility_shift": 20,
+            "flat_low_information": 42,
+            "oscillation": 4,
+            "intermittent": 11,
+            "mixed_uncertain": 97,
+            "impulse_spike": 3,
+            "level_shift": 3
+          }
+        },
+        "trend": {
+          "n": 180,
+          "recall": 0.8388888888888889,
+          "uncertain_rate": 0.07777777777777778,
+          "pred_distribution": {
+            "trend": 151,
+            "mixed_uncertain": 14,
+            "level_shift": 10,
+            "intermittent": 4,
+            "impulse_spike": 1
+          }
+        },
+        "oscillation": {
+          "n": 180,
+          "recall": 0.48333333333333334,
+          "uncertain_rate": 0.25,
+          "pred_distribution": {
+            "oscillation": 87,
+            "level_shift": 48,
+            "mixed_uncertain": 45
+          }
+        },
+        "impulse_spike": {
+          "n": 180,
+          "recall": 0.1111111111111111,
+          "uncertain_rate": 0.7888888888888889,
+          "pred_distribution": {
+            "mixed_uncertain": 142,
+            "volatility_shift": 16,
+            "impulse_spike": 20,
+            "oscillation": 1,
+            "intermittent": 1
+          }
+        },
+        "burst_event": {
+          "n": 180,
+          "recall": 0.08888888888888889,
+          "uncertain_rate": 0.4166666666666667,
+          "pred_distribution": {
+            "mixed_uncertain": 75,
+            "burst_event": 16,
+            "volatility_shift": 64,
+            "level_shift": 1,
+            "intermittent": 10,
+            "impulse_spike": 13,
+            "oscillation": 1
+          }
+        },
+        "level_shift": {
+          "n": 180,
+          "recall": 0.5833333333333334,
+          "uncertain_rate": 0.40555555555555556,
+          "pred_distribution": {
+            "level_shift": 105,
+            "burst_event": 2,
+            "mixed_uncertain": 73
+          }
+        },
+        "volatility_shift": {
+          "n": 180,
+          "recall": 0.5777777777777777,
+          "uncertain_rate": 0.2611111111111111,
+          "pred_distribution": {
+            "volatility_shift": 104,
+            "mixed_uncertain": 47,
+            "impulse_spike": 3,
+            "intermittent": 14,
+            "burst_event": 9,
+            "level_shift": 3
+          }
+        },
+        "intermittent": {
+          "n": 180,
+          "recall": 0.1,
+          "uncertain_rate": 0.06111111111111111,
+          "pred_distribution": {
+            "impulse_spike": 151,
+            "intermittent": 18,
+            "mixed_uncertain": 11
+          }
+        },
+        "mixed_uncertain": {
+          "n": 180,
+          "recall": 0.45555555555555555,
+          "uncertain_rate": 0.45555555555555555,
+          "pred_distribution": {
+            "mixed_uncertain": 82,
+            "level_shift": 79,
+            "impulse_spike": 11,
+            "volatility_shift": 5,
+            "intermittent": 3
+          }
+        }
+      }
+    },
+    "32": {
+      "num_patches": 1620,
+      "accuracy_including_mixed": 0.5419753086419753,
+      "non_uncertain_coverage": 0.5734567901234567,
+      "per_true_label": {
+        "flat_low_information": {
+          "n": 180,
+          "recall": 0.28888888888888886,
+          "uncertain_rate": 0.55,
+          "pred_distribution": {
+            "flat_low_information": 52,
+            "intermittent": 27,
+            "mixed_uncertain": 99,
+            "impulse_spike": 1,
+            "volatility_shift": 1
+          }
+        },
+        "trend": {
+          "n": 180,
+          "recall": 0.7944444444444444,
+          "uncertain_rate": 0.15,
+          "pred_distribution": {
+            "trend": 143,
+            "mixed_uncertain": 27,
+            "level_shift": 10
+          }
+        },
+        "oscillation": {
+          "n": 180,
+          "recall": 0.7055555555555556,
+          "uncertain_rate": 0.28888888888888886,
+          "pred_distribution": {
+            "oscillation": 127,
+            "mixed_uncertain": 52,
+            "volatility_shift": 1
+          }
+        },
+        "impulse_spike": {
+          "n": 180,
+          "recall": 0.22777777777777777,
+          "uncertain_rate": 0.6777777777777778,
+          "pred_distribution": {
+            "mixed_uncertain": 122,
+            "volatility_shift": 9,
+            "impulse_spike": 41,
+            "intermittent": 8
+          }
+        },
+        "burst_event": {
+          "n": 180,
+          "recall": 0.06111111111111111,
+          "uncertain_rate": 0.3611111111111111,
+          "pred_distribution": {
+            "intermittent": 16,
+            "level_shift": 1,
+            "mixed_uncertain": 65,
+            "burst_event": 11,
+            "volatility_shift": 81,
+            "impulse_spike": 6
+          }
+        },
+        "level_shift": {
+          "n": 180,
+          "recall": 0.65,
+          "uncertain_rate": 0.34444444444444444,
+          "pred_distribution": {
+            "level_shift": 117,
+            "mixed_uncertain": 62,
+            "intermittent": 1
+          }
+        },
+        "volatility_shift": {
+          "n": 180,
+          "recall": 0.5722222222222222,
+          "uncertain_rate": 0.36666666666666664,
+          "pred_distribution": {
+            "volatility_shift": 103,
+            "impulse_spike": 1,
+            "mixed_uncertain": 66,
+            "intermittent": 10
+          }
+        },
+        "intermittent": {
+          "n": 180,
+          "recall": 0.7333333333333333,
+          "uncertain_rate": 0.25555555555555554,
+          "pred_distribution": {
+            "intermittent": 132,
+            "mixed_uncertain": 46,
+            "impulse_spike": 2
+          }
+        },
+        "mixed_uncertain": {
+          "n": 180,
+          "recall": 0.8444444444444444,
+          "uncertain_rate": 0.8444444444444444,
+          "pred_distribution": {
+            "mixed_uncertain": 152,
+            "impulse_spike": 26,
+            "intermittent": 2
+          }
+        }
+      }
+    }
+  },
+  "figures": {
+    "expected_prototypes": "outputs/prior_guided_probe_sanity/figures/expected_prior_guided_prototype_shapes.png",
+    "real_examples": "outputs/prior_guided_probe_sanity/figures/real_patch_high_confidence_examples.png",
+    "real_distribution": "outputs/prior_guided_probe_sanity/figures/real_patch_label_distribution.png",
+    "ambiguity_examples": "outputs/prior_guided_probe_sanity/figures/real_patch_ambiguity_examples.png",
+    "synthetic_confusion_16": "outputs/prior_guided_probe_sanity/figures/synthetic_calibration_confusion_patch16.png",
+    "synthetic_confusion_32": "outputs/prior_guided_probe_sanity/figures/synthetic_calibration_confusion_patch32.png"
+  },
+  "summary_path": "outputs/prior_guided_probe_sanity/prior_guided_probe_sanity_summary.json",
+  "report_path": "docs/prior_guided_motif_probe_sanity_check.md"
+}
