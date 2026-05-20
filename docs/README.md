@@ -52,11 +52,20 @@
 
 ## Appendix And Meeting Materials
 
+- [93_last_week_ppt_archive_manifest.md](93_last_week_ppt_archive_manifest.md)  
+  上一周 PPT 素材归档说明。把 TimesFM/cross-model/prior-probe 相关材料标记为历史和 backup，不再作为本周主线证据。
+
+- [94_weekly_advisor_ppt_draft.md](94_weekly_advisor_ppt_draft.md)  
+  本周导师汇报 PPT 草稿。主线切换为 Chronos-2-only layer-wise validation、two-space distance principle 和 DTW-aware original-space validation。
+
+- [95_dynamical_systems_story_ppt_draft.md](95_dynamical_systems_story_ppt_draft.md)  
+  故事版 PPT 草稿。参考 dynamical systems perspective，把当前 Chronos-2 结果组织成 `Dynamical Prototype State Hypothesis`，并给出逐页 figure redraw plan。
+
 - [80_external_weak_motif_probe_sanity_check.md](80_external_weak_motif_probe_sanity_check.md)  
   external weak motif probe 的 sanity check。当前结论是它不能作为 paper-level 主证据。
 
 - [90_advisor_meeting_ppt_material_pack.md](90_advisor_meeting_ppt_material_pack.md)  
-  给导师汇报用的 PPT 素材包、排版建议和口头讲法。
+  上一周给导师汇报用的 PPT 素材包、排版建议和口头讲法。当前作为历史材料和 backup。
 
 - [91_advisor_meeting_ppt_draft_archive.md](91_advisor_meeting_ppt_draft_archive.md)  
   旧 PPT 草稿归档。
