@@ -26,7 +26,7 @@
 - `chronos-2-small/`
 - `timesfm-2.5-200m-pytorch/`
 
-默认下载方式见 `docs/local_model_download.md`。核心原则是使用 `hf-mirror` 的 `hfd.sh`，并在下载命令中显式：
+默认下载方式见 `docs/00_local_model_download.md`。核心原则是使用 `hf-mirror` 的 `hfd.sh`，并在下载命令中显式：
 
 - `HF_ENDPOINT=https://hf-mirror.com`
 - `unset`/`env -u` 所有 `http_proxy`、`https_proxy`、`HTTP_PROXY`、`HTTPS_PROXY`、`ALL_PROXY`、`all_proxy`

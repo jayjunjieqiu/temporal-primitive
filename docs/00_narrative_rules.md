@@ -67,6 +67,19 @@
 7. **Contribution：motif taxonomy discovery protocol。**  
    当前贡献应写成 `model-derived motif taxonomy discovery protocol`、`motif taxonomy v1 pilot`、跨模型/跨层诊断结果。
 
+## 5.1 Distance Principle
+
+本项目采用 **two-space distance principle**：
+
+- 在 `TSFM representation space` 中，用 Euclidean geometry / KMeans / nearest-neighbor 分析模型内部认为哪些 `patch tokens` 相近。这里的目标是发现 `representation neighborhoods`，不是直接定义 motif。
+- 在 `original time-series space` 中，用 DTW-aware geometry 验证这些 neighborhoods 是否对应可解释的 `shapelet-like local patterns`。这里的目标是检查 time shift、phase shift、local warping 后仍是否保持 prototype coherence。
+- 因此，`representation-space Euclidean clustering` 是 candidate generator；`original-space DTW validation` 是 motif/prototype family 命名的必要 gate。
+- raw Euclidean 和 correlation 可以作为 diagnostic controls，但不应替代 DTW 来判断 spike、burst、oscillation 等局部错位敏感 pattern 的原空间相似性。
+
+推荐句式：
+
+> We use Euclidean geometry to discover neighborhoods in Chronos patch-token representation space, and DTW geometry to validate whether those neighborhoods correspond to coherent temporal shapes in original time-series space.
+
 ## 6. 和老师已有工作的连接
 
 ### FM4TS / TSFM Survey
@@ -104,9 +117,9 @@
 一个 cluster 只有同时满足下面条件，才可以作为 `candidate motif/prototype family`，进入 `model-derived motif taxonomy v1 pilot`：
 
 - original-space medoid / nearest neighbors 形态可解释；
-- controlled retrieval 后仍能保持相似形态；
+- DTW-aware controlled retrieval 后仍能保持相似形态；
 - 不被单一 domain、frequency 或 patch position 主导；
-- motif taxonomy v0 分布可以帮助解释，但不要求纯；
+- external weak motif labels / motif taxonomy v0 只能作为 appendix-level sanity check，不进入 paper-level 主证据链；
 - lineage 上能看到 hidden 层相对 raw/tokenizer/projection 的重组；
 - 尽可能通过 cross-model sanity check。
 

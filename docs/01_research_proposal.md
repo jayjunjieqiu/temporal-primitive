@@ -76,20 +76,22 @@ tokenizer/projection 层更可能保留局部形状和数值模式，即 local p
 
 ## 5. 方法路线：Discover First, Name Second
 
-本项目不再从人工 motif taxonomy 出发单向验证模型，而是采用双层 taxonomy 路线：
+本项目不再从人工 motif taxonomy 出发单向验证模型，而是采用 discover-first, name-second 路线。由于当前 external weak motif labels / prior-guided probe 稳定性不足，它们不进入主证据链，只保留为 appendix-level sanity check 或负例讨论。
 
-1. 构造 `motif taxonomy v0`：human-prior / shapelet-inspired probe taxonomy。
-2. 从真实多域数据中抽取 patch bank。
-3. 提取 `raw patch`、`tokenizer/projection`、selected `hidden states`。
-4. 在 representation space 中做 PCA/KMeans、nearest-neighbor retrieval 和 stability check，筛选 candidate motif clusters。
-5. 对每个 cluster 做 original-space inspection：查看 medoid patches、nearest neighbors、full context。
+1. 从真实多域数据中抽取 patch bank。
+2. 提取 `raw patch`、`tokenizer/projection`、selected `hidden states`。
+3. 在 representation space 中用 Euclidean geometry 做 PCA/KMeans、nearest-neighbor retrieval 和 stability check，筛选 candidate motif clusters。
+4. 对每个 cluster 做 original-space inspection：查看 medoid patches、nearest neighbors、full context。
+5. 在 original time-series space 中用 DTW-aware validation 检查 shape coherence，尤其关注 time-shifted / phase-shifted / locally warped shapelet-like patterns。
 6. 对每个 cluster 做 confounder audit：检查 dataset/domain/frequency/patch-index/raw statistics。
 7. 对候选 cluster 做 controlled retrieval：cross-domain、same patch-index、same frequency、cross-model 等条件。
-8. 只有通过审计的 cluster，才进入 `model-derived motif taxonomy v1 pilot`。
+8. 只有通过 representation-space stability、DTW-aware original-space validation 和 confounder audit 的 cluster，才进入 `model-derived motif taxonomy v1 pilot`。
+
+核心方法原则是 **two-space distance principle**：Euclidean 用于 `TSFM representation space` 的模型内部邻域发现；DTW 用于 `original time-series space` 的 motif/prototype 形态验证。
 
 ## 6. Motif Taxonomy v0：Human-Prior Probe
 
-`motif taxonomy v0` 的作用不是提供 ground truth，而是提供弱语义锚点，让我们可以解释和校准原空间 patch shape。
+`motif taxonomy v0` 的作用不是提供 ground truth。考虑到当前 deterministic probe 在真实 patch bank 上稳定性不足，它不再进入主报告证据链，只作为 appendix-level sanity check、术语对照和失败边界说明。
 
 建议 v0 类别：
 
@@ -129,9 +131,9 @@ tokenizer/projection 层更可能保留局部形状和数值模式，即 local p
 
 - silhouette / clustering stability；
 - NMI with dataset/domain/frequency/patch_index；
-- NMI with motif taxonomy v0 labels；
 - cluster size 和 domain coverage；
 - original-space medoid / prototype shape。
+- DTW ratio / DTW medoid coherence，用于判断 cluster 是否能在 original time-series space 中解释为 shapelet-like motif/prototype family。
 
 ### 7.3 Controlled retrieval
 
@@ -148,7 +150,7 @@ tokenizer/projection 层更可能保留局部形状和数值模式，即 local p
 
 - top-k shape similarity；
 - domain/frequency diversity；
-- motif taxonomy v0 agreement as weak probe；
+- DTW / correlation / raw Euclidean retrieval 对比；
 - visual coherence；
 - failure cases。
 
@@ -226,8 +228,8 @@ TimesFM tokenizer 的 patch-index NMI 很低，更像 local patch vocabulary；T
 2. 用更大、更稳的采样替代当前 100 windows/dataset pilot：优先 `500 windows/dataset`，必要时做轻量 `1000 windows/dataset` sanity check。
 3. 从 source-domain balanced 升级为 macro-domain balanced，并在 macro-domain 内限制单个 dataset 贡献，避免 Traffic / Energy 或单个 ETT/PEMS 数据集主导 cluster center。
 4. 用 K sweep 和质量闸门选择 final K setting，而不是依赖 `round(sqrt(n/35))` 这类经验公式。
-5. 在 final K setting 下生成导师汇报级证据：K selection summary、layer comparison、KMeans center-nearest raw patches、confidence-filtered macro-domain examples、prior-guided motif audit 和 diagnostic failure cases。
-6. 更新 `docs/chronos_layer_effect_report.md`，把“哪些 cluster 是可信 temporal concepts，哪些只是 artifact / weak evidence”讲清楚。
+5. 在 final K setting 下生成导师汇报级证据：K selection summary、layer comparison、KMeans center-nearest raw patches、confidence-filtered macro-domain examples、DTW-aware prototype validation 和 diagnostic failure cases。
+6. 更新 `docs/11_chronos_layer_effect_main_report.md`，把“哪些 cluster 是可信 temporal concepts，哪些只是 artifact / weak evidence”讲清楚。
 7. 在 Chronos-2 证据链稳定后，再考虑是否重新引入 Chronos-2-small / TimesFM 做 scale 和 architecture comparison。
 
 ## 13. 相关参考

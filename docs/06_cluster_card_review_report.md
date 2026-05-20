@@ -65,9 +65,7 @@ Retrieval:
 
 - `outputs/cluster_cards/retrieval/chronos_2_layer_11_c6_high_variation_transition_like_retrieval.png`
 
-![Chronos c6 cluster card](../outputs/cluster_cards/cards/chronos_2_layer_11_c6_high_variation_transition_like.png)
 
-![Chronos c6 retrieval](../outputs/cluster_cards/retrieval/chronos_2_layer_11_c6_high_variation_transition_like_retrieval.png)
 
 关键信息：
 
@@ -111,9 +109,7 @@ Retrieval:
 
 - `outputs/cluster_cards/retrieval/timesfm_2_5_layer_10_c8_timesfm_transition_like_retrieval.png`
 
-![TimesFM c8 cluster card](../outputs/cluster_cards/cards/timesfm_2_5_layer_10_c8_timesfm_transition_like.png)
 
-![TimesFM c8 retrieval](../outputs/cluster_cards/retrieval/timesfm_2_5_layer_10_c8_timesfm_transition_like_retrieval.png)
 
 关键信息：
 
@@ -270,7 +266,6 @@ Retrieval:
 
 - `outputs/cluster_cards/retrieval/timesfm_2_5_layer_10_c4_timesfm_patch_position_artifact_retrieval.png`
 
-![TimesFM c4 patch-position artifact card](../outputs/cluster_cards/cards/timesfm_2_5_layer_10_c4_timesfm_patch_position_artifact.png)
 
 关键信息：
 

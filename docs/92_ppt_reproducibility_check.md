@@ -1,6 +1,6 @@
 # PPT 内容幻觉检测与代码可复现性检查
 
-检查对象：`docs/ppt_material_pack_advisor_meeting.md` 及其引用的 `outputs/ppt_raw_assets/` 图片和配套 JSON。
+检查对象：`docs/90_advisor_meeting_ppt_material_pack.md` 及其引用的 `outputs/ppt_raw_assets/` 图片和配套 JSON。
 
 检查时间：2026-05-12。
 
@@ -62,7 +62,7 @@
 .venv/bin/python -m py_compile scripts/build_ppt_raw_assets.py scripts/build_ppt_assets.py scripts/run_cross_model_concept_validation.py scripts/run_input_embedding_ablation.py scripts/run_representation_lineage.py scripts/build_lineage_cards.py scripts/build_patch_cluster_shape_summary.py scripts/build_poster_assets.py
 ```
 
-Markdown 图片链接检查通过：`docs/ppt_material_pack_advisor_meeting.md` 中 23 个本地图片/JSON 链接均存在。
+Markdown 图片链接检查通过：`docs/90_advisor_meeting_ppt_material_pack.md` 中 23 个本地图片/JSON 链接均存在。
 
 核心 claim 的 JSON consistency check 通过，没有发现硬冲突。
 
@@ -114,4 +114,4 @@ Markdown 图片链接检查通过：`docs/ppt_material_pack_advisor_meeting.md` 
 - `outputs/figures/second_pilot/*.png`
 - `outputs/input_embedding_ablation/input_embedding_ablation_summary.json`
 
-因此，本文档中提到的 clean clone 缺少 second-pilot 中间图和 lineage summary 的风险已被缓解。模型权重、external repositories 和 `.venv` 仍然不纳入 git，需要按 `docs/local_model_download.md` 和 `pyproject.toml` 重新恢复。
+因此，本文档中提到的 clean clone 缺少 second-pilot 中间图和 lineage summary 的风险已被缓解。模型权重、external repositories 和 `.venv` 仍然不纳入 git，需要按 `docs/00_local_model_download.md` 和 `pyproject.toml` 重新恢复。

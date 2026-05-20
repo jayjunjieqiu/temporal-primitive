@@ -1,6 +1,6 @@
 version: model_derived_taxonomy_v1_pilot
 status: candidate_inventory_not_final_taxonomy
-source_report: docs/taxonomy_v1_pilot_report.md
+source_report: docs/08_model_derived_taxonomy_pilot_report.md
 source_summary: outputs/taxonomy_v1_pilot/taxonomy_v1_pilot_summary.json
 inclusion_rule:
   required:

@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 DATA_ROOT = Path("/data/junjieqiu/datasets/basicts_datasets")
 OUTPUT_DIR = ROOT / "outputs" / "prior_guided_probe_sanity"
 FIG_DIR = OUTPUT_DIR / "figures"
-REPORT_PATH = ROOT / "docs" / "prior_guided_motif_probe_sanity_check.md"
+REPORT_PATH = ROOT / "docs" / "80_external_weak_motif_probe_sanity_check.md"
 
 sys.path.insert(0, str(ROOT))
 from scripts.explore_motif_taxonomy import LABELS, generate_dataset, label_patch, robust_z  # noqa: E402

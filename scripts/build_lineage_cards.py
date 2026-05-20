@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parents[1]
 OUT_DIR = ROOT / "outputs" / "lineage_cards"
 FIG_DIR = OUT_DIR / "figures"
 SUMMARY_PATH = OUT_DIR / "lineage_card_summary.json"
-REPORT_PATH = ROOT / "docs" / "lineage_card_report.md"
+REPORT_PATH = ROOT / "docs" / "06_representation_lineage_card_report.md"
 
 sys.path.insert(0, str(ROOT))
 import scripts.run_input_embedding_ablation as ab  # noqa: E402

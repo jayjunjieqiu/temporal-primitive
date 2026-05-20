@@ -1,6 +1,6 @@
 # Repository Writing Rules
 
-本仓库所有 proposal、poster、report、figure caption 和实验解释，默认使用 `docs/yuxuan_liang_narrative_rules.md` 中定义的话语体系。
+本仓库所有 proposal、poster、report、figure caption 和实验解释，默认使用 `docs/00_narrative_rules.md` 中定义的话语体系。
 
 核心原则：
 
@@ -15,7 +15,9 @@
 
 写作前先阅读：
 
-- `docs/yuxuan_liang_narrative_rules.md`
-- `proposal_temporal_primitives.md`
-- `docs/second_pilot_discovery_report.md`
-- `docs/lineage_card_report.md`
+- `docs/00_narrative_rules.md`
+- `docs/01_research_proposal.md`
+- `docs/05_second_pilot_discovery_report.md`
+- `docs/06_cluster_card_review_report.md`
+- `docs/07_cluster_level_controlled_validation_report.md`
+- `docs/11_chronos_layer_effect_main_report.md`

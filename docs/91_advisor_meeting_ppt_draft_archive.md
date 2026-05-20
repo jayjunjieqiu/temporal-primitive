@@ -87,7 +87,6 @@ Patch-based TSFMs: `Chronos-2-small`, `Chronos-2`, `TimesFM-2.5`
 
 ## 推荐图片
 
-![Motif taxonomy v0](../outputs/poster_assets/poster_taxonomy_v0_prototypes.png)
 
 ## 版式建议
 
@@ -168,7 +167,6 @@ Pipeline:
 
 ## 推荐图片
 
-![TimesFM clustering](../outputs/poster_assets/poster_selected_timesfm_clustering.png)
 
 ## 版式建议
 
@@ -193,7 +191,6 @@ Pipeline:
 
 ## 推荐图片
 
-![Selected TimesFM patch rows](../outputs/poster_assets/poster_selected_timesfm_patch_rows.png)
 
 ## 版式建议
 
@@ -223,7 +220,6 @@ Evidence for contextualization:
 
 ## 推荐图片
 
-![TimesFM c8 lineage](../outputs/lineage_cards/figures/timesfm_c8_rising_recovery_candidate.png)
 
 ## 版式建议
 
@@ -254,7 +250,6 @@ TimesFM `c4`:
 
 ## 推荐图片
 
-![TimesFM c4 artifact](../outputs/lineage_cards/figures/timesfm_c4_first_patch_artifact.png)
 
 ## 版式建议
 
@@ -282,7 +277,6 @@ Current v1 pilot:
 
 ## 推荐图片
 
-![Concept curves](../outputs/poster_assets/poster_concept_curves.png)
 
 ## 版式建议
 
@@ -310,7 +304,6 @@ Conditions:
 
 ## 推荐图片
 
-![Audit matrix](../outputs/poster_assets/poster_audit_matrix.png)
 
 ## 版式建议
 
@@ -337,7 +330,6 @@ Main result:
 
 ## 推荐图片
 
-![Cross-model validation](../outputs/poster_assets/poster_cross_model.png)
 
 ## 版式建议
 
@@ -420,7 +412,6 @@ tokenizer/projection 和 hidden layer 回答的是不同问题：
 
 ## 可用图
 
-![Lineage overview](../outputs/representation_lineage/figures/lineage_overview.png)
 
 ---
 

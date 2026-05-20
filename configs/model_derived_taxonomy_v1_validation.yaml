@@ -1,6 +1,6 @@
 version: model_derived_taxonomy_v1_cross_model_validation
 status: pilot_validation_not_final_taxonomy
-source_report: docs/cross_model_taxonomy_v1_validation_report.md
+source_report: docs/09_cross_model_validation_archive_report.md
 source_summary: outputs/cross_model_validation/cross_model_validation_summary.json
 prototype_bank: outputs/cross_model_validation/prototype_bank.json
 

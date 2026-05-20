@@ -24,7 +24,7 @@ TIMESFM_SRC = ROOT / "external" / "timesfm" / "src"
 OUT_DIR = ROOT / "outputs" / "input_embedding_ablation"
 FIG_DIR = OUT_DIR / "figures"
 SUMMARY_PATH = OUT_DIR / "input_embedding_ablation_summary.json"
-REPORT_PATH = ROOT / "docs" / "input_embedding_ablation_report.md"
+REPORT_PATH = ROOT / "docs" / "10_input_embedding_ablation_report.md"
 
 sys.path.insert(0, str(ROOT))
 from scripts.run_second_pilot_discovery import (  # noqa: E402

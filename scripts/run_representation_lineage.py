@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 OUT_DIR = ROOT / "outputs" / "representation_lineage"
 FIG_DIR = OUT_DIR / "figures"
 SUMMARY_PATH = OUT_DIR / "representation_lineage_summary.json"
-REPORT_PATH = ROOT / "docs" / "representation_lineage_report.md"
+REPORT_PATH = ROOT / "docs" / "06_representation_lineage_report.md"
 
 import sys
 

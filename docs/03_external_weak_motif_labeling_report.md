@@ -223,7 +223,7 @@ uv lock
    - cluster purity / NMI / ARI
 5. 对 `impulse_spike` 和 `burst_event` 先汇报 parent family `event_like`，只有高置信 prototype 才看 subtype。
 
-模型代码路径沿用 `docs/feasibility_report.md` 已验证结果：
+模型代码路径沿用 `docs/02_feasibility_model_loading_report.md` 已验证结果：
 
 - Chronos-2: `external/chronos-forecasting/src/chronos/chronos2/model.py`
 - Chronos-2 pipeline embed: `external/chronos-forecasting/src/chronos/chronos2/pipeline.py`

@@ -2,7 +2,7 @@
 
 ## 1. 目的
 
-本轮验证是对 `docs/cluster_card_review_report.md` 的进一步审计：上一轮每个 cluster 主要依赖一个 medoid query，因此容易被单个 query 的形态偶然性影响。本轮把单位升级为 **cluster-level multi-query retrieval**，每个 cluster 选取 `16` 个 diverse medoid-like queries，并加入更严格的 position/frequency-aware retrieval 条件。
+本轮验证是对 `docs/06_cluster_card_review_report.md` 的进一步审计：上一轮每个 cluster 主要依赖一个 medoid query，因此容易被单个 query 的形态偶然性影响。本轮把单位升级为 **cluster-level multi-query retrieval**，每个 cluster 选取 `16` 个 diverse medoid-like queries，并加入更严格的 position/frequency-aware retrieval 条件。
 
 本轮仍然不定义最终 taxonomy，只判断哪些候选 cluster 在控制 `patch_index`、`frequency`、`domain` 后仍有稳定 shape-level coherence。
 

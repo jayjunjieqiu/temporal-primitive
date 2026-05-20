@@ -598,10 +598,10 @@ def plot_k_selection(metrics_by_rep: dict[str, list[dict[str, Any]]], selected: 
     fig, axes = plt.subplots(2, 2, figsize=(10.8, 7.2), sharex=True)
     axes = axes.ravel()
     metrics = [
-        ("silhouette", "Silhouette"),
-        ("seed_stability_nmi", "Seed stability NMI"),
-        ("kmeans_vs_agglomerative_nmi", "KMeans vs Agglomerative NMI"),
-        ("nmi_macro_domain", "Macro-domain NMI"),
+        ("silhouette", "Silhouette ($\\uparrow$)"),
+        ("seed_stability_nmi", "Seed stability NMI ($\\uparrow$)"),
+        ("kmeans_vs_agglomerative_nmi", "KMeans vs Agglomerative NMI ($\\uparrow$)"),
+        ("nmi_macro_domain", "Macro-domain NMI ($\\downarrow$)"),
     ]
     for ax, (key, title) in zip(axes, metrics):
         for rep, rows in metrics_by_rep.items():
@@ -619,7 +619,7 @@ def plot_k_selection(metrics_by_rep: dict[str, list[dict[str, Any]]], selected: 
         ax.set_xlabel("K")
         ax.grid(color="#e8edf2", linewidth=0.7)
     axes[0].legend(frameon=False, fontsize=8, ncols=2)
-    fig.suptitle("K selection diagnostics", fontsize=14, y=0.99)
+    fig.suptitle("K selection diagnostics: arrows show preferred direction", fontsize=14, y=0.99)
     fig.tight_layout(rect=[0, 0, 1, 0.97])
     fig.savefig(fig_dir / "k_selection_summary.png", dpi=FIG_DPI)
     plt.close(fig)
@@ -630,10 +630,10 @@ def plot_layer_comparison(final_results: dict[str, dict[str, Any]], fig_dir: Pat
 
     reps = REPRESENTATIONS
     metrics = [
-        ("seed_stability_nmi", "Stability"),
-        ("kmeans_vs_agglomerative_nmi", "Agglomerative agreement"),
-        ("nmi_macro_domain", "Macro-domain NMI"),
-        ("macro_high_conf_rate", "High-conf macro rate"),
+        ("seed_stability_nmi", "Stability ($\\uparrow$)"),
+        ("kmeans_vs_agglomerative_nmi", "Agglomerative agreement ($\\uparrow$)"),
+        ("nmi_macro_domain", "Macro-domain NMI ($\\downarrow$)"),
+        ("macro_high_conf_rate", "High-conf macro rate ($\\uparrow$)"),
     ]
     values = np.asarray([[final_results[rep]["metrics"][key] for key, _ in metrics] for rep in reps], dtype=float)
     x = np.arange(len(reps))
@@ -647,7 +647,7 @@ def plot_layer_comparison(final_results: dict[str, dict[str, Any]], fig_dir: Pat
     ax.set_xticklabels(["Projection", "Layer 0", "Layer 6", "Layer 11"])
     ax.set_ylim(0, max(1.0, float(np.nanmax(values)) * 1.18))
     ax.set_ylabel("Score")
-    ax.set_title("Layer-wise validation summary", fontsize=14)
+    ax.set_title("Layer-wise validation summary: arrows show preferred direction", fontsize=14)
     ax.legend(frameon=False, fontsize=8, ncols=2)
     ax.grid(axis="y", color="#e8edf2", linewidth=0.7)
     fig.tight_layout()
@@ -963,7 +963,9 @@ def write_report(
     lines.append("")
     lines.append("这版报告回答 Yuxuan Liang 老师关心的机制问题：Chronos-2 的 `projection`、`layer_0`、`layer_6`、`layer_11` 是否保留 single patch 的 local temporal information，以及这些 local primitives 如何被 transformer layers 重组为 contextualized cross-domain temporal concepts。")
     lines.append("")
-    lines.append("我们不把 `prior-guided motif` 当 ground truth，也不把它用于命名 KMeans clusters。所有 cluster 只写作 `C0, C1, ...`。")
+    lines.append("由于当前 external weak motif labels 稳定性不足，本报告不再把它放入主证据链。所有 cluster 只写作 `C0, C1, ...`，主结论只依赖 representation geometry、original-space prototype、macro-domain evidence 和 confounder audit。")
+    lines.append("")
+    lines.append("方法上采用 **two-space distance principle**：在 `Chronos-2 representation space` 中用 Euclidean geometry / KMeans 发现模型内部的 patch-token neighborhoods；回到 `original time-series space` 后，再用 DTW-aware validation 判断这些 neighborhoods 是否足以被命名为 shapelet-like motif/prototype family。本报告的 K 是 representation-space operating point，不是 DTW clustering 的 K。")
     lines.append("")
     lines.append("## 1. Pilot Limitations")
     lines.append("")
@@ -986,9 +988,9 @@ def write_report(
     lines.append(f"- max patches per dataset within macro-domain: `{summary['max_per_dataset_within_macro_domain']}`")
     lines.append(f"- K candidates after coarse-to-fine search are recorded in `k_sweep_metrics.csv`。")
     lines.append("")
-    lines.append("K selection 不使用 silhouette-only，而是综合 seed stability、KMeans vs Agglomerative agreement、cluster size、confounder NMI、Davies-Bouldin 和 original-space evidence。")
+    lines.append("K selection 不使用 silhouette-only，而是综合 seed stability、KMeans vs Agglomerative agreement、cluster size、confounder NMI、Davies-Bouldin 和 original-space evidence。需要注意：这里选择的是 representation-space K；motif/prototype 命名还需要后续 DTW-aware original-space validation。")
     lines.append("")
-    lines.append("主证据筛选也预先定义：cluster 不能太小，center-nearest raw patches 需要视觉一致，confidence-filtered macro-domain view 需要多个真实 macro-domain 的可信 match，同时不能明显被 single dataset、frequency 或 patch index 主导。")
+    lines.append("主证据筛选也预先定义：cluster 不能太小，center-nearest raw patches 需要视觉一致，confidence-filtered macro-domain view 需要多个真实 macro-domain 的可信 match，同时不能明显被 single dataset、frequency 或 patch index 主导。后续进入 motif/prototype family 的候选，还必须通过 DTW medoid / DTW controlled retrieval。")
     lines.append("")
     lines.append("## 3. K Selection Result")
     lines.append("")
@@ -1011,7 +1013,7 @@ def write_report(
     lines.append("")
     lines.append("## 4. Layer-wise Validation Summary")
     lines.append("")
-    lines.append("| representation | K | silhouette | stability | agg NMI | macro NMI | frequency NMI | high-conf macro rate |")
+    lines.append("| representation | K | silhouette ↑ | stability ↑ | agg NMI ↑ | macro NMI ↓ | frequency NMI ↓ | high-conf macro rate ↑ |")
     lines.append("|---|---:|---:|---:|---:|---:|---:|---:|")
     for rep in REPRESENTATIONS:
         m = final_results[rep]["metrics"]
@@ -1025,12 +1027,12 @@ def write_report(
     lines.append("")
     lines.append("| metric | 含义 | 方向 | 注意事项 |")
     lines.append("|---|---|---|---|")
-    lines.append("| `silhouette` | 样本到本 cluster 的紧密度相对其它 cluster 的分离度。 | 越高越好 | 不能单独用来选 K，因为高分可能来自过粗划分或 domain separation。 |")
-    lines.append("| `stability` | 不同 KMeans random seeds 得到的 labels 的 NMI 平均值。 | 越高越好 | 表示 clustering 对初始化不敏感，但不等于语义正确。 |")
-    lines.append("| `agg NMI` | KMeans labels 与 AgglomerativeClustering labels 的 NMI。 | 越高越好 | 表示 cluster structure 不太依赖单一聚类算法。 |")
-    lines.append("| `macro NMI` | cluster labels 与 macro-domain labels 的 NMI。 | 通常越低越好 | 高值提示 domain confounding；若研究 domain-specific concept，则可作为警告而非直接否定。 |")
-    lines.append("| `frequency NMI` | cluster labels 与采样频率/cadence labels 的 NMI。 | 通常越低越好 | 高值提示 frequency/cadence confounding。 |")
-    lines.append("| `high-conf macro rate` | cluster × real macro-domain cell 中存在同 cluster 且距离中心足够近的比例。 | 越高越好 | 用于检查原空间 prototype 能否跨真实 macro-domain 复现，不含 Synthetic control。 |")
+    lines.append("| `silhouette ↑` | 样本到本 cluster 的紧密度相对其它 cluster 的分离度。 | 越高越好 | 不能单独用来选 K，因为高分可能来自过粗划分或 domain separation。 |")
+    lines.append("| `stability ↑` | 不同 KMeans random seeds 得到的 labels 的 NMI 平均值。 | 越高越好 | 表示 clustering 对初始化不敏感，但不等于语义正确。 |")
+    lines.append("| `agg NMI ↑` | KMeans labels 与 AgglomerativeClustering labels 的 NMI。 | 越高越好 | 表示 cluster structure 不太依赖单一聚类算法。 |")
+    lines.append("| `macro NMI ↓` | cluster labels 与 macro-domain labels 的 NMI。 | 通常越低越好 | 高值提示 domain confounding；若研究 domain-specific concept，则可作为警告而非直接否定。 |")
+    lines.append("| `frequency NMI ↓` | cluster labels 与采样频率/cadence labels 的 NMI。 | 通常越低越好 | 高值提示 frequency/cadence confounding。 |")
+    lines.append("| `high-conf macro rate ↑` | cluster × real macro-domain cell 中存在同 cluster 且距离中心足够近的比例。 | 越高越好 | 用于检查原空间 prototype 能否跨真实 macro-domain 复现，不含 Synthetic control。 |")
     lines.append("")
     lines.append(f"![Layer comparison summary]({rel_fig('layer_comparison_summary.png')})")
     lines.append("")
@@ -1083,8 +1085,6 @@ def write_report(
             lines.append("")
             lines.append(f"![{rep} K{k} macro-domain filtered]({rel_fig(f'{rep}_k{k}_macro_domain_filtered.png')})")
             lines.append("")
-            lines.append(f"![{rep} K{k} prior audit]({rel_fig(f'{rep}_k{k}_embedding_audit.png')})")
-            lines.append("")
             lines.append("All clusters under this layer-specific K setting:")
             lines.append("")
             lines.append("| cluster | tier | size | score | macro domains | raw coherence | confounder risk | interpretation status |")
@@ -1105,20 +1105,13 @@ def write_report(
                     f"{c['confounder_risk_max_share']:.3f} | {status} |"
                 )
         lines.append("")
-    lines.append("## 7. Prior-guided Motif Audit")
-    lines.append("")
-    lines.append("下面的图只用于检查 model-derived clusters 与 human-prior motif probe 是否对齐。它不能证明 cluster 的 ground-truth 语义，也不能作为 cluster 命名来源。")
-    for rep in REPRESENTATIONS:
-        lines.append("")
-        lines.append(f"![{rep} prior audit]({rel_fig(f'{rep}_embedding_audit.png')})")
-    lines.append("")
-    lines.append("## 8. Diagnostic Evidence and Failure Cases")
+    lines.append("## 7. Diagnostic Evidence and Failure Cases")
     lines.append("")
     lines.append(f"![Diagnostic failure cases]({rel_fig('diagnostic_failure_cases.png')})")
     lines.append("")
     lines.append("这些 failure cases 是方法的安全阀：如果 cluster 视觉上有形态但 confounder 风险高、macro-domain match 弱或 cluster 太小，就不进入主结论。")
     lines.append("")
-    lines.append("## 9. Final Answer for Advisor")
+    lines.append("## 8. Final Answer for Advisor")
     lines.append("")
     lines.append("当前可以稳健声称：Chronos-2 的 patch representations 在不同层中确实保留并重组 local temporal information；但不同层承担的角色不同。`projection` / `layer_0` 更适合回答 single patch local vocabulary，`layer_6` / `layer_11` 更适合观察 contextual mixing 和 domain/cadence-style 的重组。")
     lines.append("")
@@ -1237,15 +1230,6 @@ def main() -> None:
         final_results[rep] = result
         rep_payloads[rep] = plot_payload
 
-        plot_embedding_audit(
-            rep,
-            plot_payload["x_pca"][:, :2],
-            plot_payload["labels"],
-            plot_payload["centers"][:, :2],
-            plot_payload["metadata"],
-            result["displayed_clusters"],
-            fig_dir,
-        )
         plot_center_nearest(
             rep,
             result["displayed_clusters"],
@@ -1274,17 +1258,6 @@ def main() -> None:
         result, plot_payload = build_cluster_result(rep, per_layer_k, payload, metrics_by_rep[rep], args.seed)
         layer_specific_results[rep] = result
         title_suffix = f"K={per_layer_k}"
-        plot_embedding_audit(
-            rep,
-            plot_payload["x_pca"][:, :2],
-            plot_payload["labels"],
-            plot_payload["centers"][:, :2],
-            plot_payload["metadata"],
-            result["displayed_clusters"],
-            fig_dir,
-            output_name=f"{rep}_k{per_layer_k}_embedding_audit",
-            title_suffix=title_suffix,
-        )
         plot_center_nearest(
             rep,
             result["displayed_clusters"],
@@ -1315,7 +1288,7 @@ def main() -> None:
         out_dir,
         "## Checkpoint 4: figures generated\n\n"
         "- all-cluster evidence figures: center-nearest raw patches, confidence-filtered macro-domain examples, layer comparison, K selection summary。\n"
-        "- diagnostic figures: prior-guided audit and failure cases。\n"
+        "- diagnostic figures: failure cases。External weak motif labels are excluded from the main evidence chain。\n"
         "- 注意：shared K=6 时每层均展示 C0-C5，不隐藏 weak/confounded clusters。\n"
         f"- layer-specific K checks: `{ {rep: result['metrics']['k'] for rep, result in layer_specific_results.items()} }`。",
     )
@@ -1350,11 +1323,11 @@ def main() -> None:
         },
     }
     (out_dir / "cluster_validation_summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
-    write_report(ROOT / "docs" / "chronos_layer_effect_report.md", summary, selected_k, final_results, layer_specific_results, fig_dir)
+    write_report(ROOT / "docs" / "11_chronos_layer_effect_main_report.md", summary, selected_k, final_results, layer_specific_results, fig_dir)
     append_log(
         out_dir,
         "## Checkpoint 5: report updated\n\n"
-        f"- report: `docs/chronos_layer_effect_report.md`\n"
+        f"- report: `docs/11_chronos_layer_effect_main_report.md`\n"
         f"- selected shared K: `{shared_k}`\n"
         "- 剩余风险：cluster 仍是 exploratory operating point，不是 final taxonomy；需要更大数据重采样和领域审阅才能写成最终 paper claim。",
     )
