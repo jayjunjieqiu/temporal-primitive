@@ -24,6 +24,17 @@ external/
 *.log
 *.tmp
 
+# Figure project caches and superseded scratch assets
+figure_projects/**/cache/**
+figure_projects/**/assets/intermediates/**
+figure_projects/**/assets/smoke_*
+figure_projects/**/assets/*p30*
+figure_projects/**/assets/**/*_v2.*
+figure_projects/**/assets/**/*_v3.*
+figure_projects/**/assets/**/patch_stack_exemplar_cards_layer0_k6.png
+figure_projects/**/assets/**/patch_stack_exemplar_cards_layer0_k6_data.npz
+figure_projects/**/assets/**/patch_stack_exemplar_cards_layer0_k6_summary.json
+
 # Output policy:
 # ignore generated outputs by default, then explicitly keep compact summaries
 # and report-linked evidence figures that are useful for discussion.

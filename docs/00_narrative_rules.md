@@ -6,15 +6,17 @@
 
 关键修正：`motif taxonomy`、`temporal primitives`、`时序语言` 都可以使用，而且是我们圈子里能读懂的语言；但要采用双层叙事，避免把 human-prior taxonomy 当作 ground truth。
 
+2026-05-20 路线更新：`Chronos-2` 相关 layer-wise representation 结果统一归档为历史探索材料。原因是 Chronos-2 `projection` / `input_patch_embedding` 输入包含 `[time encoding, normalized patch values, patch mask]`，不适合作为 pure value-only patch token 来回答 single-patch local information。后续默认使用 `Chronos-Bolt` 作为 Chronos family 主模型，重新验证 patch-level temporal primitive / motif prototype learning。
+
 ## 2. 主叙事
 
 推荐一句话：
 
-> 本项目研究 patch-based TSFMs 是否在 heterogeneous cross-domain time series 中学习到可迁移的 patch-level temporal primitives，并通过 representation clustering、controlled retrieval、confounder audit 和 original-space inspection，从 human-prior motif taxonomy v0 走向 model-derived motif taxonomy v1。
+> 本项目研究 patch-based TSFMs 是否在 heterogeneous cross-domain time series 中学习到可迁移的 patch-level temporal primitives，并通过 representation clustering、controlled retrieval、confounder audit 和 original-space inspection，从 human-prior motif taxonomy v0 走向 model-derived motif taxonomy v1。当前新主线以 Chronos-Bolt 作为默认模型，Chronos-2 结果作为 archived diagnostic pilot。
 
 英文短句：
 
-> We diagnose what patch tokens in TSFMs learn by discovering and auditing model-derived motif/prototype families in the patch-token representation space.
+> We diagnose what patch tokens in TSFMs learn by discovering and auditing model-derived motif/prototype families in the patch-token representation space. Chronos-2 evidence is archived because its projection token includes explicit time encoding; Chronos-Bolt is the default model for the next clean patch-token analysis.
 
 ## 3. 双层 Motif Taxonomy
 
@@ -104,7 +106,8 @@
 
 ### Scaling Laws
 
-- `Chronos-2-small -> Chronos-2` 是模型规模/能力变化下 motif organization 的 scaling diagnosis。
+- `Chronos-2-small -> Chronos-2` 是历史阶段的模型规模/能力变化下 motif organization 的 scaling diagnosis，但当前已归档。
+- `Chronos-Bolt` 是后续 Chronos family 的默认主线模型，用于更干净地验证 patch-value-based local motif/prototype learning。
 - `TimesFM-2.5` 是 architecture contrast，用来判断发现是否是 Chronos-specific。
 
 ### ShapeX / Shapelet-Driven Explanation

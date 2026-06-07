@@ -1,5 +1,8 @@
 # 研究提案：TSFM 的 Model-Derived Motif Taxonomy Discovery
 
+> **2026-05-20 路线更新**  
+> Chronos-2 相关 layer-wise representation 结果已归档。原因是进一步检查发现 Chronos-2 `projection` / `input_patch_embedding` 输入包含 `[time encoding, normalized patch values, patch mask]`，因此它不是 pure value-only patch token，不适合作为回答 single-patch local information 的主证据。后续默认使用 `Chronos-Bolt` 作为 Chronos family 主模型，重新验证 patch-level temporal primitive / motif prototype learning。详见 `docs/99_chronos2_archive_and_chronos_bolt_pivot.md`。
+
 ## 题目
 
 **What Is the Temporal Language of TSFMs? From Human-Prior Motif Taxonomy to Model-Derived Taxonomy**

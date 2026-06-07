@@ -1,0 +1,356 @@
+{
+  "source": "end-to-end redraw, no PNG cropping",
+  "model": "Chronos-2 archived pilot",
+  "representation": "layer_0",
+  "k": 15,
+  "cluster_space": "pca",
+  "windows_per_dataset": 100,
+  "context_len": 128,
+  "seed": 47,
+  "batch_size": 128,
+  "use_cache": true,
+  "selection_mode": "source_domain_balanced",
+  "num_all_patches": 7700,
+  "num_selected_patches": 7700,
+  "num_tsne_patches": 7700,
+  "max_tsne_points": 7700,
+  "pca": {
+    "pca_pre_dim": 30
+  },
+  "tsne": {
+    "pca_pre_dim": 30,
+    "backend": "cuml_tsne",
+    "input_shape": [
+      7700,
+      30
+    ],
+    "output_shape": [
+      7700,
+      2
+    ],
+    "perplexity": 40.0,
+    "n_neighbors": 121,
+    "max_iter": 1000,
+    "init": "random",
+    "fit_sec": 0.9073645062744617,
+    "rapids_env": "rapids-tsne",
+    "input_cache": "/data/junjieqiu/temporal-primitive/figure_projects/reference_style_spectral_illustration/cache/reducers/cuml_layer0_n7700_d30_seed47_p40_it1000_initrandom_input.npy",
+    "output_cache": "/data/junjieqiu/temporal-primitive/figure_projects/reference_style_spectral_illustration/cache/reducers/cuml_layer0_n7700_d30_seed47_p40_it1000_initrandom_tsne.npy"
+  },
+  "reducer": "cuml_tsne",
+  "cluster_center_marker": "center-nearest point displayed in t-SNE space",
+  "intermediate_paths": {
+    "embeddings": "/data/junjieqiu/temporal-primitive/figure_projects/reference_style_spectral_illustration/assets/intermediates/central_representation_atlas_layer0_aligned_k15_pca_cluster_cuml_tsne/embeddings.npy",
+    "raw_patches": "/data/junjieqiu/temporal-primitive/figure_projects/reference_style_spectral_illustration/assets/intermediates/central_representation_atlas_layer0_aligned_k15_pca_cluster_cuml_tsne/raw_patches.npy",
+    "pca_coordinates": "/data/junjieqiu/temporal-primitive/figure_projects/reference_style_spectral_illustration/assets/intermediates/central_representation_atlas_layer0_aligned_k15_pca_cluster_cuml_tsne/pca_coordinates.npy",
+    "tsne_coordinates": "/data/junjieqiu/temporal-primitive/figure_projects/reference_style_spectral_illustration/assets/intermediates/central_representation_atlas_layer0_aligned_k15_pca_cluster_cuml_tsne/tsne_coordinates.npy",
+    "cluster_input_coordinates": "/data/junjieqiu/temporal-primitive/figure_projects/reference_style_spectral_illustration/assets/intermediates/central_representation_atlas_layer0_aligned_k15_pca_cluster_cuml_tsne/cluster_input_coordinates.npy",
+    "cluster_labels": "/data/junjieqiu/temporal-primitive/figure_projects/reference_style_spectral_illustration/assets/intermediates/central_representation_atlas_layer0_aligned_k15_pca_cluster_cuml_tsne/cluster_labels.npy",
+    "cluster_centers": "/data/junjieqiu/temporal-primitive/figure_projects/reference_style_spectral_illustration/assets/intermediates/central_representation_atlas_layer0_aligned_k15_pca_cluster_cuml_tsne/cluster_centers.npy",
+    "center_nearest_indices": "/data/junjieqiu/temporal-primitive/figure_projects/reference_style_spectral_illustration/assets/intermediates/central_representation_atlas_layer0_aligned_k15_pca_cluster_cuml_tsne/center_nearest_indices.npy",
+    "center_nearest_raw_patches": "/data/junjieqiu/temporal-primitive/figure_projects/reference_style_spectral_illustration/assets/intermediates/central_representation_atlas_layer0_aligned_k15_pca_cluster_cuml_tsne/center_nearest_raw_patches.npy",
+    "display_positions": "/data/junjieqiu/temporal-primitive/figure_projects/reference_style_spectral_illustration/assets/intermediates/central_representation_atlas_layer0_aligned_k15_pca_cluster_cuml_tsne/display_positions.npy",
+    "metadata": "/data/junjieqiu/temporal-primitive/figure_projects/reference_style_spectral_illustration/assets/intermediates/central_representation_atlas_layer0_aligned_k15_pca_cluster_cuml_tsne/metadata.json",
+    "cluster_summary": "/data/junjieqiu/temporal-primitive/figure_projects/reference_style_spectral_illustration/assets/intermediates/central_representation_atlas_layer0_aligned_k15_pca_cluster_cuml_tsne/cluster_summary.json"
+  },
+  "timings_sec": {
+    "load_cache_sec": 0.13735106959939003,
+    "load_raw_patch_cache_sec": 0.000519879162311554,
+    "dropped_nonfinite_embeddings": 0.0,
+    "tsne_stratified_cap_sec": 0.07098278030753136,
+    "preprocess_pca_sec": 1.9638839773833752,
+    "tsne_sec": 3.5960704907774925,
+    "kmeans_sec": 12.313891731202602,
+    "draw_sec": 0.8095261417329311,
+    "total_sec": 18.966086618602276
+  },
+  "dataset_summary": [
+    {
+      "dataset": "BeijingAirQuality",
+      "domain": "Beijing air quality",
+      "frequency_minutes": 60,
+      "shape": [
+        36000,
+        7,
+        3
+      ],
+      "accepted_windows": 100,
+      "attempts": 100,
+      "status": "ok"
+    },
+    {
+      "dataset": "CA",
+      "domain": "traffic flow",
+      "frequency_minutes": 15,
+      "shape": [
+        35040,
+        8600,
+        3
+      ],
+      "accepted_windows": 100,
+      "attempts": 100,
+      "status": "ok"
+    },
+    {
+      "dataset": "ETTh1",
+      "domain": "electricity transformer temperature",
+      "frequency_minutes": 60,
+      "shape": [
+        14400,
+        7,
+        5
+      ],
+      "accepted_windows": 100,
+      "attempts": 100,
+      "status": "ok"
+    },
+    {
+      "dataset": "ETTh2",
+      "domain": "electricity transformer temperature",
+      "frequency_minutes": 60,
+      "shape": [
+        14400,
+        7,
+        5
+      ],
+      "accepted_windows": 100,
+      "attempts": 102,
+      "status": "ok"
+    },
+    {
+      "dataset": "ETTm1",
+      "domain": "electricity transformer temperature",
+      "frequency_minutes": 15,
+      "shape": [
+        57600,
+        7,
+        5
+      ],
+      "accepted_windows": 100,
+      "attempts": 100,
+      "status": "ok"
+    },
+    {
+      "dataset": "ETTm2",
+      "domain": "electricity transformer temperature",
+      "frequency_minutes": 15,
+      "shape": [
+        57600,
+        7,
+        5
+      ],
+      "accepted_windows": 100,
+      "attempts": 104,
+      "status": "ok"
+    },
+    {
+      "dataset": "Electricity",
+      "domain": "electricity consumption",
+      "frequency_minutes": 60,
+      "shape": [
+        26304,
+        321,
+        5
+      ],
+      "accepted_windows": 100,
+      "attempts": 100,
+      "status": "ok"
+    },
+    {
+      "dataset": "ExchangeRate",
+      "domain": "exchange rate",
+      "frequency_minutes": 1440,
+      "shape": [
+        7588,
+        8,
+        5
+      ],
+      "accepted_windows": 100,
+      "attempts": 100,
+      "status": "ok"
+    },
+    {
+      "dataset": "GBA",
+      "domain": "traffic flow",
+      "frequency_minutes": 15,
+      "shape": [
+        35040,
+        2352,
+        3
+      ],
+      "accepted_windows": 100,
+      "attempts": 101,
+      "status": "ok"
+    },
+    {
+      "dataset": "GLA",
+      "domain": "traffic flow",
+      "frequency_minutes": 15,
+      "shape": [
+        35040,
+        3834,
+        3
+      ],
+      "accepted_windows": 100,
+      "attempts": 100,
+      "status": "ok"
+    },
+    {
+      "dataset": "Gaussian",
+      "domain": "simulated Gaussian data",
+      "frequency_minutes": null,
+      "shape": [
+        10000,
+        1,
+        1
+      ],
+      "accepted_windows": 100,
+      "attempts": 100,
+      "status": "ok"
+    },
+    {
+      "dataset": "Illness",
+      "domain": "illness data",
+      "frequency_minutes": 10080.0,
+      "shape": [
+        966,
+        7,
+        5
+      ],
+      "accepted_windows": 100,
+      "attempts": 100,
+      "status": "ok"
+    },
+    {
+      "dataset": "METR-LA",
+      "domain": "traffic speed",
+      "frequency_minutes": 5,
+      "shape": [
+        34272,
+        207,
+        3
+      ],
+      "accepted_windows": 100,
+      "attempts": 104,
+      "status": "ok"
+    },
+    {
+      "dataset": "PEMS-BAY",
+      "domain": "traffic speed",
+      "frequency_minutes": 5,
+      "shape": [
+        52116,
+        325,
+        3
+      ],
+      "accepted_windows": 100,
+      "attempts": 100,
+      "status": "ok"
+    },
+    {
+      "dataset": "PEMS03",
+      "domain": "traffic flow",
+      "frequency_minutes": 5,
+      "shape": [
+        26208,
+        358,
+        3
+      ],
+      "accepted_windows": 100,
+      "attempts": 100,
+      "status": "ok"
+    },
+    {
+      "dataset": "PEMS04",
+      "domain": "traffic flow",
+      "frequency_minutes": 5,
+      "shape": [
+        16992,
+        307,
+        3
+      ],
+      "accepted_windows": 100,
+      "attempts": 100,
+      "status": "ok"
+    },
+    {
+      "dataset": "PEMS07",
+      "domain": "traffic flow",
+      "frequency_minutes": 5,
+      "shape": [
+        28224,
+        883,
+        3
+      ],
+      "accepted_windows": 100,
+      "attempts": 100,
+      "status": "ok"
+    },
+    {
+      "dataset": "PEMS08",
+      "domain": "traffic flow",
+      "frequency_minutes": 5,
+      "shape": [
+        17856,
+        170,
+        3
+      ],
+      "accepted_windows": 100,
+      "attempts": 100,
+      "status": "ok"
+    },
+    {
+      "dataset": "Pulse",
+      "domain": "simulated pulse data",
+      "frequency_minutes": null,
+      "shape": [
+        20000,
+        1,
+        1
+      ],
+      "accepted_windows": 100,
+      "attempts": 100,
+      "status": "ok"
+    },
+    {
+      "dataset": "SD",
+      "domain": "traffic flow",
+      "frequency_minutes": 15,
+      "shape": [
+        35040,
+        716,
+        3
+      ],
+      "accepted_windows": 100,
+      "attempts": 101,
+      "status": "ok"
+    },
+    {
+      "dataset": "Traffic",
+      "domain": "road occupancy rates",
+      "frequency_minutes": 60,
+      "shape": [
+        17544,
+        862,
+        5
+      ],
+      "accepted_windows": 100,
+      "attempts": 100,
+      "status": "ok"
+    },
+    {
+      "dataset": "Weather",
+      "domain": "weather",
+      "frequency_minutes": 10,
+      "shape": [
+        52696,
+        21,
+        5
+      ],
+      "accepted_windows": 100,
+      "attempts": 102,
+      "status": "ok"
+    }
+  ],
+  "output": "figure_projects/reference_style_spectral_illustration/assets/central_representation_atlas_layer0_aligned_k15_pca_cluster_cuml_tsne.png"
+}

@@ -1,14 +1,21 @@
 # Documentation Index
 
-本目录按研究阶段和证据层级重新命名。当前主线是 **Chronos-2-only representation interpretability**：在 `representation space` 中用 Euclidean geometry 发现 model-derived neighborhoods，在 `original time-series space` 中用 DTW-aware validation 判断这些 neighborhoods 是否足以进入 candidate motif/prototype family。
+本目录按研究阶段和证据层级重新命名。当前主线已经从 **Chronos-2-only representation interpretability** 转向 **Chronos-Bolt-based patch-token motif/prototype discovery**。
+
+转向原因：进一步检查后发现，`Chronos-2` 的 `projection` / `input_patch_embedding` 输入并不是 pure value-only patch，而是 `[time encoding, normalized patch values, patch mask]`。这会混淆我们对 single-patch local information 的解释。因此 Chronos-2 相关结果统一归档为历史探索材料，后续默认使用 `Chronos-Bolt` 重新验证 patch-level temporal primitive / motif prototype 问题。
 
 ## Current Main Reports
 
+- [99_chronos2_archive_and_chronos_bolt_pivot.md](99_chronos2_archive_and_chronos_bolt_pivot.md)  
+  当前路线转向说明。解释为什么 Chronos-2 证据需要归档，以及为什么后续默认改用 Chronos-Bolt。
+
+## Archived Chronos-2 Evidence
+
 - [11_chronos_layer_effect_main_report.md](11_chronos_layer_effect_main_report.md)  
-  当前最主要报告。回答 Chronos-2 的 `projection / layer_0 / layer_6 / layer_11` 是否保留 single-patch local information，以及这些 representation clusters 是否能回到原空间解释为 candidate motif/prototype families。
+  已归档。回答 Chronos-2 的 `projection / layer_0 / layer_6 / layer_11` 是否保留 single-patch local information，以及这些 representation clusters 是否能回到原空间解释为 candidate motif/prototype families。由于 Chronos-2 projection 包含 explicit time encoding，不再作为后续主线证据。
 
 - [12_distance_metric_ablation_report.md](12_distance_metric_ablation_report.md)  
-  方法补充报告。说明 two-space distance principle：`representation space` 用 Euclidean/KMeans 做 candidate discovery，`original time-series space` 用 DTW 做 prototype validation 和 controlled retrieval audit。
+  已归档的方法补充报告。说明 two-space distance principle：`representation space` 用 Euclidean/KMeans 做 candidate discovery，`original time-series space` 用 DTW 做 prototype validation 和 controlled retrieval audit。该方法原则保留，但 Chronos-2 结果不再作为主线。
 
 ## Project Setup And Rules
 
@@ -56,10 +63,25 @@
   上一周 PPT 素材归档说明。把 TimesFM/cross-model/prior-probe 相关材料标记为历史和 backup，不再作为本周主线证据。
 
 - [94_weekly_advisor_ppt_draft.md](94_weekly_advisor_ppt_draft.md)  
-  本周导师汇报 PPT 草稿。主线切换为 Chronos-2-only layer-wise validation、two-space distance principle 和 DTW-aware original-space validation。
+  已归档的导师汇报 PPT 草稿。主线曾切换为 Chronos-2-only layer-wise validation、two-space distance principle 和 DTW-aware original-space validation。
 
 - [95_dynamical_systems_story_ppt_draft.md](95_dynamical_systems_story_ppt_draft.md)  
-  故事版 PPT 草稿。参考 dynamical systems perspective，把当前 Chronos-2 结果组织成 `Dynamical Prototype State Hypothesis`，并给出逐页 figure redraw plan。
+  已归档的故事版 PPT 草稿。参考 dynamical systems perspective，把 Chronos-2 结果组织成 `Dynamical Prototype State Hypothesis`，并给出逐页 figure redraw plan。
+
+- [96_notion_dynamical_story_report.md](96_notion_dynamical_story_report.md)  
+  已归档的 Notion 版周汇报报告。直接使用 Chronos-2 实验原图，回答 single patch local information、KMeans center-nearest examples 和新 TSFM 设计启发三个问题。
+
+- [97_tsne_then_kmeans_cluster_report.md](97_tsne_then_kmeans_cluster_report.md)  
+  已归档。t-SNE 降维后 KMeans 聚类结果与原型图报告。只看 Chronos-2 `projection`、`layer_6`、`layer_11`。
+
+- [98_tsne_domain_label_report.md](98_tsne_domain_label_report.md)  
+  已归档。t-SNE 降维后直接打上 source-domain / macro-domain 标签的诊断报告。
+
+- [97_pca_then_kmeans_cluster_report.md](97_pca_then_kmeans_cluster_report.md)  
+  已归档。PCA-space KMeans 聚类结果与原型图报告。作为 t-SNE 的线性全局结构对照。
+
+- [98_pca_domain_label_report.md](98_pca_domain_label_report.md)  
+  已归档。PCA 降维后直接打上 source-domain / macro-domain 标签的诊断报告。
 
 - [80_external_weak_motif_probe_sanity_check.md](80_external_weak_motif_probe_sanity_check.md)  
   external weak motif probe 的 sanity check。当前结论是它不能作为 paper-level 主证据。
@@ -73,7 +95,7 @@
 - [92_ppt_reproducibility_check.md](92_ppt_reproducibility_check.md)  
   PPT 内容幻觉检测与代码可复现性检查归档。
 
-注意：`90_*` 到 `92_*` 是 meeting/archive materials，部分引用的旧图片来自 ignored `outputs/` 目录，clean clone 中可能不存在。当前主证据以 `11_*` 和 `12_*` 为准。
+注意：`90_*` 到 `98_*` 多为 meeting/archive materials，部分引用的旧图片来自 ignored `outputs/` 目录，clean clone 中可能不存在。当前路线决策以 `99_*` 为准；后续主证据应围绕 Chronos-Bolt 重新生成。
 
 ## Naming Rule
 
@@ -81,6 +103,7 @@
 - `01_*`: proposal
 - `02_*`: feasibility
 - `03_*` to `10_*`: discovery and validation history
-- `11_*` to `12_*`: current main evidence and method ablation
+- `11_*` to `12_*`: archived Chronos-2 main evidence and method ablation
 - `80_*`: appendix / weak-label sanity checks
 - `90_*`: meeting and PPT materials
+- `99_*`: route pivot / archive decisions
