@@ -1,0 +1,181 @@
+{
+  "model": "chronos-bolt-base",
+  "patch_len": 16,
+  "config": {
+    "windows_per_dataset": 120,
+    "context_len": 128,
+    "seed": 47,
+    "batch_size": 128,
+    "card_layers": [
+      0,
+      11
+    ],
+    "prototype_layers": [
+      0,
+      11
+    ],
+    "k": 6,
+    "top_n": 24,
+    "proto_per_cluster": 6,
+    "max_per_domain": 400,
+    "tsne_perplexity": 40.0,
+    "out": "/data/junjieqiu/temporal-primitive/outputs/figures/bolt_main_figure"
+  },
+  "cards": {
+    "layer_0": {
+      "output": "/data/junjieqiu/temporal-primitive/outputs/figures/bolt_main_figure/bolt_patch_stack_cards_layer0.png",
+      "clusters": [
+        {
+          "cluster": "C1",
+          "size": 546,
+          "dominant_macro_domain": "Traffic"
+        },
+        {
+          "cluster": "C2",
+          "size": 1121,
+          "dominant_macro_domain": "Traffic"
+        },
+        {
+          "cluster": "C3",
+          "size": 224,
+          "dominant_macro_domain": "Synthetic control"
+        },
+        {
+          "cluster": "C4",
+          "size": 1306,
+          "dominant_macro_domain": "Environment"
+        },
+        {
+          "cluster": "C5",
+          "size": 586,
+          "dominant_macro_domain": "Synthetic control"
+        },
+        {
+          "cluster": "C6",
+          "size": 617,
+          "dominant_macro_domain": "Environment"
+        }
+      ]
+    },
+    "layer_11": {
+      "output": "/data/junjieqiu/temporal-primitive/outputs/figures/bolt_main_figure/bolt_patch_stack_cards_layer11.png",
+      "clusters": [
+        {
+          "cluster": "C1",
+          "size": 430,
+          "dominant_macro_domain": "Environment"
+        },
+        {
+          "cluster": "C2",
+          "size": 899,
+          "dominant_macro_domain": "Environment"
+        },
+        {
+          "cluster": "C3",
+          "size": 247,
+          "dominant_macro_domain": "Synthetic control"
+        },
+        {
+          "cluster": "C4",
+          "size": 1439,
+          "dominant_macro_domain": "Traffic"
+        },
+        {
+          "cluster": "C5",
+          "size": 841,
+          "dominant_macro_domain": "Environment"
+        },
+        {
+          "cluster": "C6",
+          "size": 544,
+          "dominant_macro_domain": "Synthetic control"
+        }
+      ]
+    }
+  },
+  "prototype_panel": {
+    "layer_0": {
+      "output": "/data/junjieqiu/temporal-primitive/outputs/figures/bolt_main_figure/bolt_domain_balanced_prototype_panel_layer0.png",
+      "clusters": [
+        {
+          "cluster": "C1",
+          "size": 546,
+          "dominant_macro_domain": "Energy"
+        },
+        {
+          "cluster": "C2",
+          "size": 1121,
+          "dominant_macro_domain": "Traffic"
+        },
+        {
+          "cluster": "C3",
+          "size": 224,
+          "dominant_macro_domain": "Synthetic control"
+        },
+        {
+          "cluster": "C4",
+          "size": 1306,
+          "dominant_macro_domain": "Environment"
+        },
+        {
+          "cluster": "C5",
+          "size": 586,
+          "dominant_macro_domain": "Synthetic control"
+        },
+        {
+          "cluster": "C6",
+          "size": 617,
+          "dominant_macro_domain": "Energy"
+        }
+      ]
+    },
+    "layer_11": {
+      "output": "/data/junjieqiu/temporal-primitive/outputs/figures/bolt_main_figure/bolt_domain_balanced_prototype_panel_layer11.png",
+      "clusters": [
+        {
+          "cluster": "C1",
+          "size": 430,
+          "dominant_macro_domain": "Environment"
+        },
+        {
+          "cluster": "C2",
+          "size": 899,
+          "dominant_macro_domain": "Traffic"
+        },
+        {
+          "cluster": "C3",
+          "size": 247,
+          "dominant_macro_domain": "Synthetic control"
+        },
+        {
+          "cluster": "C4",
+          "size": 1439,
+          "dominant_macro_domain": "Traffic"
+        },
+        {
+          "cluster": "C5",
+          "size": 841,
+          "dominant_macro_domain": "Environment"
+        },
+        {
+          "cluster": "C6",
+          "size": 544,
+          "dominant_macro_domain": "Synthetic control"
+        }
+      ]
+    }
+  },
+  "n_balanced_patches": 4400,
+  "cluster_maps": {
+    "output": "/data/junjieqiu/temporal-primitive/outputs/figures/bolt_main_figure/bolt_cluster_maps.png",
+    "panels": {
+      "layer_0": {
+        "n_points": 4400
+      },
+      "layer_11": {
+        "n_points": 4400
+      }
+    },
+    "perplexity": 40.0
+  }
+}

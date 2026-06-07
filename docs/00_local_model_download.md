@@ -41,6 +41,22 @@ env -u http_proxy -u https_proxy -u HTTP_PROXY -u HTTPS_PROXY -u ALL_PROXY -u al
 
 注意：`Chronos-2-small` 的 Hugging Face repo id 是 `autogluon/chronos-2-small`，不是 `amazon/chronos-2-small`。
 
+### 2.1 Chronos-Bolt（clean 路线默认模型）
+
+自 2026-05-20 路线转向起，clean analysis 默认模型是 **Chronos-Bolt**（见
+`docs/99_chronos2_archive_and_chronos_bolt_pivot.md`）。base 版本 repo id 是
+`amazon/chronos-bolt-base`（T5 encoder 12 层，`d_model=768`，`input_patch_size=16`）：
+
+```bash
+env -u http_proxy -u https_proxy -u HTTP_PROXY -u HTTPS_PROXY -u ALL_PROXY -u all_proxy \
+  HF_ENDPOINT=https://hf-mirror.com \
+  /tmp/hfd.sh amazon/chronos-bolt-base \
+  --local-dir chronos-bolt-base \
+  --tool aria2c -x 8 -j 4
+```
+
+参考大小：`chronos-bolt-base/`: 约 784M。
+
 ## 3. 验证
 
 ```bash

@@ -1,0 +1,314 @@
+{
+  "model": "chronos-bolt-base",
+  "mode": "horizon",
+  "probe": "mlp",
+  "note": "clean successor to archived Chronos-2 pilot; input token is value-only (no time encoding)",
+  "config": {
+    "windows_per_dataset": 200,
+    "context_len": 128,
+    "horizon": 16,
+    "pooling": "mean",
+    "patch_len": 16,
+    "layers": [
+      0,
+      3,
+      6,
+      9,
+      11
+    ],
+    "seed": 47,
+    "test_frac": 0.3,
+    "n_windows": 4400,
+    "n_examples": 4400,
+    "metric_note": "MASE baseline = persistence (last context value repeated)"
+  },
+  "results": {
+    "raw_last_patch": {
+      "n_train": 3080,
+      "n_test": 1320,
+      "alpha": NaN,
+      "mae": 0.6624204516410828,
+      "mae_naive_persistence": 0.7407065033912659,
+      "mase": 0.8943089450521136,
+      "r2": 0.49302610754966736,
+      "per_macro_domain": {
+        "Energy": {
+          "n_test": 301,
+          "mae": 0.8084341883659363,
+          "mase": 0.8453964908934575
+        },
+        "Environment": {
+          "n_test": 121,
+          "mae": 0.6002443432807922,
+          "mase": 0.9398259818803297
+        },
+        "Finance": {
+          "n_test": 73,
+          "mae": 0.6773040890693665,
+          "mase": 1.1447729187763973
+        },
+        "Health": {
+          "n_test": 57,
+          "mae": 0.9090346693992615,
+          "mase": 0.9800078934895546
+        },
+        "Synthetic control": {
+          "n_test": 125,
+          "mae": 0.6425564289093018,
+          "mase": 0.8129449719093307
+        },
+        "Traffic": {
+          "n_test": 643,
+          "mae": 0.5860797166824341,
+          "mase": 0.9020922794523072
+        }
+      }
+    },
+    "tokenizer": {
+      "n_train": 3080,
+      "n_test": 1320,
+      "alpha": NaN,
+      "mae": 0.8145358562469482,
+      "mae_naive_persistence": 0.7407065033912659,
+      "mase": 1.0996742333402778,
+      "r2": 0.3602939248085022,
+      "per_macro_domain": {
+        "Energy": {
+          "n_test": 301,
+          "mae": 0.8903743624687195,
+          "mase": 0.9310830398377928
+        },
+        "Environment": {
+          "n_test": 121,
+          "mae": 0.9633783102035522,
+          "mase": 1.5083989985820152
+        },
+        "Finance": {
+          "n_test": 73,
+          "mae": 0.8436084389686584,
+          "mase": 1.4258589466210125
+        },
+        "Health": {
+          "n_test": 57,
+          "mae": 0.932442307472229,
+          "mase": 1.0052430917186987
+        },
+        "Synthetic control": {
+          "n_test": 125,
+          "mae": 0.6446428298950195,
+          "mase": 0.8155846298668505
+        },
+        "Traffic": {
+          "n_test": 643,
+          "mae": 0.7702999114990234,
+          "mase": 1.1856434939593457
+        }
+      }
+    },
+    "layer_0": {
+      "n_train": 3080,
+      "n_test": 1320,
+      "alpha": NaN,
+      "mae": 0.7183985710144043,
+      "mae_naive_persistence": 0.7407065033912659,
+      "mase": 0.9698828992661378,
+      "r2": 0.46101292967796326,
+      "per_macro_domain": {
+        "Energy": {
+          "n_test": 301,
+          "mae": 0.8688749074935913,
+          "mase": 0.9086006113932055
+        },
+        "Environment": {
+          "n_test": 121,
+          "mae": 0.7363149523735046,
+          "mase": 1.1528770422145873
+        },
+        "Finance": {
+          "n_test": 73,
+          "mae": 0.7814034223556519,
+          "mase": 1.3207206201590374
+        },
+        "Health": {
+          "n_test": 57,
+          "mae": 0.8235352039337158,
+          "mase": 0.8878330250648495
+        },
+        "Synthetic control": {
+          "n_test": 125,
+          "mae": 0.643459141254425,
+          "mase": 0.8140870590926994
+        },
+        "Traffic": {
+          "n_test": 643,
+          "mae": 0.6426815986633301,
+          "mase": 0.9892137396974563
+        }
+      }
+    },
+    "layer_3": {
+      "n_train": 3080,
+      "n_test": 1320,
+      "alpha": NaN,
+      "mae": 0.6198483109474182,
+      "mae_naive_persistence": 0.7407065033912659,
+      "mase": 0.8368338985947767,
+      "r2": 0.5522361397743225,
+      "per_macro_domain": {
+        "Energy": {
+          "n_test": 301,
+          "mae": 0.7465376853942871,
+          "mase": 0.7806700268672689
+        },
+        "Environment": {
+          "n_test": 121,
+          "mae": 0.613240122795105,
+          "mase": 0.9601739807895434
+        },
+        "Finance": {
+          "n_test": 73,
+          "mae": 0.6821824312210083,
+          "mase": 1.1530182462059102
+        },
+        "Health": {
+          "n_test": 57,
+          "mae": 0.7581084370613098,
+          "mase": 0.8172980387338751
+        },
+        "Synthetic control": {
+          "n_test": 125,
+          "mae": 0.6447483897209167,
+          "mase": 0.8157181812964804
+        },
+        "Traffic": {
+          "n_test": 643,
+          "mae": 0.5376124382019043,
+          "mase": 0.8274915784233693
+        }
+      }
+    },
+    "layer_6": {
+      "n_train": 3080,
+      "n_test": 1320,
+      "alpha": NaN,
+      "mae": 0.6320768594741821,
+      "mae_naive_persistence": 0.7407065033912659,
+      "mase": 0.8533432021728828,
+      "r2": 0.5458266735076904,
+      "per_macro_domain": {
+        "Energy": {
+          "n_test": 301,
+          "mae": 0.7474594116210938,
+          "mase": 0.7816338952054968
+        },
+        "Environment": {
+          "n_test": 121,
+          "mae": 0.6170459985733032,
+          "mase": 0.9661329889504691
+        },
+        "Finance": {
+          "n_test": 73,
+          "mae": 0.7393816113471985,
+          "mase": 1.2496957555276789
+        },
+        "Health": {
+          "n_test": 57,
+          "mae": 0.7334063649177551,
+          "mase": 0.7906673430066922
+        },
+        "Synthetic control": {
+          "n_test": 125,
+          "mae": 0.7129322290420532,
+          "mase": 0.9019825261037996
+        },
+        "Traffic": {
+          "n_test": 643,
+          "mae": 0.5440095067024231,
+          "mase": 0.8373379285719659
+        }
+      }
+    },
+    "layer_9": {
+      "n_train": 3080,
+      "n_test": 1320,
+      "alpha": NaN,
+      "mae": 0.6211168766021729,
+      "mae_naive_persistence": 0.7407065033912659,
+      "mase": 0.8385465413877677,
+      "r2": 0.5535708665847778,
+      "per_macro_domain": {
+        "Energy": {
+          "n_test": 301,
+          "mae": 0.7559655904769897,
+          "mase": 0.7905289838338262
+        },
+        "Environment": {
+          "n_test": 121,
+          "mae": 0.6249253749847412,
+          "mase": 0.9784700359470457
+        },
+        "Finance": {
+          "n_test": 73,
+          "mae": 0.7471597194671631,
+          "mase": 1.2628422397712404
+        },
+        "Health": {
+          "n_test": 57,
+          "mae": 0.6966660022735596,
+          "mase": 0.7510584627152782
+        },
+        "Synthetic control": {
+          "n_test": 125,
+          "mae": 0.6622774004936218,
+          "mase": 0.8378954104534648
+        },
+        "Traffic": {
+          "n_test": 643,
+          "mae": 0.5282663106918335,
+          "mase": 0.8131060448011913
+        }
+      }
+    },
+    "layer_11": {
+      "n_train": 3080,
+      "n_test": 1320,
+      "alpha": NaN,
+      "mae": 0.6157772541046143,
+      "mae_naive_persistence": 0.7407065033912659,
+      "mase": 0.8313377178211978,
+      "r2": 0.5545363426208496,
+      "per_macro_domain": {
+        "Energy": {
+          "n_test": 301,
+          "mae": 0.7456860542297363,
+          "mase": 0.7797794583974941
+        },
+        "Environment": {
+          "n_test": 121,
+          "mae": 0.6097820997238159,
+          "mase": 0.9547596191804432
+        },
+        "Finance": {
+          "n_test": 73,
+          "mae": 0.7365791201591492,
+          "mase": 1.244959011620527
+        },
+        "Health": {
+          "n_test": 57,
+          "mae": 0.6549246311187744,
+          "mase": 0.7060581182907909
+        },
+        "Synthetic control": {
+          "n_test": 125,
+          "mae": 0.6305395364761353,
+          "mase": 0.7977415254227702
+        },
+        "Traffic": {
+          "n_test": 643,
+          "mae": 0.536037802696228,
+          "mase": 0.8250679038067783
+        }
+      }
+    }
+  }
+}

@@ -9,6 +9,7 @@ __pycache__/
 # Local model weights and large checkpoints
 chronos-2/
 chronos-2-small/
+chronos-bolt-base/
 timesfm-2.5-200m-pytorch/
 *.safetensors
 *.bin
@@ -71,3 +72,14 @@ outputs/**
 !outputs/ppt_assets/
 !outputs/ppt_assets/*.json
 !outputs/ppt_assets/*.png
+!outputs/bolt_forecasting_probe/
+!outputs/bolt_forecasting_probe/*.json
+!outputs/figures/bolt_forecasting_probe/
+!outputs/figures/bolt_forecasting_probe/*.png
+!outputs/bolt_contextualization/
+!outputs/bolt_contextualization/*.json
+!outputs/figures/bolt_contextualization/
+!outputs/figures/bolt_contextualization/*.png
+!outputs/figures/bolt_main_figure/
+!outputs/figures/bolt_main_figure/*.png
+!outputs/figures/bolt_main_figure/*.json

@@ -1,0 +1,168 @@
+{
+  "model": "chronos-bolt-base",
+  "note": "clean successor to archived Chronos-2 pilot; input token value-only (no time encoding)",
+  "config": {
+    "windows_per_dataset": 100,
+    "context_len": 128,
+    "patch_len": 16,
+    "num_patches": 8,
+    "layers": [
+      0,
+      3,
+      6,
+      9,
+      11
+    ],
+    "k": 10,
+    "seed": 47,
+    "n_windows": 2200
+  },
+  "rep_order": [
+    "tokenizer",
+    "layer_0",
+    "layer_3",
+    "layer_6",
+    "layer_9",
+    "layer_11"
+  ],
+  "results": {
+    "tokenizer": {
+      "nmi": {
+        "macro_domain": 0.12311016020266224,
+        "frequency": 0.1450491139162791,
+        "patch_index": 0.005483368002454377
+      },
+      "similarity": {
+        "raw": {
+          "local_mean": 0.7709371447563171,
+          "global_mean": 0.7848393321037292,
+          "gap": -0.01390218734741211,
+          "ratio": 0.9822865817515186
+        },
+        "centered": {
+          "local_mean": 0.007138366345316172,
+          "global_mean": 0.013551672920584679,
+          "gap": -0.006413306575268507,
+          "ratio": 0.5267516702290799
+        },
+        "n_local_pairs": 61600,
+        "n_global_pairs": 399823
+      }
+    },
+    "layer_0": {
+      "nmi": {
+        "macro_domain": 0.12923706041365965,
+        "frequency": 0.15621406373887756,
+        "patch_index": 0.0029695859407028653
+      },
+      "similarity": {
+        "raw": {
+          "local_mean": 0.739150881767273,
+          "global_mean": 0.7417439818382263,
+          "gap": -0.002593100070953369,
+          "ratio": 0.9965040497335388
+        },
+        "centered": {
+          "local_mean": 0.08518840372562408,
+          "global_mean": 0.009783503599464893,
+          "gap": 0.07540490012615919,
+          "ratio": 8.70735139610757
+        },
+        "n_local_pairs": 61600,
+        "n_global_pairs": 399823
+      }
+    },
+    "layer_3": {
+      "nmi": {
+        "macro_domain": 0.16388710985657917,
+        "frequency": 0.20380014752524023,
+        "patch_index": 0.003992722855554459
+      },
+      "similarity": {
+        "raw": {
+          "local_mean": 0.5615648031234741,
+          "global_mean": 0.49304795265197754,
+          "gap": 0.06851685047149658,
+          "ratio": 1.138965895919377
+        },
+        "centered": {
+          "local_mean": 0.15571752190589905,
+          "global_mean": 0.0030121137388050556,
+          "gap": 0.152705408167094,
+          "ratio": 51.69709227768875
+        },
+        "n_local_pairs": 61600,
+        "n_global_pairs": 399823
+      }
+    },
+    "layer_6": {
+      "nmi": {
+        "macro_domain": 0.16457880285707335,
+        "frequency": 0.2299723266414508,
+        "patch_index": 0.009197640822171917
+      },
+      "similarity": {
+        "raw": {
+          "local_mean": 0.46848371624946594,
+          "global_mean": 0.37461864948272705,
+          "gap": 0.09386506676673889,
+          "ratio": 1.25056164955041
+        },
+        "centered": {
+          "local_mean": 0.16189874708652496,
+          "global_mean": 0.0012774766655638814,
+          "gap": 0.16062127042096108,
+          "ratio": 126.73323235619529
+        },
+        "n_local_pairs": 61600,
+        "n_global_pairs": 399823
+      }
+    },
+    "layer_9": {
+      "nmi": {
+        "macro_domain": 0.15412549167056888,
+        "frequency": 0.25699569819229356,
+        "patch_index": 0.012492433349333112
+      },
+      "similarity": {
+        "raw": {
+          "local_mean": 0.4948904812335968,
+          "global_mean": 0.4052566587924957,
+          "gap": 0.08963382244110107,
+          "ratio": 1.221177914036439
+        },
+        "centered": {
+          "local_mean": 0.16567716002464294,
+          "global_mean": 0.0009384931181557477,
+          "gap": 0.1647386669064872,
+          "ratio": 176.53529559195763
+        },
+        "n_local_pairs": 61600,
+        "n_global_pairs": 399823
+      }
+    },
+    "layer_11": {
+      "nmi": {
+        "macro_domain": 0.14339631300439726,
+        "frequency": 0.2615550472539365,
+        "patch_index": 0.020598670602410104
+      },
+      "similarity": {
+        "raw": {
+          "local_mean": 0.6188605427742004,
+          "global_mean": 0.5582807660102844,
+          "gap": 0.060579776763916016,
+          "ratio": 1.1085113090978314
+        },
+        "centered": {
+          "local_mean": 0.16791298985481262,
+          "global_mean": 0.0005586299812421203,
+          "gap": 0.1673543598735705,
+          "ratio": 300.57998226564234
+        },
+        "n_local_pairs": 61600,
+        "n_global_pairs": 399823
+      }
+    }
+  }
+}

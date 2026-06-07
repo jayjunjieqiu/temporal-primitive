@@ -1,0 +1,72 @@
+# Chronos-Bolt main figure：raw-only patch-stack cards + domain-balanced prototype panel
+
+更新时间：2026-06-07  
+模型：**Chronos-Bolt-base**（clean 路线）  
+脚本：`scripts/build_bolt_main_figure.py` · `scripts/chronos_bolt_backbone.py`
+
+advisor 反馈：main 图**不要 first-difference / power-spectrum 行，只留 raw patch stack**；
+**加最深层**；下面用**分 domain 的 prototype example** 那张。已整迁到 clean Chronos-Bolt。
+
+modular PNG（用户偏好手动拼接，不自动合成整图），都在
+`outputs/figures/bolt_main_figure/`：
+
+- `bolt_patch_stack_cards_layer0.png` —— layer_0（shallow）的 raw-only patch-stack cards。
+- `bolt_patch_stack_cards_layer11.png` —— layer_11（deepest）的 raw-only cards。
+- `bolt_cluster_maps.png` —— **中间 plate**：两个 depth（layer_0 / layer_11）的聚类散点图，
+  展示 cluster 结构随 depth 重组。KMeans 在 PCA(30) space 完成，t-SNE（perplexity=40）只把同一
+  PCA 坐标投到 2D 做可视化（不参与聚类）。
+- `bolt_domain_balanced_prototype_panel_layer0.png` —— layer_0 的 domain-balanced prototype
+  example panel（shape-coherent：下降/上升/impulse/振荡，跨域）。
+- `bolt_domain_balanced_prototype_panel_layer11.png` —— layer_11 版（contextualized）。
+
+建议的 main 图排版（modular 手动拼）：上=patch-stack cards（layer_0 / layer_11），中=
+`bolt_cluster_maps.png`（两 depth 聚类 atlas），下=prototype panel（layer_0 / layer_11）。
+
+## 1. 方法
+
+two-space principle（`docs/00_narrative_rules.md` §5.1）：representation space 里
+StandardScaler → PCA(30) → KMeans(k=6) 生成候选 cluster；回到 original time-series space
+用 z-normalized raw patch 展示。**cards 与 prototype 都在 domain-balanced 子集上聚类**
+（每个 source domain ≤ 400 patch，共 4400），否则 Traffic 这类高频 domain 会主导每个
+cluster、淹没 shape 结构。
+
+- patch-stack card：每个 cluster 取 center-nearest top-24 raw patch，z-normalize 后 imshow
+  堆叠（行=rank，列=patch 内时间）。只有 raw 一行。
+- prototype panel：每个 cluster 取 center-nearest 6 个 patch，画 z-normalized line plot
+  （行=cluster，列=原型）。
+
+设置：22 数据集各 120 窗口（2640 窗口），`context_len=128`，`patch_len=16`，k=6，seed=47。
+
+## 2. 观察（含必须如实展示的对比）
+
+- **layer_0 cards 是 shape-coherent 的候选 cluster**：能看到 monotonic ramp / level-shift
+  （C1 下降 step、C6 上升 ramp）、impulse spike（C3，全是 synthetic pulse = negative
+  control）等形状家族。这是"model-learned temporal primitive-like structures"在 shallow 层
+  的证据（主线 3）。
+- **layer_11 cards 的 raw patch stack 明显更"杂"**：这不是 bug。深层 cluster 已按
+  **context / domain** 重组（C1/C2/C5≈Environment、C4≈Traffic、C3/C6≈Synthetic），所以
+  同一 cluster 内的 raw patch 形状不再一致。这与 `docs/14_`（contextualization：深层 NMI 与
+  域/位置对齐上升）完全一致——**深层是 contextualized cluster，不是 shape family**。
+  （C3 在两层都保持干净的 synthetic-impulse 形状，是 negative-control 组的稳定特征。）
+- **domain-balanced prototype panel（layer_11）每行一个可解释原型**：下降趋势 / 平坦-
+  intermittent / impulse spike（synthetic）/ 上升趋势 / 峰 / 高频振荡。适合作 main 图下半部。
+
+叙事边界（narrative rules）：这些是 clean Chronos-Bolt 的**候选** cluster，**不能**直接称为
+motif；只有经过 original-space inspection + DTW-aware controlled retrieval + domain/frequency/
+position confounder audit 后才是 `candidate motif/prototype family`。synthetic 组（C3）必须
+作为 negative control 主动展示。
+
+## 3. 复现
+
+```bash
+.venv/bin/python scripts/build_bolt_main_figure.py \
+  --windows-per-dataset 120 --card-layers 0 11 --prototype-layers 0 11 \
+  --k 6 --top-n 24 --proto-per-cluster 6 --max-per-domain 400 --tsne-perplexity 40
+```
+
+## 4. 待定（需 advisor 确认的排版选择）
+
+- layer_11 的 raw patch-stack cards 因 contextualization 而 shape-incoherent。main 图里这一排
+  是当作"shallow shape vs deep context"的对比保留，还是只放 layer_0 cards + prototype panel，
+  取决于 main 图想强调哪条主线。脚本两种都能出（`--card-layers`）。
+- k=6 沿用 reference 设定；如需更细/更粗的 cluster 粒度可调 `--k`。
