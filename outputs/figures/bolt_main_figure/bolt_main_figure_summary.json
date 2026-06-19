@@ -14,7 +14,7 @@
       0,
       11
     ],
-    "k": 6,
+    "k": 8,
     "top_n": 24,
     "proto_per_cluster": 6,
     "max_per_domain": 400,
@@ -27,33 +27,43 @@
       "clusters": [
         {
           "cluster": "C1",
-          "size": 546,
-          "dominant_macro_domain": "Traffic"
+          "size": 573,
+          "dominant_macro_domain": "Environment"
         },
         {
           "cluster": "C2",
-          "size": 1121,
+          "size": 805,
           "dominant_macro_domain": "Traffic"
         },
         {
           "cluster": "C3",
-          "size": 224,
-          "dominant_macro_domain": "Synthetic control"
+          "size": 336,
+          "dominant_macro_domain": "Energy"
         },
         {
           "cluster": "C4",
-          "size": 1306,
-          "dominant_macro_domain": "Environment"
-        },
-        {
-          "cluster": "C5",
-          "size": 586,
+          "size": 572,
           "dominant_macro_domain": "Synthetic control"
         },
         {
+          "cluster": "C5",
+          "size": 429,
+          "dominant_macro_domain": "Energy"
+        },
+        {
           "cluster": "C6",
-          "size": 617,
-          "dominant_macro_domain": "Environment"
+          "size": 500,
+          "dominant_macro_domain": "Traffic"
+        },
+        {
+          "cluster": "C7",
+          "size": 972,
+          "dominant_macro_domain": "Synthetic control"
+        },
+        {
+          "cluster": "C8",
+          "size": 213,
+          "dominant_macro_domain": "Synthetic control"
         }
       ]
     },
@@ -62,32 +72,42 @@
       "clusters": [
         {
           "cluster": "C1",
-          "size": 430,
-          "dominant_macro_domain": "Environment"
+          "size": 241,
+          "dominant_macro_domain": "Synthetic control"
         },
         {
           "cluster": "C2",
-          "size": 899,
-          "dominant_macro_domain": "Environment"
+          "size": 469,
+          "dominant_macro_domain": "Energy"
         },
         {
           "cluster": "C3",
-          "size": 247,
+          "size": 533,
           "dominant_macro_domain": "Synthetic control"
         },
         {
           "cluster": "C4",
-          "size": 1439,
+          "size": 1110,
           "dominant_macro_domain": "Traffic"
         },
         {
           "cluster": "C5",
-          "size": 841,
+          "size": 753,
           "dominant_macro_domain": "Environment"
         },
         {
           "cluster": "C6",
-          "size": 544,
+          "size": 673,
+          "dominant_macro_domain": "Traffic"
+        },
+        {
+          "cluster": "C7",
+          "size": 387,
+          "dominant_macro_domain": "Traffic"
+        },
+        {
+          "cluster": "C8",
+          "size": 234,
           "dominant_macro_domain": "Synthetic control"
         }
       ]
@@ -95,72 +115,209 @@
   },
   "prototype_panel": {
     "layer_0": {
-      "output": "/data/junjieqiu/temporal-primitive/outputs/figures/bolt_main_figure/bolt_domain_balanced_prototype_panel_layer0.png",
+      "output": "/data/junjieqiu/temporal-primitive/outputs/figures/bolt_main_figure/bolt_cross_domain_prototype_panel_layer0.png",
       "clusters": [
         {
           "cluster": "C1",
-          "size": 546,
-          "dominant_macro_domain": "Energy"
+          "size": 573,
+          "n_domains_present": 5,
+          "domains_shown": [
+            "Traffic",
+            "Health",
+            "Environment",
+            "Finance",
+            "Energy"
+          ]
         },
         {
           "cluster": "C2",
-          "size": 1121,
-          "dominant_macro_domain": "Traffic"
+          "size": 805,
+          "n_domains_present": 5,
+          "domains_shown": [
+            "Finance",
+            "Traffic",
+            "Energy",
+            "Health",
+            "Environment"
+          ]
         },
         {
           "cluster": "C3",
-          "size": 224,
-          "dominant_macro_domain": "Synthetic control"
+          "size": 336,
+          "n_domains_present": 6,
+          "domains_shown": [
+            "Energy",
+            "Environment",
+            "Traffic",
+            "Finance",
+            "Health",
+            "Synthetic control"
+          ]
         },
         {
           "cluster": "C4",
-          "size": 1306,
-          "dominant_macro_domain": "Environment"
+          "size": 572,
+          "n_domains_present": 6,
+          "domains_shown": [
+            "Synthetic control",
+            "Energy",
+            "Traffic",
+            "Finance",
+            "Environment",
+            "Health"
+          ]
         },
         {
           "cluster": "C5",
-          "size": 586,
-          "dominant_macro_domain": "Synthetic control"
+          "size": 429,
+          "n_domains_present": 5,
+          "domains_shown": [
+            "Energy",
+            "Environment",
+            "Traffic",
+            "Health",
+            "Finance"
+          ]
         },
         {
           "cluster": "C6",
-          "size": 617,
-          "dominant_macro_domain": "Energy"
+          "size": 500,
+          "n_domains_present": 6,
+          "domains_shown": [
+            "Energy",
+            "Traffic",
+            "Health",
+            "Environment",
+            "Finance",
+            "Synthetic control"
+          ]
+        },
+        {
+          "cluster": "C7",
+          "size": 972,
+          "n_domains_present": 6,
+          "domains_shown": [
+            "Environment",
+            "Synthetic control",
+            "Energy",
+            "Finance",
+            "Traffic",
+            "Health"
+          ]
+        },
+        {
+          "cluster": "C8",
+          "size": 213,
+          "n_domains_present": 5,
+          "domains_shown": [
+            "Synthetic control",
+            "Environment",
+            "Energy",
+            "Finance",
+            "Traffic"
+          ]
         }
       ]
     },
     "layer_11": {
-      "output": "/data/junjieqiu/temporal-primitive/outputs/figures/bolt_main_figure/bolt_domain_balanced_prototype_panel_layer11.png",
+      "output": "/data/junjieqiu/temporal-primitive/outputs/figures/bolt_main_figure/bolt_cross_domain_prototype_panel_layer11.png",
       "clusters": [
         {
           "cluster": "C1",
-          "size": 430,
-          "dominant_macro_domain": "Environment"
+          "size": 241,
+          "n_domains_present": 5,
+          "domains_shown": [
+            "Synthetic control",
+            "Environment",
+            "Energy",
+            "Traffic",
+            "Health"
+          ]
         },
         {
           "cluster": "C2",
-          "size": 899,
-          "dominant_macro_domain": "Traffic"
+          "size": 469,
+          "n_domains_present": 5,
+          "domains_shown": [
+            "Energy",
+            "Environment",
+            "Traffic",
+            "Finance",
+            "Health"
+          ]
         },
         {
           "cluster": "C3",
-          "size": 247,
-          "dominant_macro_domain": "Synthetic control"
+          "size": 533,
+          "n_domains_present": 5,
+          "domains_shown": [
+            "Synthetic control",
+            "Finance",
+            "Traffic",
+            "Environment",
+            "Energy"
+          ]
         },
         {
           "cluster": "C4",
-          "size": 1439,
-          "dominant_macro_domain": "Traffic"
+          "size": 1110,
+          "n_domains_present": 5,
+          "domains_shown": [
+            "Finance",
+            "Traffic",
+            "Environment",
+            "Energy",
+            "Health"
+          ]
         },
         {
           "cluster": "C5",
-          "size": 841,
-          "dominant_macro_domain": "Environment"
+          "size": 753,
+          "n_domains_present": 5,
+          "domains_shown": [
+            "Traffic",
+            "Environment",
+            "Finance",
+            "Energy",
+            "Health"
+          ]
         },
         {
           "cluster": "C6",
-          "size": 544,
-          "dominant_macro_domain": "Synthetic control"
+          "size": 673,
+          "n_domains_present": 5,
+          "domains_shown": [
+            "Traffic",
+            "Environment",
+            "Energy",
+            "Finance",
+            "Health"
+          ]
+        },
+        {
+          "cluster": "C7",
+          "size": 387,
+          "n_domains_present": 5,
+          "domains_shown": [
+            "Traffic",
+            "Environment",
+            "Finance",
+            "Energy",
+            "Health"
+          ]
+        },
+        {
+          "cluster": "C8",
+          "size": 234,
+          "n_domains_present": 6,
+          "domains_shown": [
+            "Synthetic control",
+            "Environment",
+            "Energy",
+            "Finance",
+            "Health",
+            "Traffic"
+          ]
         }
       ]
     }
