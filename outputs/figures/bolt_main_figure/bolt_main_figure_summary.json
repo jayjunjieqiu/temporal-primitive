@@ -19,7 +19,8 @@
     "proto_per_cluster": 6,
     "max_per_domain": 400,
     "tsne_perplexity": 40.0,
-    "out": "/data/junjieqiu/temporal-primitive/outputs/figures/bolt_main_figure"
+    "out": "/data/junjieqiu/temporal-primitive/outputs/figures/bolt_main_figure",
+    "no_cache": false
   },
   "cards": {
     "layer_0": {
@@ -28,42 +29,94 @@
         {
           "cluster": "C1",
           "size": 573,
-          "dominant_macro_domain": "Environment"
+          "domain_composition": {
+            "Environment": 0.304,
+            "Traffic": 0.293,
+            "Finance": 0.148,
+            "Health": 0.133,
+            "Energy": 0.122
+          }
         },
         {
           "cluster": "C2",
           "size": 805,
-          "dominant_macro_domain": "Traffic"
+          "domain_composition": {
+            "Traffic": 0.391,
+            "Environment": 0.229,
+            "Finance": 0.186,
+            "Energy": 0.127,
+            "Health": 0.067
+          }
         },
         {
           "cluster": "C3",
           "size": 336,
-          "dominant_macro_domain": "Energy"
+          "domain_composition": {
+            "Energy": 0.414,
+            "Traffic": 0.33,
+            "Environment": 0.134,
+            "Synthetic control": 0.054,
+            "Health": 0.051,
+            "Finance": 0.018
+          }
         },
         {
           "cluster": "C4",
           "size": 572,
-          "dominant_macro_domain": "Synthetic control"
+          "domain_composition": {
+            "Synthetic control": 0.694,
+            "Traffic": 0.185,
+            "Energy": 0.096,
+            "Finance": 0.014,
+            "Environment": 0.009,
+            "Health": 0.002
+          }
         },
         {
           "cluster": "C5",
           "size": 429,
-          "dominant_macro_domain": "Energy"
+          "domain_composition": {
+            "Energy": 0.352,
+            "Traffic": 0.298,
+            "Environment": 0.154,
+            "Health": 0.142,
+            "Finance": 0.054
+          }
         },
         {
           "cluster": "C6",
           "size": 500,
-          "dominant_macro_domain": "Traffic"
+          "domain_composition": {
+            "Energy": 0.336,
+            "Traffic": 0.322,
+            "Environment": 0.134,
+            "Health": 0.13,
+            "Finance": 0.074,
+            "Synthetic control": 0.004
+          }
         },
         {
           "cluster": "C7",
           "size": 972,
-          "dominant_macro_domain": "Synthetic control"
+          "domain_composition": {
+            "Environment": 0.26,
+            "Traffic": 0.213,
+            "Synthetic control": 0.19,
+            "Health": 0.13,
+            "Energy": 0.114,
+            "Finance": 0.093
+          }
         },
         {
           "cluster": "C8",
           "size": 213,
-          "dominant_macro_domain": "Synthetic control"
+          "domain_composition": {
+            "Synthetic control": 0.93,
+            "Environment": 0.028,
+            "Energy": 0.019,
+            "Traffic": 0.019,
+            "Finance": 0.005
+          }
         }
       ]
     },
@@ -73,42 +126,91 @@
         {
           "cluster": "C1",
           "size": 241,
-          "dominant_macro_domain": "Synthetic control"
+          "domain_composition": {
+            "Synthetic control": 0.884,
+            "Traffic": 0.046,
+            "Environment": 0.037,
+            "Energy": 0.021,
+            "Health": 0.012
+          }
         },
         {
           "cluster": "C2",
           "size": 469,
-          "dominant_macro_domain": "Energy"
+          "domain_composition": {
+            "Energy": 0.458,
+            "Traffic": 0.362,
+            "Environment": 0.151,
+            "Health": 0.023,
+            "Finance": 0.004
+          }
         },
         {
           "cluster": "C3",
           "size": 533,
-          "dominant_macro_domain": "Synthetic control"
+          "domain_composition": {
+            "Synthetic control": 0.75,
+            "Traffic": 0.158,
+            "Energy": 0.068,
+            "Finance": 0.013,
+            "Environment": 0.011
+          }
         },
         {
           "cluster": "C4",
           "size": 1110,
-          "dominant_macro_domain": "Traffic"
+          "domain_composition": {
+            "Traffic": 0.368,
+            "Energy": 0.239,
+            "Environment": 0.141,
+            "Finance": 0.14,
+            "Health": 0.113
+          }
         },
         {
           "cluster": "C5",
           "size": 753,
-          "dominant_macro_domain": "Environment"
+          "domain_composition": {
+            "Environment": 0.296,
+            "Traffic": 0.252,
+            "Health": 0.183,
+            "Finance": 0.163,
+            "Energy": 0.105
+          }
         },
         {
           "cluster": "C6",
           "size": 673,
-          "dominant_macro_domain": "Traffic"
+          "domain_composition": {
+            "Traffic": 0.316,
+            "Energy": 0.264,
+            "Environment": 0.21,
+            "Health": 0.144,
+            "Finance": 0.065
+          }
         },
         {
           "cluster": "C7",
           "size": 387,
-          "dominant_macro_domain": "Traffic"
+          "domain_composition": {
+            "Environment": 0.403,
+            "Traffic": 0.318,
+            "Finance": 0.176,
+            "Health": 0.065,
+            "Energy": 0.039
+          }
         },
         {
           "cluster": "C8",
           "size": 234,
-          "dominant_macro_domain": "Synthetic control"
+          "domain_composition": {
+            "Synthetic control": 0.799,
+            "Environment": 0.158,
+            "Energy": 0.03,
+            "Finance": 0.004,
+            "Health": 0.004,
+            "Traffic": 0.004
+          }
         }
       ]
     }

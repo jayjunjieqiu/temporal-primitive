@@ -24,6 +24,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import pickle
 import sys
 from collections import Counter
 from pathlib import Path
@@ -57,6 +58,17 @@ from scripts.run_second_pilot_discovery import (  # noqa: E402
 )
 
 OUTPUT_DIR = ROOT / "outputs" / "figures" / "bolt_main_figure"
+
+# 固定的 macro_domain 调色板（全图统一，用于卡片上的 domain-composition 堆叠条）
+DOMAIN_COLORS = {
+    "Traffic": "#4C72B0",
+    "Energy": "#DD8452",
+    "Environment": "#55A868",
+    "Finance": "#C44E52",
+    "Health": "#8172B3",
+    "Synthetic control": "#937860",
+    "Other": "#999999",
+}
 
 
 def z_normalize(x: np.ndarray, eps: float = 1e-8) -> np.ndarray:
@@ -106,13 +118,23 @@ def render_raw_cards(
     top_n: int,
     out_path: Path,
 ) -> dict[str, Any]:
-    """每个 cluster 一张 raw patch-stack 卡（center-nearest top_n，z-normalized imshow）。"""
-    fig, axes = plt.subplots(1, k, figsize=(2.05 * k, 3.2), squeeze=False)
+    """每个 cluster 一张 raw patch-stack 卡（center-nearest top_n，z-normalized imshow）。
+
+    标题下加一根 100% 归一化的 domain-composition 横条，反映**整个 cluster**（不是 top_n）
+    的 macro_domain 构成，避免"cluster=单一 domain"的误读。
+    """
+    fig = plt.figure(figsize=(2.05 * k, 4.1))
+    # bottom 留一点空间放 ticker(time/0 7 15) + 单排 legend，二者之间留小间隙、不重叠
+    gs = fig.add_gridspec(2, k, height_ratios=[0.085, 1.0], hspace=0.04, wspace=0.18,
+                          top=0.90, bottom=0.20)
     card_info = []
+    seen_domains: set[str] = set()
     for cid in range(k):
-        ax = axes[0, cid]
+        bar_ax = fig.add_subplot(gs[0, cid])
+        ax = fig.add_subplot(gs[1, cid])
         idx = np.where(labels == cid)[0]
         if len(idx) == 0:
+            bar_ax.axis("off")
             ax.axis("off")
             continue
         dist = np.linalg.norm(pca_coords[idx] - centers[cid], axis=1)
@@ -124,20 +146,44 @@ def render_raw_cards(
         ax.set_xticks([0, 7, 15])
         ax.set_yticks([])
         ax.tick_params(labelsize=6, length=2)
-        dom = Counter(meta[i]["macro_domain"] for i in chosen).most_common(1)[0][0]
-        ax.set_title(f"C{cid + 1}  (n={len(idx)})\n{dom}", fontsize=8, pad=3)
         ax.set_xlabel("time", fontsize=7)
         if cid == 0:
             ax.set_ylabel("rank (center→far)", fontsize=7.5)
         for sp in ax.spines.values():
             sp.set_color("#1f2933")
             sp.set_linewidth(0.8)
-        card_info.append({"cluster": f"C{cid + 1}", "size": int(len(idx)), "dominant_macro_domain": dom})
+
+        # 整个 cluster 的 domain 构成（100% 堆叠条，按占比降序）
+        comp = Counter(meta[i]["macro_domain"] for i in idx)
+        total = sum(comp.values())
+        ordered = sorted(comp.items(), key=lambda kv: -kv[1])
+        left = 0.0
+        for dom, cnt in ordered:
+            frac = cnt / total
+            bar_ax.barh(0, frac, left=left, height=1.0,
+                        color=DOMAIN_COLORS.get(dom, DOMAIN_COLORS["Other"]), edgecolor="white", lw=0.3)
+            left += frac
+            seen_domains.add(dom)
+        bar_ax.set_xlim(0, 1)
+        bar_ax.set_ylim(-0.5, 0.5)
+        bar_ax.axis("off")
+        bar_ax.set_title(f"C{cid + 1}  (n={len(idx)})", fontsize=8, pad=2)
+        card_info.append(
+            {"cluster": f"C{cid + 1}", "size": int(len(idx)),
+             "domain_composition": {d: round(c / total, 3) for d, c in ordered}}
+        )
+
+    handles = [
+        Line2D([0], [0], marker="s", ls="", ms=7, color=DOMAIN_COLORS[d], label=d)
+        for d in DOMAIN_COLORS if d in seen_domains
+    ]
+    fig.legend(handles=handles, loc="upper center", ncol=len(handles), fontsize=8,
+               frameon=False, bbox_to_anchor=(0.5, 0.115), title="macro domain composition",
+               title_fontsize=8.5, columnspacing=1.6, handletextpad=0.5)
     fig.suptitle(
         f"Chronos-Bolt {layer_name} — raw patch-stack candidate clusters (k={k}, center-nearest {top_n})",
-        fontsize=10,
+        fontsize=10, y=0.97,
     )
-    fig.tight_layout(rect=(0, 0, 1, 0.94))
     fig.savefig(out_path, dpi=300, bbox_inches="tight", facecolor="white")
     plt.close(fig)
     return {"output": str(out_path), "clusters": card_info}
@@ -146,16 +192,17 @@ def render_raw_cards(
 def render_cluster_maps(
     layer_clusters: dict[str, tuple[np.ndarray, np.ndarray]],
     v0_labels: np.ndarray,
+    domain_labels: np.ndarray,
     k: int,
     seed: int,
     perplexity: float,
     out_path: Path,
 ) -> dict[str, Any]:
-    """representation atlas（中间 plate）：每行一个 depth，左=模型 KMeans cluster，
-    右=human motif taxonomy v0（shapelet-inspired probe，不是 ground truth）。
+    """representation atlas（中间 plate）：每行一个 depth，三列同一套 t-SNE 点、不同着色——
+    左=模型 KMeans cluster，中=human motif taxonomy v0（shapelet probe，*不是* ground truth），
+    右=macro domain（confounder audit：模型 cluster 有没有被 domain 带跑）。
 
-    KMeans 在 PCA(30) space 完成；t-SNE 只把同一 PCA 坐标投到 2D 做 visualization（不参与
-    聚类）。左右两列共享同一套 t-SNE 点，只是着色不同，方便对比"模型 cluster vs 人工 motif"。
+    KMeans 在 PCA(30) space 完成；t-SNE 只做 visualization（不参与聚类）。
     """
     names = list(layer_clusters.keys())
     clu_cmap = plt.get_cmap("tab10" if k <= 10 else "tab20")
@@ -164,10 +211,10 @@ def render_cluster_maps(
     # mixed_uncertain 是 probe 的"兜底"类、占比大，淡化成浅灰画在底层，让真正 fired 的 motif 突出
     DIM_MOTIFS = {"mixed_uncertain": "#cfcfcf"}
     motif_color.update(DIM_MOTIFS)
-    # 绘制顺序：先画淡化类（底层），再画其余（顶层）
     motif_draw_order = [m for m in MOTIF_LABELS if m in DIM_MOTIFS] + [m for m in MOTIF_LABELS if m not in DIM_MOTIFS]
+    seen_domains = [d for d in DOMAIN_COLORS if d in set(domain_labels.tolist())]
 
-    fig, axes = plt.subplots(len(names), 2, figsize=(11.0, 4.6 * len(names)), squeeze=False)
+    fig, axes = plt.subplots(len(names), 3, figsize=(15.5, 4.6 * len(names)), squeeze=False)
     info: dict[str, Any] = {}
     for row, name in enumerate(names):
         labels, pca_coords = layer_clusters[name]
@@ -191,6 +238,12 @@ def render_cluster_maps(
                        zorder=1 if dim else 2)
         ax.set_title(f"Chronos-Bolt {name}\nhuman motif taxonomy v0 (probe)", fontsize=10)
 
+        ax = axes[row, 2]  # macro domain（confounder）
+        for dom in seen_domains:
+            m = domain_labels == dom
+            ax.scatter(xy[m, 0], xy[m, 1], s=5, color=DOMAIN_COLORS[dom], alpha=0.6)
+        ax.set_title(f"Chronos-Bolt {name}\nmacro domain (confounder)", fontsize=10)
+
         for col, ax in enumerate(axes[row]):
             ax.set_xticks([])
             ax.set_yticks([])
@@ -207,17 +260,21 @@ def render_cluster_maps(
         for c in range(k)
     ]
     motif_handles = [Line2D([0], [0], marker="o", ls="", ms=6, color=motif_color[l], label=l) for l in MOTIF_LABELS]
-    leg_clu = fig.legend(handles=clu_handles, loc="upper left", bbox_to_anchor=(0.87, 0.88), fontsize=8,
-                         title="model cluster (left col)", title_fontsize=9)
-    fig.add_artist(leg_clu)
-    fig.legend(handles=motif_handles, loc="upper left", bbox_to_anchor=(0.87, 0.55), fontsize=8,
-               title="human motif v0 (right col)", title_fontsize=9)
+    dom_handles = [Line2D([0], [0], marker="o", ls="", ms=6, color=DOMAIN_COLORS[d], label=d) for d in seen_domains]
+    leg1 = fig.legend(handles=clu_handles, loc="upper left", bbox_to_anchor=(0.875, 0.90), fontsize=8,
+                      title="model cluster (col 1)", title_fontsize=9)
+    fig.add_artist(leg1)
+    leg2 = fig.legend(handles=motif_handles, loc="upper left", bbox_to_anchor=(0.875, 0.66), fontsize=8,
+                      title="human motif v0 (col 2)", title_fontsize=9)
+    fig.add_artist(leg2)
+    fig.legend(handles=dom_handles, loc="upper left", bbox_to_anchor=(0.875, 0.33), fontsize=8,
+               title="macro domain (col 3)", title_fontsize=9)
     fig.suptitle(
-        "Representation atlas across depth — model-derived clusters vs human motif taxonomy v0\n"
+        "Representation atlas across depth — model clusters vs human motif taxonomy v0 vs macro domain\n"
         "(KMeans in PCA space; t-SNE for visualization only; v0 = shapelet-inspired probe, not ground truth)",
         fontsize=11,
     )
-    fig.tight_layout(rect=(0, 0, 0.86, 0.94))
+    fig.tight_layout(rect=(0, 0, 0.865, 0.94))
     fig.savefig(out_path, dpi=220, bbox_inches="tight", facecolor="white")
     plt.close(fig)
     return {"output": str(out_path), "panels": info, "perplexity": perplexity}
@@ -299,24 +356,42 @@ def main() -> None:
     parser.add_argument("--max-per-domain", type=int, default=400)
     parser.add_argument("--tsne-perplexity", type=float, default=40.0, help="cluster-map t-SNE perplexity (viz only)")
     parser.add_argument("--out", type=Path, default=OUTPUT_DIR)
+    parser.add_argument("--no-cache", action="store_true", help="忽略提取缓存，强制重新跑 GPU 提取")
     args = parser.parse_args()
     args.out.mkdir(parents=True, exist_ok=True)
 
-    print(f"[main-fig] sampling windows (per_dataset={args.windows_per_dataset})")
-    windows, window_meta, _ = sample_windows(
-        DATA_ROOT, context_len=args.context_len, windows_per_dataset=args.windows_per_dataset, seed=args.seed
-    )
-    windows_z = np.stack([robust_z(w) for w in windows]).astype(np.float32)
-    print(f"[main-fig] {len(windows)} windows")
-
     layers = sorted(set(args.card_layers) | set(args.prototype_layers))
-    print(f"[main-fig] extracting Bolt layers {layers} ...")
-    pipe = load_bolt_pipeline()
-    patch_len = int(pipe.model.chronos_config.input_patch_size)
-    reps = extract_bolt_representations(
-        windows_z, batch_size=args.batch_size, layers=layers, include_tokenizer=False,
-        pipeline=pipe, keep_pipeline=False,
+    # 提取缓存：纯图形微调时跳过 GPU。key 只跟"采样 + 提取"有关（与 k / 配色 / 版式无关）
+    cache_path = args.out / ".cache" / (
+        f"extract_wpd{args.windows_per_dataset}_ctx{args.context_len}"
+        f"_seed{args.seed}_layers{'-'.join(map(str, layers))}.pkl"
     )
+    if not args.no_cache and cache_path.exists():
+        print(f"[main-fig] loading extraction cache -> {cache_path.name}")
+        with open(cache_path, "rb") as fh:
+            bundle = pickle.load(fh)
+        windows_z, window_meta, reps, patch_len = (
+            bundle["windows_z"], bundle["window_meta"], bundle["reps"], bundle["patch_len"]
+        )
+    else:
+        print(f"[main-fig] sampling windows (per_dataset={args.windows_per_dataset})")
+        windows, window_meta, _ = sample_windows(
+            DATA_ROOT, context_len=args.context_len, windows_per_dataset=args.windows_per_dataset, seed=args.seed
+        )
+        windows_z = np.stack([robust_z(w) for w in windows]).astype(np.float32)
+        print(f"[main-fig] {len(windows)} windows; extracting Bolt layers {layers} ...")
+        pipe = load_bolt_pipeline()
+        patch_len = int(pipe.model.chronos_config.input_patch_size)
+        reps = extract_bolt_representations(
+            windows_z, batch_size=args.batch_size, layers=layers, include_tokenizer=False,
+            pipeline=pipe, keep_pipeline=False,
+        )
+        if not args.no_cache:
+            cache_path.parent.mkdir(parents=True, exist_ok=True)
+            with open(cache_path, "wb") as fh:
+                pickle.dump({"windows_z": windows_z, "window_meta": window_meta,
+                             "reps": reps, "patch_len": patch_len}, fh)
+            print(f"[main-fig] cached extraction -> {cache_path.name}")
 
     summary: dict[str, Any] = {"model": "chronos-bolt-base", "patch_len": patch_len,
                                "config": vars(args) | {"out": str(args.out)}, "cards": {}, "prototype_panel": {}}
@@ -350,12 +425,15 @@ def main() -> None:
     # human motif taxonomy v0 标签（shapelet-inspired probe；只依赖 raw patch，与层无关）
     raw_b0 = flat_cache[layers[0]][1][sel]
     v0_labels = np.array([label_patch(raw_b0[i], patch_len).label for i in range(len(sel))])
+    # macro domain 标签（confounder 列）
+    meta_b0 = flat_cache[layers[0]][2]
+    domain_labels = np.array([meta_b0[i]["macro_domain"] for i in sel])
 
-    # 中间 plate：每行一个 depth，左=模型 KMeans cluster，右=human motif v0
+    # 中间 plate：每行一个 depth，三列 = 模型 KMeans cluster | human motif v0 | macro domain
     cmap_out = args.out / "bolt_cluster_maps.png"
-    print(f"[main-fig] rendering cluster maps + human motif v0 ({list(layer_clusters)}) -> {cmap_out.name}")
+    print(f"[main-fig] rendering cluster maps (cluster|motif v0|domain) ({list(layer_clusters)}) -> {cmap_out.name}")
     summary["cluster_maps"] = render_cluster_maps(
-        layer_clusters, v0_labels, args.k, args.seed, args.tsne_perplexity, cmap_out
+        layer_clusters, v0_labels, domain_labels, args.k, args.seed, args.tsne_perplexity, cmap_out
     )
 
     summary["prototype_panel"] = {}

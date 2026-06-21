@@ -51,7 +51,10 @@ StandardScaler → PCA(30) → KMeans(k=8) 生成候选 cluster；回到 origina
 cluster、淹没 shape 结构。
 
 - patch-stack card：每个 cluster 取 center-nearest top-24 raw patch，z-normalize 后 imshow
-  堆叠（行=rank，列=patch 内时间）。只有 raw 一行。
+  堆叠（行=rank，列=patch 内时间）。只有 raw 一行。标题下加一根 100% 归一化的
+  **domain-composition 横条**，反映**整个 cluster**（非 top-24）的 macro_domain 构成 +
+  共享 legend——明确展示 cluster 是跨域混合的，避免"cluster=单一 domain"误读（早期版本只印
+  top-24 众数 domain，会误导，已弃用）。
 - cross-domain prototype panel：每个 cluster 按 macro domain 分组、每域取 center-nearest 最佳
   代表，取前若干个**不同域**，画 z-normalized line plot（行=cluster，列=不同域的代表）。
 
