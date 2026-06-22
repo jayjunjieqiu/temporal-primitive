@@ -1,0 +1,133 @@
+{
+  "model": "chronos-bolt-base",
+  "metric_note": "supervised macro-domain separation in per-layer PCA(30); knn_domain_acc = fraction of a patch's k nearest neighbours sharing its macro_domain; CH = between/within variance ratio; silhouette(domain) stays ~0 because domains are overlapping manifolds (kept as a foil).",
+  "config": {
+    "windows_per_dataset": 200,
+    "context_len": 128,
+    "seed": 47,
+    "batch_size": 128,
+    "layers": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11
+    ],
+    "max_per_domain": 400,
+    "knn": 10,
+    "no_cache": false
+  },
+  "results": {
+    "tokenizer": {
+      "n": 2800,
+      "knn_domain_acc": 0.4871,
+      "calinski_harabasz": 25.2,
+      "silhouette_domain": -0.06,
+      "majority_baseline": 0.1429,
+      "n_domains": 7
+    },
+    "layer_0": {
+      "n": 2800,
+      "knn_domain_acc": 0.6168,
+      "calinski_harabasz": 46.69,
+      "silhouette_domain": -0.0511,
+      "majority_baseline": 0.1429,
+      "n_domains": 7
+    },
+    "layer_1": {
+      "n": 2800,
+      "knn_domain_acc": 0.7036,
+      "calinski_harabasz": 52.01,
+      "silhouette_domain": -0.025,
+      "majority_baseline": 0.1429,
+      "n_domains": 7
+    },
+    "layer_2": {
+      "n": 2800,
+      "knn_domain_acc": 0.7457,
+      "calinski_harabasz": 48.64,
+      "silhouette_domain": -0.0146,
+      "majority_baseline": 0.1429,
+      "n_domains": 7
+    },
+    "layer_3": {
+      "n": 2800,
+      "knn_domain_acc": 0.7729,
+      "calinski_harabasz": 55.91,
+      "silhouette_domain": 0.0026,
+      "majority_baseline": 0.1429,
+      "n_domains": 7
+    },
+    "layer_4": {
+      "n": 2800,
+      "knn_domain_acc": 0.7857,
+      "calinski_harabasz": 59.06,
+      "silhouette_domain": 0.0055,
+      "majority_baseline": 0.1429,
+      "n_domains": 7
+    },
+    "layer_5": {
+      "n": 2800,
+      "knn_domain_acc": 0.8004,
+      "calinski_harabasz": 61.38,
+      "silhouette_domain": 0.0151,
+      "majority_baseline": 0.1429,
+      "n_domains": 7
+    },
+    "layer_6": {
+      "n": 2800,
+      "knn_domain_acc": 0.8104,
+      "calinski_harabasz": 62.34,
+      "silhouette_domain": 0.0137,
+      "majority_baseline": 0.1429,
+      "n_domains": 7
+    },
+    "layer_7": {
+      "n": 2800,
+      "knn_domain_acc": 0.8143,
+      "calinski_harabasz": 59.31,
+      "silhouette_domain": 0.0144,
+      "majority_baseline": 0.1429,
+      "n_domains": 7
+    },
+    "layer_8": {
+      "n": 2800,
+      "knn_domain_acc": 0.8132,
+      "calinski_harabasz": 61.01,
+      "silhouette_domain": 0.0193,
+      "majority_baseline": 0.1429,
+      "n_domains": 7
+    },
+    "layer_9": {
+      "n": 2800,
+      "knn_domain_acc": 0.8139,
+      "calinski_harabasz": 60.33,
+      "silhouette_domain": 0.0131,
+      "majority_baseline": 0.1429,
+      "n_domains": 7
+    },
+    "layer_10": {
+      "n": 2800,
+      "knn_domain_acc": 0.8193,
+      "calinski_harabasz": 61.99,
+      "silhouette_domain": 0.0116,
+      "majority_baseline": 0.1429,
+      "n_domains": 7
+    },
+    "layer_11": {
+      "n": 2800,
+      "knn_domain_acc": 0.7975,
+      "calinski_harabasz": 66.1,
+      "silhouette_domain": 0.0005,
+      "majority_baseline": 0.1429,
+      "n_domains": 7
+    }
+  }
+}
