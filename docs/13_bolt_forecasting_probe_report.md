@@ -30,17 +30,33 @@ Chronos-Bolt 的 `input_patch_embedding`（我们称的 "tokenizer"）只吃
 - frozen **MLP probe**（`MLPRegressor(256,128)`，early-stopping）预测**窗口之后真正的未来
   H 步**（genuine future，H∈{16, 64}）。用 MLP 而非线性 probe，是为匹配 Bolt 自身的
   非线性 forecast head（见 §5 的负例诊断）。
-- 评估：held-out 窗口（按 window 划分，避免同窗口泄漏），report **MASE**（基线 =
+- 评估：held-out 窗口（按 window 划分，避免同窗口泄漏），report **RelMAE (vs persistence)**（基线 =
   persistence，context 最后值重复）与 **R²**。锚点 `raw_last_patch` = context 最后 16 个
   归一化值（linear-AR 参照）。
 
+  **命名校正（2026-06-21）**：我们报的主指标精确名是 **RelMAE (vs persistence)** = MAE /
+  persistence-MAE（同 horizon、out-of-sample 的 skill ratio）。这**不是**教科书 MASE——后者用
+  **in-sample 1-step naive 的平均绝对差**做标度（与 horizon / 被评估预测器无关）。我们特意选
+  persistence-on-horizon 当分母，好处是 persistence 的得分**恒 = 1**，"1"成了干净可读的及格线；代价是
+  跨 horizon 的可比性弱于教科书 MASE。代码里 `relmae` 是正名，`mase` 键仅作向后兼容别名。
+
+  **RelMAE 与 R² 不是冗余，是两个相互独立的指标**——一起放当 robustness check：
+  - **RelMAE**：L1 误差，基线 = **persistence**（有结构、很强的时序 naive）。RelMAE<1 才算赢；L1 抗离群。
+  - **R²**（`sklearn.r2_score`，多输出 `uniform_average`，即逐 horizon 步算 1−SS_res/SS_tot 再
+    平均）：L2 误差，基线 = **均值**（平的常数）。衡量解释了未来方差的百分之多少。
+  - 二者基线（persistence vs mean）与损失（L1 vs L2）都不同，回答的是不同问题；**同一结论
+    （backbone > tokenizer、L3 后饱和）在两套独立标准下都成立 = 稳健**。
+
 ## 3. 主结果
 
-证据图：`outputs/figures/bolt_forecasting_probe/bolt_forecasting_probe_depth_curve.png`
+证据图（两版，`outputs/figures/bolt_forecasting_probe/`）：
+- `..._depth_curve_paper.png` —— **论文版**：单面板，只 RelMAE（正文主图，省版面）。
+- `..._depth_curve.png` —— **素材版**：双面板 RelMAE + R²（给老师看 / robustness check；R² 在论文里
+  进 appendix，见 §6 表）。
 
 **H = 16**
 
-| representation | MASE ↓ | R² ↑ |
+| representation | RelMAE ↓ | R² ↑ |
 | --- | --- | --- |
 | raw_last_patch (AR 锚点) | 0.894 | 0.493 |
 | tokenizer (input embed) | 1.100 | 0.360 |
@@ -52,7 +68,7 @@ Chronos-Bolt 的 `input_patch_embedding`（我们称的 "tokenizer"）只吃
 
 **H = 64**
 
-| representation | MASE ↓ | R² ↑ |
+| representation | RelMAE ↓ | R² ↑ |
 | --- | --- | --- |
 | raw_last_patch (AR 锚点) | 0.889 | 0.286 |
 | tokenizer (input embed) | 0.927 | 0.249 |
@@ -64,7 +80,7 @@ Chronos-Bolt 的 `input_patch_embedding`（我们称的 "tokenizer"）只吃
 
 三个结论，对应三条主线：
 
-1. **TSFM 有用（主线 1）**：backbone representation 的 MASE < 1（赢过 persistence 基线），
+1. **TSFM 有用（主线 1）**：backbone representation 的 RelMAE < 1（赢过 persistence 基线），
    并且赢过 `raw_last_patch` 这个 raw-AR 读出（H=16: R² 0.555 vs 0.493；H=64: 0.401 vs
    0.286）。即学到的表示比"原始最近值"更能预测未来。
 2. **随层 contextualized（主线 2）**：误差从 tokenizer → encoder 层显著下降，**最大跳变发生在
@@ -72,9 +88,9 @@ Chronos-Bolt 的 `input_patch_embedding`（我们称的 "tokenizer"）只吃
    plateau。深度本身带来 forecasting 价值。
 3. **backbone > tokenizer**：两个 horizon、**每个 macro domain** 下，encoder 层都赢 tokenizer
    （H=16 per-domain：layer_11 在 Energy/Environment/Finance/Health/Traffic/Synthetic
-   全面低于 tokenizer 的 MASE）。
+   全面低于 tokenizer 的 RelMAE）。
 
-一个值得点出的细节：H=16 时 **tokenizer 反而比 raw_last_patch 差**（MASE 1.10 vs 0.89）。
+一个值得点出的细节：H=16 时 **tokenizer 反而比 raw_last_patch 差**（RelMAE 1.10 vs 0.89）。
 tokenizer 是对每个 patch 的有损非线性 embedding、再 mean-pool，丢掉了 raw 保留的精确最近值；
 **只有经过 attention（encoder）后，表示才恢复并反超**。这本身就是"contextualization 才是
 usefulness 来源"的直接证据。
@@ -117,3 +133,20 @@ usefulness 来源"的直接证据。
   设定下 backbone 都碾压"。
 - 可选的黄金标准补充：用 Bolt 真实 `predict()` 的 forecasting metric（WQL/MASE）对比"完整
   模型 vs 绕过 encoder"，更贴近"TSFM 有用"的端到端叙事（本轮未做）。
+
+## 7. Appendix：R²（L2 / mean 基线 robustness check）
+
+论文正文主图只放 RelMAE 单面板（省版面）；R² 作为独立指标（L2 损失 + mean 基线）放这里当 robustness
+check——结论与 RelMAE 完全一致（backbone > tokenizer，layer_0→layer_3 大跳变后 plateau）。
+
+| representation | R² (H=16) | R² (H=64) |
+| --- | --- | --- |
+| tokenizer (input embed) | 0.360 | 0.249 |
+| enc layer_0 | 0.461 | 0.287 |
+| enc layer_3 | 0.552 | 0.392 |
+| enc layer_6 | 0.546 | 0.400 |
+| enc layer_9 | 0.554 | 0.398 |
+| **enc layer_11** | **0.555** | **0.401** |
+
+R² = `sklearn.r2_score`（多输出 `uniform_average`）。素材版双面板图 `..._depth_curve.png` 同时画了
+RelMAE 与 R²，供汇报时展示"两套独立标准同结论"。

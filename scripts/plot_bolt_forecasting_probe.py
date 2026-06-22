@@ -45,7 +45,29 @@ def load(tag: str) -> dict:
 
 
 def series(summary: dict, metric: str) -> list[float]:
+    # relmae 是诚实命名；旧 summary 只有 "mase" 别名 → 回退
+    if metric == "relmae":
+        return [summary["results"][r].get("relmae", summary["results"][r].get("mase"))
+                for r in REP_ORDER]
     return [summary["results"][r][metric] for r in REP_ORDER]
+
+
+def _style_x(ax, xs, xlabels, tok_x) -> None:
+    ax.set_xticks(xs)
+    ax.set_xticklabels(xlabels, fontsize=8)
+    ax.axvline(tok_x + 0.5, color="#2ca02c", ls=":", lw=1)
+    ax.legend(loc="best", fontsize=9, title="future horizon")
+    ax.grid(True, axis="y", alpha=0.25)
+
+
+def _draw_relmae(ax, data, xs, tok_x) -> None:
+    for tag, label, color in HORIZONS:
+        ax.plot(xs, series(data[tag], "relmae"), "-o", color=color, label=label, lw=2, ms=6)
+    ax.axhline(1.0, ls="--", color="gray", lw=1)
+    ax.text(0.02, 1.0, "persistence (RelMAE=1)", color="gray", fontsize=8, va="bottom",
+            transform=ax.get_yaxis_transform())
+    ax.axvspan(tok_x + 0.5, len(REP_ORDER) - 0.5, color="#2ca02c", alpha=0.06)
+    ax.set_ylabel("RelMAE vs persistence  (↓ better)")
 
 
 def main() -> None:
@@ -55,46 +77,52 @@ def main() -> None:
     xs = list(range(len(REP_ORDER)))
     xlabels = [REP_LABEL[r] for r in REP_ORDER]
     tok_x = REP_ORDER.index("tokenizer")
+    n = data["horizon16"]["config"]["n_examples"]
 
+    # ---------- 论文版（单面板，只 RelMAE）----------
+    figp, axp = plt.subplots(1, 1, figsize=(6.6, 4.6))
+    _draw_relmae(axp, data, xs, tok_x)
+    _style_x(axp, xs, xlabels, tok_x)
+    axp.set_title("Forecast skill vs representation depth\nRelMAE vs persistence (L1; <1 beats naive)",
+                  fontsize=10.5)
+    figp.suptitle(
+        "Chronos-Bolt-base forecasting probe — contextualized backbone > tokenizer\n"
+        f"frozen rep → MLP probe → predict genuine future (mean-pool; {n} windows)",
+        fontsize=10,
+    )
+    figp.tight_layout(rect=(0, 0, 1, 0.90))
+    out_paper = FIG_DIR / "bolt_forecasting_probe_depth_curve_paper.png"
+    figp.savefig(out_paper, dpi=150)
+    print(f"[plot] saved (paper, RelMAE only) -> {out_paper}")
+
+    # ---------- 素材版（双面板，RelMAE + R² robustness check）----------
     fig, axes = plt.subplots(1, 2, figsize=(12.5, 4.6))
+    _draw_relmae(axes[0], data, xs, tok_x)
+    axes[0].set_title("Forecast skill vs representation\nRelMAE — L1, baseline = persistence", fontsize=10)
 
-    # --- MASE panel ---
-    ax = axes[0]
-    for tag, label, color in HORIZONS:
-        ax.plot(xs, series(data[tag], "mase"), "-o", color=color, label=label, lw=2, ms=6)
-    ax.axhline(1.0, ls="--", color="gray", lw=1)
-    ax.text(0.02, 1.0, "persistence (MASE=1)", color="gray", fontsize=8, va="bottom", transform=ax.get_yaxis_transform())
-    ax.axvspan(tok_x + 0.5, len(REP_ORDER) - 0.5, color="#2ca02c", alpha=0.06)
-    ax.set_ylabel("MASE  (↓ better)")
-    ax.set_title("Forecast error vs representation")
-
-    # --- R2 panel ---
     ax = axes[1]
     for tag, label, color in HORIZONS:
         ax.plot(xs, series(data[tag], "r2"), "-o", color=color, label=label, lw=2, ms=6)
     ax.axhline(0.0, ls="--", color="gray", lw=1)
     ax.axvspan(tok_x + 0.5, len(REP_ORDER) - 0.5, color="#2ca02c", alpha=0.06)
     ax.set_ylabel("R²  (↑ better)")
-    ax.set_title("Explained variance vs representation")
+    ax.set_title("Explained variance vs representation\nR² — L2, baseline = mean (independent check)", fontsize=10)
 
     for ax in axes:
-        ax.set_xticks(xs)
-        ax.set_xticklabels(xlabels, fontsize=8)
-        ax.axvline(tok_x + 0.5, color="#2ca02c", ls=":", lw=1)
-        ax.legend(loc="best", fontsize=9, title="future horizon")
-        ax.grid(True, axis="y", alpha=0.25)
+        _style_x(ax, xs, xlabels, tok_x)
 
-    n = data["horizon16"]["config"]["n_examples"]
     fig.suptitle(
         "Chronos-Bolt-base forecasting probe — contextualized backbone > tokenizer\n"
         f"frozen representation → MLP probe → predict genuine future (mean-pool over context; "
-        f"{n} windows; green = transformer-contextualized)",
-        fontsize=11,
+        f"{n} windows; green = transformer-contextualized)\n"
+        "RelMAE (L1, vs persistence) and R² (L2, vs mean) are independent metrics — "
+        "same conclusion under both = robustness, not redundancy",
+        fontsize=10.5,
     )
-    fig.tight_layout(rect=(0, 0, 1, 0.93))
+    fig.tight_layout(rect=(0, 0, 1, 0.90))
     out = FIG_DIR / "bolt_forecasting_probe_depth_curve.png"
     fig.savefig(out, dpi=150)
-    print(f"[plot] saved -> {out}")
+    print(f"[plot] saved (advisor, RelMAE + R²) -> {out}")
 
 
 if __name__ == "__main__":

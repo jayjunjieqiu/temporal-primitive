@@ -207,6 +207,9 @@ def evaluate_rep(
         "alpha": float(getattr(probe, "alpha_", float("nan"))),
         "mae": mae,
         "mae_naive_persistence": mae_naive,
+        # RelMAE = MAE / persistence-MAE（同 horizon、out-of-sample skill ratio）。注意这**不是**
+        # 教科书 MASE（后者用 in-sample 1-step naive 标度）；"mase" 键仅为向后兼容的别名。
+        "relmae": float(mae / mae_naive) if mae_naive > 0 else float("nan"),
         "mase": float(mae / mae_naive) if mae_naive > 0 else float("nan"),
         "r2": float(r2_score(y_te, pred)),
         "per_macro_domain": {},
@@ -220,6 +223,7 @@ def evaluate_rep(
         result["per_macro_domain"][macro] = {
             "n_test": int(m.sum()),
             "mae": mm,
+            "relmae": float(mm / mn) if mn > 0 else float("nan"),
             "mase": float(mm / mn) if mn > 0 else float("nan"),
         }
     return result
@@ -309,7 +313,8 @@ def main() -> None:
             "test_frac": args.test_frac,
             "n_windows": int(len(full_windows)),
             "n_examples": int(len(y)),
-            "metric_note": "MASE baseline = persistence (last context value repeated)",
+            "metric_note": ("RelMAE = MAE / persistence-MAE (same horizon, out-of-sample skill "
+                            "ratio; NOT textbook in-sample MASE). 'mase' key kept as legacy alias."),
         },
         "results": results,
     }
@@ -318,10 +323,10 @@ def main() -> None:
     out_json.write_text(json.dumps(summary, indent=2, ensure_ascii=False), encoding="utf-8")
 
     print(f"\n=== Forecasting probe [{args.mode}, probe={args.probe}] (lower=better) ===")
-    print(f"{'representation':<16}{'dim':>6}{'MAE':>9}{'MASE':>9}{'R2':>8}")
+    print(f"{'representation':<16}{'dim':>6}{'MAE':>9}{'RelMAE':>9}{'R2':>8}")
     for rep in rep_order:
         r = results[rep]
-        print(f"{rep:<16}{X_by_rep[rep].shape[1]:>6}{r['mae']:>9.4f}{r['mase']:>9.4f}{r['r2']:>8.3f}")
+        print(f"{rep:<16}{X_by_rep[rep].shape[1]:>6}{r['mae']:>9.4f}{r['relmae']:>9.4f}{r['r2']:>8.3f}")
     print(f"\n[probe] saved -> {out_json}")
 
 
