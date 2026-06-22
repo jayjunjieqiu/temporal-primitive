@@ -1,32 +1,68 @@
 # Chronos-Bolt contextualization：representation 随层变得 contextualized
 
-更新时间：2026-06-07  
-模型：**Chronos-Bolt-base**（clean 路线；见 `docs/99_chronos2_archive_and_chronos_bolt_pivot.md`）  
-脚本：`scripts/run_bolt_contextualization.py` · `scripts/plot_bolt_contextualization.py` · `scripts/chronos_bolt_backbone.py`
+更新时间：2026-06-22
+模型：**Chronos-Bolt-base**（clean 路线；见 `docs/99_chronos2_archive_and_chronos_bolt_pivot.md`）
+主脚本：`scripts/run_bolt_contextualization_training.py`（训练数据、probe accuracy 版，**当前主图**）
+对照脚本：`scripts/run_bolt_contextualization.py` · `scripts/plot_bolt_contextualization.py`（旧 NMI 版，appendix）
 
 advisor 三条主线里"**随层 contextualized**"的 clean 证据。两个 layer-wise 量随 representation
-深度（`tokenizer` → encoder `layer_0/3/6/9/11`）变化，配合原有的 NMI 思路 + 一个新的
-local-vs-global 相似度检查。
+深度（`tokenizer` → encoder 12 层）变化。
 
 ## 1. 两个指标
 
-- **NMI（confounder absorption）**：每层在 PCA(30) space 做 KMeans(k=10)，算 cluster label
-  与 `macro_domain` / `frequency` / `patch_index` 的 normalized mutual information。
+- **confounder decodability（probe accuracy，主指标，取代 NMI）**：对每个 confounder
+  （`macro_domain` / `frequency` / `position`）做 **k-NN probe**——从每层表征（PCA(30)）直接预测该
+  confounder 标签，看准确率随深度怎么变。这是**直接的 decodability**，不经 KMeans。
+  - **为什么取代 NMI**：旧指标是 NMI(KMeans 簇标签, confounder)，经 KMeans + 固定 k；深层连续体被
+    任意切分，使 domain NMI 出现**中层达峰后回落的 artifact**（见 §2b / §4）。probe accuracy 无此问题：
+    domain/frequency/position 三者都**单调上升后饱和**。NMI 版降为 appendix 对照（§2.2）。
 - **within-context patch similarity**（研究问题）：**同一 context 下不同位置的 patch
   representation 之间的相似度，会不会随 depth 增加而增加？** 同一窗口内不同位置的 patch 当
   *same-context*，跨窗口随机 patch 当 *different-context*，比较余弦相似度。
   - ⚠️ **绝对 cosine 会被 confound**：深层表示空间整体散开，所有相似度（含 different-context）
-    一起下降，掩盖真实趋势。因此用 **centered cosine**（每层先减全局均值方向，去掉所有 patch
-    共享的 dominant component），度量同 context 耦合**本身**随深度的变化。
+    一起下降，掩盖真实趋势。因此用 **centered cosine**（每层先减全局均值方向）度量同 context 耦合
+    **本身**随深度的变化。
 
-设置：22 数据集各 100 窗口（2200 窗口），`context_len=128`，`patch_len=16`，seed=47。
+设置（主图）：Chronos in-distribution 训练子集（16 数据集，与 main figure 一致），每数据集 200 窗口、
+`context_len=128`、`patch_len=16`、seed=47、全 12 层 + tokenizer；probe = 10-NN、domain-balanced ≤400/域。
+（旧 NMI 对照版在 basicts 22 数据集 × 100 窗口上算。）
 
 ## 2. 结果
 
 层号约定：图中 x 轴 `enc L1…L12` 用 1-based（Nature 习惯）= encoder block 索引 + 1；代码/CLI 仍 0-based
 （`enc L1` = block 0、`enc L12` = block 11）。
 
-证据图：`outputs/figures/bolt_contextualization/bolt_contextualization_depth_curve.png`
+### 2.1 主图：confounder decodability（probe accuracy）+ within-context similarity
+
+证据图：`outputs/figures/bolt_contextualization/bolt_contextualization_probe_depth.png`（训练数据；
+左 = 三个 confounder 的 10-NN probe accuracy，右 = within-context centered-cosine similarity）。
+
+| representation | domain acc | frequency acc | position acc | same-ctx sim |
+| --- | --- | --- | --- | --- |
+| tokenizer | 0.49 | 0.67 | 0.21 | 0.04 |
+| enc L1 (block 0) | 0.62 | 0.75 | 0.29 | 0.16 |
+| enc L4 | 0.77 | 0.84 | 0.32 | 0.25 |
+| enc L7 | 0.81 | 0.86 | 0.38 | 0.24 |
+| enc L10 | 0.82 | 0.86 | 0.50 | 0.23 |
+| enc L12 (block 11) | 0.80 | 0.85 | **0.59** | 0.24 |
+
+（chance：domain≈0.14、frequency≈0.2–0.3、position=1/8=0.125；frequency probe 剔除 synthetic——无 cadence）
+
+结论：
+
+1. **三个 confounder 的 decodability 都随深度单调上升后饱和**，无 NMI 版那种回落。最大跃升都在
+   tokenizer → 前几层 encoder（attention 注入 context）。
+2. **position 最干净、且持续上升到最深层**（0.21 → 0.59，chance 0.125）：value-only tokenizer 几乎不含
+   位置信息，**位置完全是经 encoder 逐层注入**——contextualization 的招牌信号。
+3. **domain / frequency 早期猛涨、中后段饱和**（domain 0.49→0.82、frequency 0.67→0.86）。
+4. **同一 context 下不同位置 patch 的 centered 相似度随深度上升**（0.04 → ~0.24，答研究问题：会），
+   different-context 始终≈0。
+
+### 2.2 对照（appendix）：旧 NMI 版（basicts，经 KMeans，存在 artifact）
+
+证据图：`outputs/figures/bolt_contextualization/bolt_contextualization_depth_curve.png`。**保留作对照**——
+注意 domain NMI 在中层达峰后回落，是 deep-layer KMeans 切连续体 + frequency 轴挤占的 **artifact**（直接
+probe accuracy 无此问题，见 §2.1 / §2b）。
 
 NMI（confounder absorption）：
 
@@ -105,12 +141,16 @@ PCA(30) 空间量"同域 patch 是否聚在一起"，两个互补、且都不依
 ## 3. 复现
 
 ```bash
+# §2.1 主图：probe accuracy（训练数据，复用 §2b 全层提取缓存，无需 GPU）
+.venv/bin/python scripts/run_bolt_contextualization_training.py
+
+# §2b 直接 macro-domain 分离度（全 12 层 + tokenizer；首次跑会提取并缓存到 .cache）
+.venv/bin/python scripts/run_bolt_domain_separation.py
+
+# §2.2 对照：旧 NMI 版（basicts）
 .venv/bin/python scripts/run_bolt_contextualization.py \
   --windows-per-dataset 100 --layers 0 3 6 9 11 --k 10
 .venv/bin/python scripts/plot_bolt_contextualization.py
-
-# §2b 直接 macro-domain 分离度（全 12 层 + tokenizer；提取结果缓存到 .cache）
-.venv/bin/python scripts/run_bolt_domain_separation.py
 ```
 
 ## 4. 边界

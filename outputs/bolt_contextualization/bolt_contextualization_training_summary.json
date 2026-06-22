@@ -1,0 +1,109 @@
+{
+  "model": "chronos-bolt-base",
+  "data": "chronos in-distribution training subset",
+  "metric_note": "left = k-NN probe accuracy of each confounder from the representation (direct decodability, NO KMeans; replaces NMI); right = within-context centered-cosine similarity. frequency probe excludes synthetic (no cadence).",
+  "chance": {
+    "domain": 0.14285714285714285,
+    "frequency": 0.5295833333333333,
+    "position": 0.125
+  },
+  "config": {
+    "windows_per_dataset": 200,
+    "context_len": 128,
+    "seed": 47,
+    "batch_size": 128,
+    "layers": [
+      0,
+      3,
+      6,
+      9,
+      11
+    ],
+    "max_per_domain": 400,
+    "knn": 10,
+    "global_pairs": 400000,
+    "no_cache": false
+  },
+  "rep_order": [
+    "tokenizer",
+    "layer_0",
+    "layer_3",
+    "layer_6",
+    "layer_9",
+    "layer_11"
+  ],
+  "results": {
+    "tokenizer": {
+      "knn_probe_acc": {
+        "domain": 0.4871,
+        "frequency": 0.6658,
+        "position": 0.2089
+      },
+      "within_context_sim": {
+        "same_context": 0.04266338050365448,
+        "different_context": 0.011017458513379097,
+        "gap": 0.03164592385292053
+      }
+    },
+    "layer_0": {
+      "knn_probe_acc": {
+        "domain": 0.6168,
+        "frequency": 0.7525,
+        "position": 0.2857
+      },
+      "within_context_sim": {
+        "same_context": 0.1557706892490387,
+        "different_context": 0.00649980315938592,
+        "gap": 0.1492708921432495
+      }
+    },
+    "layer_3": {
+      "knn_probe_acc": {
+        "domain": 0.7729,
+        "frequency": 0.8383,
+        "position": 0.3154
+      },
+      "within_context_sim": {
+        "same_context": 0.24562253057956696,
+        "different_context": 0.0008211088133975863,
+        "gap": 0.24480141699314117
+      }
+    },
+    "layer_6": {
+      "knn_probe_acc": {
+        "domain": 0.8104,
+        "frequency": 0.8508,
+        "position": 0.3661
+      },
+      "within_context_sim": {
+        "same_context": 0.24847723543643951,
+        "different_context": 0.00038816872984170914,
+        "gap": 0.24808906018733978
+      }
+    },
+    "layer_9": {
+      "knn_probe_acc": {
+        "domain": 0.8139,
+        "frequency": 0.8558,
+        "position": 0.4457
+      },
+      "within_context_sim": {
+        "same_context": 0.23486630618572235,
+        "different_context": 0.000423554505687207,
+        "gap": 0.23444275557994843
+      }
+    },
+    "layer_11": {
+      "knn_probe_acc": {
+        "domain": 0.7975,
+        "frequency": 0.8512,
+        "position": 0.5932
+      },
+      "within_context_sim": {
+        "same_context": 0.2416023313999176,
+        "different_context": 0.0006165122613310814,
+        "gap": 0.24098582565784454
+      }
+    }
+  }
+}

@@ -43,6 +43,27 @@ TRAINING_DATASETS: list[tuple[str, str, str]] = [
     ("Synthetic", "training_corpus/kernel_synth_1m", "KernelSynth (synthetic)"),
 ]
 
+# 各训练数据集的近似采样周期（分钟），供 frequency/cadence confounder 用。按 dataset_path 键。
+# 近似值（按数据集已知 cadence）；synthetic 无真实 cadence → None（frequency probe 时剔除）。
+DATASET_FREQ_MINUTES: dict[str, float | None] = {
+    "monash_australian_electricity": 30,
+    "solar_1h": 60,
+    "wind_farms_hourly": 60,
+    "monash_traffic": 60,
+    "monash_pedestrian_counts": 60,
+    "taxi_30min": 30,
+    "monash_weather": 1440,
+    "ushcn_daily": 1440,
+    "monash_temperature_rain": 1440,
+    "exchange_rate": 1440,
+    "monash_fred_md": 43200,
+    "m5": 1440,
+    "dominick": 10080,
+    "wiki_daily_100k": 1440,
+    "monash_covid_deaths": 1440,
+    "training_corpus/kernel_synth_1m": None,
+}
+
 # 全图统一 macro_domain 调色板（discovery 训练域 + validation basicts 域都覆盖）
 DOMAIN_COLORS: dict[str, str] = {
     "Traffic": "#4C72B0",
@@ -138,6 +159,7 @@ def sample_training_windows(
                     "dataset_path": ds,
                     "domain": macro,
                     "macro_domain": macro,
+                    "frequency_minutes": DATASET_FREQ_MINUTES.get(ds),
                     "start": start,
                     "context_len": context_len,
                 }
