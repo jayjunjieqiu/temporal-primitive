@@ -1,9 +1,17 @@
 # 测试数据集 × Chronos 预训练成员身份（zero-shot 依据）
 
-更新时间：2026-06-08
+更新时间：2026-06-21
 
 用途：判断我们用的测试数据哪些在 Chronos / Chronos-Bolt 的**训练集内**，哪些在**训练集外**，
 为"TSFM 有用"（`docs/13_`）这条主线的 zero-shot 表述提供依据。
+
+## 0. 角色（2026-06-21 discovery-on-training pivot）
+
+primitive discovery 已迁到 Chronos **in-distribution 训练数据**上做（curated 16 数据集，见
+`scripts/chronos_training_data.py` 与 `docs/15`），basicts 测试集**降级为泛化 validation**。所以本表
+现在的作用是：**确认 basicts 测试集里哪些可以当干净的 held-out 泛化证据**——结论是除 Electricity /
+BeijingAirQuality 外的 20 个都在训练集外，可用作 validation（main figure 的 generalization 模块即用它们）。
+下面是详细判定。
 
 ## 1. 我们定义的 domain
 

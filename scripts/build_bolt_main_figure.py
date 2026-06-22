@@ -47,6 +47,7 @@ from sklearn.preprocessing import StandardScaler
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from scripts.chronos_bolt_backbone import extract_bolt_representations, load_bolt_pipeline  # noqa: E402
+from scripts.chronos_training_data import DOMAIN_COLORS, sample_training_windows  # noqa: E402
 from scripts.explore_motif_taxonomy import LABELS as MOTIF_LABELS  # noqa: E402
 from scripts.explore_motif_taxonomy import label_patch  # noqa: E402
 from scripts.run_prior_guided_probe_sanity_check import macro_domain  # noqa: E402
@@ -59,16 +60,8 @@ from scripts.run_second_pilot_discovery import (  # noqa: E402
 
 OUTPUT_DIR = ROOT / "outputs" / "figures" / "bolt_main_figure"
 
-# 固定的 macro_domain 调色板（全图统一，用于卡片上的 domain-composition 堆叠条）
-DOMAIN_COLORS = {
-    "Traffic": "#4C72B0",
-    "Energy": "#DD8452",
-    "Environment": "#55A868",
-    "Finance": "#C44E52",
-    "Health": "#8172B3",
-    "Synthetic control": "#937860",
-    "Other": "#999999",
-}
+# basicts 测试集里在 Chronos 训练集内的两个，validation 时剔除（见 docs/16）
+VALIDATION_EXCLUDE = {"Electricity", "BeijingAirQuality", "BLAST"}
 
 
 def z_normalize(x: np.ndarray, eps: float = 1e-8) -> np.ndarray:
@@ -92,7 +85,9 @@ def flatten_patches(
                 {
                     "dataset": window_meta[i]["dataset"],
                     "domain": window_meta[i].get("domain"),
-                    "macro_domain": macro_domain(window_meta[i].get("domain")),
+                    # 训练数据 meta 自带 macro_domain；basicts 走 domain->macro 映射
+                    "macro_domain": window_meta[i].get("macro_domain")
+                    or macro_domain(window_meta[i].get("domain")),
                     "patch_index": p,
                 }
             )
@@ -105,6 +100,17 @@ def cluster_pca(emb: np.ndarray, k: int, seed: int) -> tuple[np.ndarray, np.ndar
     Xp = PCA(n_components=min(30, Xs.shape[1]), random_state=seed).fit_transform(Xs)
     km = KMeans(n_clusters=k, n_init=10, random_state=seed).fit(Xp)
     return km.labels_, km.cluster_centers_, Xp
+
+
+def cluster_pca_fit(emb: np.ndarray, k: int, seed: int):
+    """同 cluster_pca，但额外返回 fit 好的 (scaler, pca, km)，供把 validation patch 投到同一
+    discovery 空间做 cross-space 泛化检验。返回 (labels, centers, pca_coords, scaler, pca, km)。"""
+    scaler = StandardScaler().fit(emb)
+    Xs = scaler.transform(emb)
+    pca = PCA(n_components=min(30, Xs.shape[1]), random_state=seed).fit(Xs)
+    Xp = pca.transform(Xs)
+    km = KMeans(n_clusters=k, n_init=10, random_state=seed).fit(Xp)
+    return km.labels_, km.cluster_centers_, Xp, scaler, pca, km
 
 
 def render_raw_cards(
@@ -342,14 +348,159 @@ def render_prototype_panel(
     return {"output": str(out_path), "clusters": panel_info}
 
 
+def _zcorr(a: np.ndarray, b: np.ndarray) -> float:
+    a = a - a.mean()
+    b = b - b.mean()
+    denom = float(np.linalg.norm(a) * np.linalg.norm(b))
+    return float(a @ b / denom) if denom > 1e-12 else 0.0
+
+
+def render_generalization_panel(
+    layer_name: str,
+    scaler: Any,
+    pca: Any,
+    centers: np.ndarray,
+    disc_labels: np.ndarray,
+    disc_raw: np.ndarray,
+    val_emb: np.ndarray,
+    val_raw: np.ndarray,
+    val_meta: list[dict[str, Any]],
+    k: int,
+    proto_per_cluster: int,
+    out_path: Path,
+    coh_thresh: float = 0.6,
+    control_datasets: tuple[str, ...] = ("Gaussian", "Pulse"),
+    noise_control: str = "Gaussian",
+) -> dict[str, Any]:
+    """泛化检验：把在**训练数据**上发现的 prototype，拿去检索**unseen** patch。
+
+    - discovery prototype shape = 每簇 z-normalized discovery raw patch 的均值（original space）。
+    - 每个 unseen patch：在 *representation space* 投到同一 discovery 空间 → 最近 cluster（rep-NN）。
+    - **headline = shape coherence**：corr(patch, 其 rep-NN prototype) ≥ thresh 的比例。real held-out
+      数据应当高，pure-noise control（Gaussian）应当≈0 → primitive 不是 artifact。这是主指标，因为它
+      能干净地拒绝噪声。
+    - 次要诊断 cross-space agreement（rep-NN == raw-shape-NN）**不**作 headline：它会被噪声蒙混
+      （纯噪声在两个空间都稳定落进同一"通用 wiggle"簇，agreement 反而偏高），不能区分 control。
+    - caveat：coherence 用 position-sensitive correlation，会**低估 shift-invariant 家族**（如
+      impulse/Pulse：spike 位置随机，对固定位置 prototype 相关性低，但 representation 仍把它们正确
+      归到 impulse 簇——见 panel）。故 Gaussian 是干净 negative control，Pulse 是被低估的 positive。
+    - panel：行=discovery cluster，列=分配进该簇、来自不同 unseen 数据集、离中心最近的 patch。
+    """
+    # discovery 每簇的 prototype 形状（original space 均值）
+    proto_shapes = np.zeros((k, disc_raw.shape[1]), dtype=np.float64)
+    for c in range(k):
+        idx = np.where(disc_labels == c)[0]
+        if len(idx):
+            proto_shapes[c] = np.mean(np.stack([z_normalize(disc_raw[i]) for i in idx]), axis=0)
+
+    # validation patch：rep-space 分配 + shape-space 分配
+    Xv = pca.transform(scaler.transform(val_emb))
+    d_rep = np.linalg.norm(Xv[:, None, :] - centers[None, :, :], axis=2)  # [n, k]
+    rep_assign = d_rep.argmin(axis=1)
+    rep_dist = d_rep.min(axis=1)
+    zval = np.stack([z_normalize(val_raw[i]) for i in range(len(val_raw))])
+    d_shape = np.linalg.norm(zval[:, None, :] - proto_shapes[None, :, :], axis=2)
+    shape_assign = d_shape.argmin(axis=1)
+
+    agree = rep_assign == shape_assign
+    coh = np.array([_zcorr(zval[i], proto_shapes[rep_assign[i]]) for i in range(len(zval))])
+    is_coh = coh >= coh_thresh
+
+    # 按数据集汇总（含 negative control 检查）
+    datasets = sorted({m["dataset"] for m in val_meta})
+    per_dataset = {}
+    for ds in datasets:
+        sel = np.array([i for i, m in enumerate(val_meta) if m["dataset"] == ds])
+        per_dataset[ds] = {
+            "n": int(len(sel)),
+            "cross_space_agreement": round(float(np.mean(agree[sel])), 3),
+            "shape_coherence": round(float(np.mean(is_coh[sel])), 3),
+        }
+
+    # headline：real held-out 的 shape coherence vs pure-noise control
+    real_mask = np.array([m["dataset"] not in control_datasets for m in val_meta])
+    real_coh = float(np.mean(is_coh[real_mask])) if real_mask.any() else 0.0
+    noise_coh = per_dataset.get(noise_control, {}).get("shape_coherence")
+
+    # 渲染：每簇取 rep-NN==该簇、来自不同数据集、离中心最近的 patch
+    fig, axes = plt.subplots(k, proto_per_cluster, figsize=(2.0 * proto_per_cluster, 1.3 * k), squeeze=False)
+    panel_info = []
+    for c in range(k):
+        cand = np.where(rep_assign == c)[0]
+        cand = cand[np.argsort(rep_dist[cand])]
+        chosen, seen_ds = [], set()
+        for i in cand:
+            ds = val_meta[i]["dataset"]
+            if ds in seen_ds:
+                continue
+            seen_ds.add(ds)
+            chosen.append(i)
+            if len(chosen) >= proto_per_cluster:
+                break
+        panel_info.append({"cluster": f"C{c + 1}", "n_assigned": int(len(cand)),
+                           "datasets_shown": [val_meta[i]["dataset"] for i in chosen]})
+        for col in range(proto_per_cluster):
+            ax = axes[c, col]
+            ax.set_xticks([])
+            ax.set_yticks([])
+            if col == 0:
+                ax.plot(proto_shapes[c], lw=1.6, color="#c0392b", zorder=3)  # 红=训练 prototype
+                ax.set_ylabel(f"C{c + 1}", fontsize=9, rotation=0, labelpad=12, va="center")
+                ax.set_facecolor("#fbecea")
+                if c == 0:
+                    ax.set_title("train prototype", fontsize=6.5, color="#c0392b")
+                continue
+            j = col - 1
+            if j >= len(chosen):
+                ax.axis("off")
+                continue
+            i = chosen[j]
+            ax.plot(proto_shapes[c], lw=1.0, color="#cccccc", zorder=1)  # 灰=prototype 参照
+            ax.plot(zval[i], lw=1.2, color="#1f2933", zorder=2)
+            ax.set_title(f"{val_meta[i]['dataset'][:12]}", fontsize=6)
+
+    noise_txt = f"{noise_coh:.0%}" if noise_coh is not None else "n/a"
+    fig.suptitle(
+        f"Chronos-Bolt {layer_name} — generalization: train-discovered prototypes retrieve held-out patches\n"
+        f"held-out shape coherence = {real_coh:.0%} (corr≥{coh_thresh} to discovered prototype) "
+        f"vs pure-noise control = {noise_txt}; red = train prototype, black = unseen patch",
+        fontsize=9.5,
+    )
+    fig.tight_layout(rect=(0, 0, 1, 0.93))
+    fig.savefig(out_path, dpi=220, bbox_inches="tight", facecolor="white")
+    plt.close(fig)
+    return {"output": str(out_path),
+            "real_coherence": round(real_coh, 3),
+            "noise_control_coherence": noise_coh,
+            "cross_space_agreement_overall": round(float(np.mean(agree)), 3),
+            "coherence_thresh": coh_thresh, "n_val_patches": int(len(zval)),
+            "control_datasets": list(control_datasets),
+            "per_dataset": per_dataset, "clusters": panel_info}
+
+
+def _extract(windows_raw, window_meta, layers, batch_size, pipe):
+    """robust-z -> Bolt 提取 -> 返回 (windows_z, reps, patch_len)。pipe 复用，避免反复加载。"""
+    windows_z = np.stack([robust_z(w) for w in windows_raw]).astype(np.float32)
+    patch_len = int(pipe.model.chronos_config.input_patch_size)
+    reps = extract_bolt_representations(
+        windows_z, batch_size=batch_size, layers=layers, include_tokenizer=False,
+        pipeline=pipe, keep_pipeline=True,
+    )
+    return windows_z, reps, patch_len
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--windows-per-dataset", type=int, default=120)
+    parser.add_argument("--windows-per-dataset", type=int, default=200,
+                        help="discovery（训练数据）每个数据集采样窗口数")
+    parser.add_argument("--val-windows-per-dataset", type=int, default=150,
+                        help="validation（basicts held-out）每个数据集采样窗口数")
     parser.add_argument("--context-len", type=int, default=128)
     parser.add_argument("--seed", type=int, default=47)
     parser.add_argument("--batch-size", type=int, default=128)
     parser.add_argument("--card-layers", type=int, nargs="+", default=[0, 11])
     parser.add_argument("--prototype-layers", type=int, nargs="+", default=[0, 11])
+    parser.add_argument("--generalization-layers", type=int, nargs="+", default=[0, 11])
     parser.add_argument("--k", type=int, default=8)
     parser.add_argument("--top-n", type=int, default=24)
     parser.add_argument("--proto-per-cluster", type=int, default=6)
@@ -360,91 +511,125 @@ def main() -> None:
     args = parser.parse_args()
     args.out.mkdir(parents=True, exist_ok=True)
 
-    layers = sorted(set(args.card_layers) | set(args.prototype_layers))
-    # 提取缓存：纯图形微调时跳过 GPU。key 只跟"采样 + 提取"有关（与 k / 配色 / 版式无关）
+    layers = sorted(set(args.card_layers) | set(args.prototype_layers) | set(args.generalization_layers))
+    # 提取缓存：纯图形微调时跳过 GPU。key 跟"采样 + 提取"有关（与 k / 配色 / 版式无关）
     cache_path = args.out / ".cache" / (
-        f"extract_wpd{args.windows_per_dataset}_ctx{args.context_len}"
-        f"_seed{args.seed}_layers{'-'.join(map(str, layers))}.pkl"
+        f"extract_train_wpd{args.windows_per_dataset}_val{args.val_windows_per_dataset}"
+        f"_ctx{args.context_len}_seed{args.seed}_layers{'-'.join(map(str, layers))}.pkl"
     )
     if not args.no_cache and cache_path.exists():
         print(f"[main-fig] loading extraction cache -> {cache_path.name}")
         with open(cache_path, "rb") as fh:
-            bundle = pickle.load(fh)
-        windows_z, window_meta, reps, patch_len = (
-            bundle["windows_z"], bundle["window_meta"], bundle["reps"], bundle["patch_len"]
+            b = pickle.load(fh)
+        (disc_z, disc_meta, disc_reps, val_z, val_meta_w, val_reps, patch_len) = (
+            b["disc_z"], b["disc_meta"], b["disc_reps"],
+            b["val_z"], b["val_meta_w"], b["val_reps"], b["patch_len"]
         )
     else:
-        print(f"[main-fig] sampling windows (per_dataset={args.windows_per_dataset})")
-        windows, window_meta, _ = sample_windows(
-            DATA_ROOT, context_len=args.context_len, windows_per_dataset=args.windows_per_dataset, seed=args.seed
+        # discovery = Chronos in-distribution 训练子集
+        print(f"[main-fig] sampling DISCOVERY (training) windows (per_dataset={args.windows_per_dataset})")
+        disc_w, disc_meta, disc_summary = sample_training_windows(
+            context_len=args.context_len, windows_per_dataset=args.windows_per_dataset, seed=args.seed
         )
-        windows_z = np.stack([robust_z(w) for w in windows]).astype(np.float32)
-        print(f"[main-fig] {len(windows)} windows; extracting Bolt layers {layers} ...")
+        # validation = basicts held-out（剔除在训练集内的 Electricity/BeijingAirQuality）
+        print(f"[main-fig] sampling VALIDATION (basicts held-out) windows (per_dataset={args.val_windows_per_dataset})")
+        val_w_all, val_meta_all, _ = sample_windows(
+            DATA_ROOT, context_len=args.context_len,
+            windows_per_dataset=args.val_windows_per_dataset, seed=args.seed,
+        )
+        keep = [i for i, m in enumerate(val_meta_all) if m["dataset"] not in VALIDATION_EXCLUDE]
+        val_w = val_w_all[keep]
+        val_meta_w = [val_meta_all[i] for i in keep]
+        print(f"[main-fig] discovery={len(disc_w)} train patches/windows | "
+              f"validation={len(val_w)} held-out windows from "
+              f"{len({m['dataset'] for m in val_meta_w})} datasets")
+
         pipe = load_bolt_pipeline()
-        patch_len = int(pipe.model.chronos_config.input_patch_size)
-        reps = extract_bolt_representations(
-            windows_z, batch_size=args.batch_size, layers=layers, include_tokenizer=False,
-            pipeline=pipe, keep_pipeline=False,
-        )
+        print(f"[main-fig] extracting Bolt layers {layers} (discovery + validation) ...")
+        disc_z, disc_reps, patch_len = _extract(disc_w, disc_meta, layers, args.batch_size, pipe)
+        val_z, val_reps, _ = _extract(val_w, val_meta_w, layers, args.batch_size, pipe)
+        del pipe
         if not args.no_cache:
             cache_path.parent.mkdir(parents=True, exist_ok=True)
             with open(cache_path, "wb") as fh:
-                pickle.dump({"windows_z": windows_z, "window_meta": window_meta,
-                             "reps": reps, "patch_len": patch_len}, fh)
+                pickle.dump({"disc_z": disc_z, "disc_meta": disc_meta, "disc_reps": disc_reps,
+                             "val_z": val_z, "val_meta_w": val_meta_w, "val_reps": val_reps,
+                             "patch_len": patch_len, "disc_summary": disc_summary}, fh)
             print(f"[main-fig] cached extraction -> {cache_path.name}")
 
-    summary: dict[str, Any] = {"model": "chronos-bolt-base", "patch_len": patch_len,
-                               "config": vars(args) | {"out": str(args.out)}, "cards": {}, "prototype_panel": {}}
+    summary: dict[str, Any] = {
+        "model": "chronos-bolt-base", "patch_len": patch_len,
+        "discovery_source": "chronos in-distribution training subset (16 datasets)",
+        "validation_source": "basicts held-out (training-external; Electricity/BeijingAirQuality excluded)",
+        "config": vars(args) | {"out": str(args.out)},
+        "cards": {}, "prototype_panel": {}, "generalization": {},
+    }
 
-    # 各层共享 flatten（raw patch / meta 不随层变）
-    flat_cache: dict[int, tuple] = {}
-    for L in layers:
-        flat_cache[L] = flatten_patches(reps[f"layer_{L}"], windows_z, window_meta, patch_len)
+    # 各层 flatten（raw patch / meta 不随层变）
+    disc_flat: dict[int, tuple] = {L: flatten_patches(disc_reps[f"layer_{L}"], disc_z, disc_meta, patch_len) for L in layers}
+    val_flat: dict[int, tuple] = {L: flatten_patches(val_reps[f"layer_{L}"], val_z, val_meta_w, patch_len) for L in layers}
 
-    # domain-balanced 子集：避免 Traffic 等高频 domain 主导 cluster（否则每簇 dominant domain
-    # 都被 Traffic 占满、shape 结构被淹没）。cards 与 prototype 共用同一平衡子集。
-    meta0 = flat_cache[layers[0]][2]
+    # discovery domain-balanced 子集（避免 Traffic 等高频域主导）
+    meta0 = disc_flat[layers[0]][2]
     sel = select_domain_balanced_indices(meta0, max_per_domain=args.max_per_domain, seed=args.seed)
     summary["n_balanced_patches"] = int(len(sel))
-    print(f"[main-fig] domain-balanced subset: {len(sel)} patches")
+    print(f"[main-fig] discovery domain-balanced subset: {len(sel)} patches")
 
+    # 每层在 discovery balanced 子集上 fit（cards + generalization 共用同一聚类）
     layer_clusters: dict[str, tuple[np.ndarray, np.ndarray]] = {}
+    fitted: dict[int, dict[str, Any]] = {}
+    for L in sorted(set(args.card_layers) | set(args.generalization_layers)):
+        emb, raw_patches, _meta = disc_flat[L]
+        emb_b, raw_b = emb[sel], raw_patches[sel]
+        labels, centers, pca_coords, scaler, pca, _km = cluster_pca_fit(emb_b, args.k, args.seed)
+        fitted[L] = {"labels": labels, "centers": centers, "pca_coords": pca_coords,
+                     "scaler": scaler, "pca": pca, "raw_b": raw_b}
+
     for L in args.card_layers:
-        emb, raw_patches, meta = flat_cache[L]
-        emb_b = emb[sel]
-        raw_b = raw_patches[sel]
-        meta_b = [meta[i] for i in sel]
-        labels, centers, pca_coords = cluster_pca(emb_b, args.k, args.seed)
-        layer_clusters[f"layer_{L}"] = (labels, pca_coords)
+        meta_b = [disc_flat[L][2][i] for i in sel]
+        f = fitted[L]
+        layer_clusters[f"layer_{L}"] = (f["labels"], f["pca_coords"])
         out = args.out / f"bolt_patch_stack_cards_layer{L}.png"
         print(f"[main-fig] layer_{L}: rendering raw-only cards -> {out.name}")
         summary["cards"][f"layer_{L}"] = render_raw_cards(
-            f"layer_{L}", labels, centers, pca_coords, raw_b, meta_b, args.k, args.top_n, out
+            f"layer_{L}", f["labels"], f["centers"], f["pca_coords"], f["raw_b"], meta_b, args.k, args.top_n, out
         )
 
-    # human motif taxonomy v0 标签（shapelet-inspired probe；只依赖 raw patch，与层无关）
-    raw_b0 = flat_cache[layers[0]][1][sel]
+    # human motif taxonomy v0 标签（shapelet probe；只依赖 raw patch）+ macro domain（confounder）
+    raw_b0 = disc_flat[layers[0]][1][sel]
     v0_labels = np.array([label_patch(raw_b0[i], patch_len).label for i in range(len(sel))])
-    # macro domain 标签（confounder 列）
-    meta_b0 = flat_cache[layers[0]][2]
-    domain_labels = np.array([meta_b0[i]["macro_domain"] for i in sel])
+    domain_labels = np.array([disc_flat[layers[0]][2][i]["macro_domain"] for i in sel])
 
-    # 中间 plate：每行一个 depth，三列 = 模型 KMeans cluster | human motif v0 | macro domain
     cmap_out = args.out / "bolt_cluster_maps.png"
     print(f"[main-fig] rendering cluster maps (cluster|motif v0|domain) ({list(layer_clusters)}) -> {cmap_out.name}")
     summary["cluster_maps"] = render_cluster_maps(
         layer_clusters, v0_labels, domain_labels, args.k, args.seed, args.tsne_perplexity, cmap_out
     )
 
-    summary["prototype_panel"] = {}
+    # cross-domain prototype（discovery 内，跨训练域）
     for Lp in args.prototype_layers:
-        emb, raw_patches, meta = flat_cache[Lp]
+        emb, raw_patches, meta = disc_flat[Lp]
         out = args.out / f"bolt_cross_domain_prototype_panel_layer{Lp}.png"
-        print(f"[main-fig] layer_{Lp}: rendering domain-balanced prototype panel -> {out.name}")
+        print(f"[main-fig] layer_{Lp}: rendering cross-domain prototype panel -> {out.name}")
         summary["prototype_panel"][f"layer_{Lp}"] = render_prototype_panel(
             emb, raw_patches, meta, args.k, args.seed, args.proto_per_cluster,
             args.max_per_domain, out, f"layer_{Lp}"
         )
+
+    # ★ generalization：训练发现的 prototype 检索 unseen patch + cross-space 命中率
+    for Lg in args.generalization_layers:
+        f = fitted[Lg]
+        v_emb, v_raw, v_meta = val_flat[Lg]
+        out = args.out / f"bolt_generalization_panel_layer{Lg}.png"
+        print(f"[main-fig] layer_{Lg}: rendering generalization panel (unseen retrieval) -> {out.name}")
+        info = render_generalization_panel(
+            f"layer_{Lg}", f["scaler"], f["pca"], f["centers"], f["labels"], f["raw_b"],
+            v_emb, v_raw, v_meta, args.k, args.proto_per_cluster, out,
+        )
+        summary["generalization"][f"layer_{Lg}"] = info
+        nc = info["noise_control_coherence"]
+        nc_txt = f" vs noise control {nc:.0%}" if nc is not None else ""
+        print(f"[main-fig]   layer_{Lg} held-out shape coherence = {info['real_coherence']:.0%}{nc_txt}")
 
     (args.out / "bolt_main_figure_summary.json").write_text(
         json.dumps(summary, indent=2, ensure_ascii=False, default=str), encoding="utf-8"

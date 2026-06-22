@@ -11,6 +11,7 @@ dependencies = [
   "numpy>=2,<3",
   "pandas>=2,<3",
   "pillow>=12.2.0",
+  "pyarrow>=24.0.0",
   "pyts>=0.13,<1",
   "ruptures>=1.1,<2",
   "scikit-learn>=1.6,<2",
