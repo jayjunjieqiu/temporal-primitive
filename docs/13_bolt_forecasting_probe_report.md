@@ -49,6 +49,9 @@ Chronos-Bolt 的 `input_patch_embedding`（我们称的 "tokenizer"）只吃
 
 ## 3. 主结果
 
+层号约定：图中 x 轴 `enc L1…L12` 用 1-based（Nature 习惯）= encoder block 索引 + 1；代码/CLI（`--layers
+0 3 6 9 11`）仍 0-based。即 `enc L1` = block 0、`enc L12` = block 11。
+
 证据图（两版，`outputs/figures/bolt_forecasting_probe/`）：
 - `..._depth_curve_paper.png` —— **论文版**：单面板，只 RelMAE（正文主图，省版面）。
 - `..._depth_curve.png` —— **素材版**：双面板 RelMAE + R²（给老师看 / robustness check；R² 在论文里

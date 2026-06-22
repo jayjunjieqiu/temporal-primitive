@@ -588,11 +588,12 @@ def main() -> None:
     for L in args.card_layers:
         meta_b = [disc_flat[L][2][i] for i in sel]
         f = fitted[L]
-        layer_clusters[f"layer_{L}"] = (f["labels"], f["pca_coords"])
+        # 图里显示 1-based layer 号（Nature 习惯）= encoder block 索引 L + 1；代码/CLI/文件名仍 0-based
+        layer_clusters[f"layer {L + 1}"] = (f["labels"], f["pca_coords"])
         out = args.out / f"bolt_patch_stack_cards_layer{L}.png"
         print(f"[main-fig] layer_{L}: rendering raw-only cards -> {out.name}")
         summary["cards"][f"layer_{L}"] = render_raw_cards(
-            f"layer_{L}", f["labels"], f["centers"], f["pca_coords"], f["raw_b"], meta_b, args.k, args.top_n, out
+            f"layer {L + 1}", f["labels"], f["centers"], f["pca_coords"], f["raw_b"], meta_b, args.k, args.top_n, out
         )
 
     # human motif taxonomy v0 标签（shapelet probe；只依赖 raw patch）+ macro domain（confounder）
@@ -613,7 +614,7 @@ def main() -> None:
         print(f"[main-fig] layer_{Lp}: rendering cross-domain prototype panel -> {out.name}")
         summary["prototype_panel"][f"layer_{Lp}"] = render_prototype_panel(
             emb, raw_patches, meta, args.k, args.seed, args.proto_per_cluster,
-            args.max_per_domain, out, f"layer_{Lp}"
+            args.max_per_domain, out, f"layer {Lp + 1}"
         )
 
     # ★ generalization：训练发现的 prototype 检索 unseen patch + cross-space 命中率
@@ -623,7 +624,7 @@ def main() -> None:
         out = args.out / f"bolt_generalization_panel_layer{Lg}.png"
         print(f"[main-fig] layer_{Lg}: rendering generalization panel (unseen retrieval) -> {out.name}")
         info = render_generalization_panel(
-            f"layer_{Lg}", f["scaler"], f["pca"], f["centers"], f["labels"], f["raw_b"],
+            f"layer {Lg + 1}", f["scaler"], f["pca"], f["centers"], f["labels"], f["raw_b"],
             v_emb, v_raw, v_meta, args.k, args.proto_per_cluster, out,
         )
         summary["generalization"][f"layer_{Lg}"] = info

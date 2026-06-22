@@ -884,10 +884,10 @@
   "cluster_maps": {
     "output": "/data/junjieqiu/temporal-primitive/outputs/figures/bolt_main_figure/bolt_cluster_maps.png",
     "panels": {
-      "layer_0": {
+      "layer 1": {
         "n_points": 2800
       },
-      "layer_11": {
+      "layer 12": {
         "n_points": 2800
       }
     },

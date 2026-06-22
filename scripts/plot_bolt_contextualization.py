@@ -27,11 +27,11 @@ FIG_DIR = ROOT / "outputs" / "figures" / "bolt_contextualization"
 
 REP_LABEL = {
     "tokenizer": "tokenizer\n(input embed)",
-    "layer_0": "enc L0",
-    "layer_3": "enc L3",
-    "layer_6": "enc L6",
-    "layer_9": "enc L9",
-    "layer_11": "enc L11",
+    "layer_0": "enc L1",
+    "layer_3": "enc L4",
+    "layer_6": "enc L7",
+    "layer_9": "enc L10",
+    "layer_11": "enc L12",
 }
 
 

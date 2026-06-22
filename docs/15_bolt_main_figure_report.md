@@ -14,6 +14,11 @@
   在模型没见过的数据上重现"。
 - 双层对比（layer_0 + layer_11）在 cards / cluster-maps / prototype / generalization 四块都保留。
 
+**层号显示约定（2026-06-21）**：图里给人看的 layer 号用 **1-based（layer 1–12，Nature 习惯）**=
+encoder block 索引 + 1。**代码 / CLI 参数（`--card-layers 0 11`）/ reps key / 源文件名仍是 0-based**
+（block 索引，对应 `model.encoder.block[i]`）。即 figure 的 "layer 1" = block 0 = 最浅，"layer 12" =
+block 11 = 最深。zip 里的 arcname 也用 1-based（`..._layer1.png` / `..._layer12.png`）。
+
 ## 1. discovery 数据（curated 训练子集，16 个）
 
 来源 `/data/ts-datasets/chronos_datasets/`（parquet，每行一条 series，值列自动探测），清单与

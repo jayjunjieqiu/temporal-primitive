@@ -23,6 +23,9 @@ local-vs-global 相似度检查。
 
 ## 2. 结果
 
+层号约定：图中 x 轴 `enc L1…L12` 用 1-based（Nature 习惯）= encoder block 索引 + 1；代码/CLI 仍 0-based
+（`enc L1` = block 0、`enc L12` = block 11）。
+
 证据图：`outputs/figures/bolt_contextualization/bolt_contextualization_depth_curve.png`
 
 NMI（confounder absorption）：
