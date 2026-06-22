@@ -138,6 +138,26 @@ PCA(30) 空间量"同域 patch 是否聚在一起"，两个互补、且都不依
 越紧**。即 domain 组织随深度持续增强，没有中层回落。（这也正是 deep-layer cluster-maps 里 domain 列看着
 更"聚"、而 shape primitive 反而留在浅层的原因。）
 
+#### 全局视角补全：三 confounder × 各层 Calinski-Harabasz（appendix 表）
+
+§2.1 主面板用的是**局部**指标（10-NN probe accuracy）。这里把**全局**指标（CH = 类间/类内方差比）补全到
+三个 confounder（与 §2.1 同稀疏层）。CH 无界、且每个 confounder 量纲不同（不可跨列比，只看**各列随层的
+趋势**），所以不放进主图、只列在这里当对照：
+
+| representation | CH domain | CH frequency | CH position |
+| --- | --- | --- | --- |
+| tokenizer | 25 | 10 | 8 |
+| enc L1 (block 0) | 47 | 18 | 9 |
+| enc L4 | 56 | 30 | 10 |
+| enc L7 | 62 | 32 | 14 |
+| enc L10 | 60 | 30 | 24 |
+| enc L12 (block 11) | 66 | 28 | **39** |
+
+全局 CH 与局部 kNN-acc **趋势一致**：domain、position 随层升（position 在深层猛升，与 kNN-acc 同步），
+frequency 中段达峰后微降。局部、全局二者答不同问题——**局部**=邻域是否同类（decodable），**全局**=类是否
+紧致单峰；二者一致说明结论稳健。注：CH 由 `scripts/run_bolt_contextualization_training.py` 一并输出
+（见 `bolt_contextualization_training_summary.json`）。
+
 ## 3. 复现
 
 ```bash

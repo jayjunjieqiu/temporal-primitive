@@ -31,6 +31,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.decomposition import PCA
+from sklearn.metrics import calinski_harabasz_score
 from sklearn.neighbors import NearestNeighbors
 from sklearn.preprocessing import StandardScaler
 
@@ -150,10 +151,17 @@ def main() -> None:
             "frequency": round(knn_accuracy(Xp[freq_ok], code(labels["frequency"][sel][freq_ok]), args.knn), 4),
             "position": round(knn_accuracy(Xp, code(labels["position"][sel]), args.knn), 4),
         }
+        # 全局视角（appendix 对照）：Calinski-Harabasz 类间/类内方差比（局部 kNN 之外的补充）
+        ch = {
+            "domain": round(float(calinski_harabasz_score(Xp, code(labels["domain"][sel]))), 1),
+            "frequency": round(float(calinski_harabasz_score(Xp[freq_ok], code(labels["frequency"][sel][freq_ok]))), 1),
+            "position": round(float(calinski_harabasz_score(Xp, code(labels["position"][sel]))), 1),
+        }
         sim = within_context_similarity(emb, args.global_pairs, args.seed)
-        results[rep] = {"knn_probe_acc": acc, "within_context_sim": sim}
+        results[rep] = {"knn_probe_acc": acc, "calinski_harabasz": ch, "within_context_sim": sim}
         print(f"[ctx-train] {rep:<10} acc dom={acc['domain']:.3f} freq={acc['frequency']:.3f} "
-              f"pos={acc['position']:.3f} | same-ctx sim={sim['same_context']:.3f}")
+              f"pos={acc['position']:.3f} | CH dom={ch['domain']:.0f} freq={ch['frequency']:.0f} "
+              f"pos={ch['position']:.0f} | same-ctx sim={sim['same_context']:.3f}")
 
     # chance（majority baseline）
     chance = {

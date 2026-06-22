@@ -39,6 +39,11 @@
         "frequency": 0.6658,
         "position": 0.2089
       },
+      "calinski_harabasz": {
+        "domain": 25.2,
+        "frequency": 10.5,
+        "position": 7.7
+      },
       "within_context_sim": {
         "same_context": 0.04266338050365448,
         "different_context": 0.011017458513379097,
@@ -50,6 +55,11 @@
         "domain": 0.6168,
         "frequency": 0.7525,
         "position": 0.2857
+      },
+      "calinski_harabasz": {
+        "domain": 46.7,
+        "frequency": 18.2,
+        "position": 8.6
       },
       "within_context_sim": {
         "same_context": 0.1557706892490387,
@@ -63,6 +73,11 @@
         "frequency": 0.8383,
         "position": 0.3154
       },
+      "calinski_harabasz": {
+        "domain": 55.9,
+        "frequency": 29.9,
+        "position": 10.1
+      },
       "within_context_sim": {
         "same_context": 0.24562253057956696,
         "different_context": 0.0008211088133975863,
@@ -74,6 +89,11 @@
         "domain": 0.8104,
         "frequency": 0.8508,
         "position": 0.3661
+      },
+      "calinski_harabasz": {
+        "domain": 62.3,
+        "frequency": 32.0,
+        "position": 14.2
       },
       "within_context_sim": {
         "same_context": 0.24847723543643951,
@@ -87,6 +107,11 @@
         "frequency": 0.8558,
         "position": 0.4457
       },
+      "calinski_harabasz": {
+        "domain": 60.3,
+        "frequency": 29.9,
+        "position": 24.2
+      },
       "within_context_sim": {
         "same_context": 0.23486630618572235,
         "different_context": 0.000423554505687207,
@@ -98,6 +123,11 @@
         "domain": 0.7975,
         "frequency": 0.8512,
         "position": 0.5932
+      },
+      "calinski_harabasz": {
+        "domain": 66.1,
+        "frequency": 28.1,
+        "position": 39.1
       },
       "within_context_sim": {
         "same_context": 0.2416023313999176,
