@@ -126,13 +126,40 @@ def render_ranking(ood_by_layer, out_path):
     for li, ln in enumerate(layer_names):
         vals = [ood_by_layer[ln].get(d, 0) for d in datasets]
         ax.barh(y + (li - 0.5) * h, vals, height=h, color=colors[li % 2], label=ln)
-    ax.axvline(1.0, ls="--", color="gray", lw=1)
-    ax.text(1.0, len(datasets) - 0.3, "in-distribution (=1)", color="gray", fontsize=7, ha="left", va="top")
+    # 不画 "=1 in-distribution" 参照线：OOD 比值有 in/out-of-sample 偏差，IID null 不在 1，1 不是判别边界
     ax.set_yticks(y); ax.set_yticklabels(datasets, fontsize=8)
     ax.invert_yaxis()
     ax.set_xlabel("OOD score = mean kNN dist(test→train) / typical train neighbour dist")
     ax.legend(fontsize=8, title="layer")
     ax.set_title("Held-out test datasets ranked by OOD-ness vs training (≈pretraining) distribution", fontsize=10)
+    fig.tight_layout()
+    fig.savefig(out_path, dpi=150, bbox_inches="tight", facecolor="white")
+    plt.close(fig)
+
+
+def render_ood_distribution(layers, layer_Ls, out_path):
+    """per-patch OOD 分布 KDE，不同 depth 叠同一张图（real held-out，剔合成 control）。
+    不画 "=1" 参照线：OOD 比值有 in/out-of-sample 偏差，IID null 不在 1，1 不是判别边界。"""
+    from scipy.stats import gaussian_kde
+    col = {0: "#4C72B0", 11: "#DD8452"}
+    fig, ax = plt.subplots(figsize=(7.6, 4.8))
+    xs = np.linspace(0.3, 2.1, 400)
+    for L in layer_Ls:
+        lay = layers[L]
+        real = np.array([m["dataset"] not in CONTROL for m in lay["val_meta"]])
+        v = lay["ood"][real]
+        dens = gaussian_kde(v)(xs)
+        c = col.get(L, "#555555")
+        ax.plot(xs, dens, color=c, lw=2,
+                label=f"layer {L + 1}  (mean={v.mean():.2f}, std={v.std():.2f}, n={len(v)})")
+        ax.fill_between(xs, dens, color=c, alpha=0.18)
+    ax.set_xlabel("per-patch OOD score = mean kNN dist(test→train) / typical train neighbour dist")
+    ax.set_ylabel("density (KDE)")
+    ax.set_title("Held-out per-patch OOD distribution across depth\n"
+                 "(real held-out patches, synthetic Gaussian/Pulse excluded; "
+                 "deeper = narrower + right-shifted = homogenized, not less OOD)", fontsize=10)
+    ax.legend(fontsize=9, title="encoder depth")
+    ax.grid(True, axis="y", alpha=0.25)
     fig.tight_layout()
     fig.savefig(out_path, dpi=150, bbox_inches="tight", facecolor="white")
     plt.close(fig)
@@ -259,6 +286,8 @@ def main() -> None:
         render_overlap(f"layer {L + 1}", layers[L], args.seed, args.tsne_perplexity, out)
     render_ranking(ood_by_layer, FIG_DIR / "ood_ranking.png")
     print("[ood] ranking -> ood_ranking.png")
+    render_ood_distribution(layers, args.layers, FIG_DIR / "ood_distribution.png")
+    print("[ood] distribution KDE -> ood_distribution.png")
 
     pl = args.primary_layer
     render_case_study(layers[pl], args.case_samples, args.case_protos, FIG_DIR / "ood_case_study.png")
