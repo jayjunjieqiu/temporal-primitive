@@ -83,5 +83,11 @@ outputs/**
 !outputs/figures/bolt_main_figure/
 !outputs/figures/bolt_main_figure/*.png
 !outputs/figures/bolt_main_figure/*.json
+!outputs/figures/bolt_main_figure_archive/
+!outputs/figures/bolt_main_figure_archive/*.png
+!outputs/bolt_ood_transfer/
+!outputs/bolt_ood_transfer/*.json
+!outputs/figures/bolt_ood_transfer/
+!outputs/figures/bolt_ood_transfer/*.png
 !outputs/figures/training_preview/
 !outputs/figures/training_preview/training_dataset_samples.png

@@ -2,7 +2,7 @@
   "model": "chronos-bolt-base",
   "patch_len": 16,
   "discovery_source": "chronos in-distribution training subset (16 datasets)",
-  "validation_source": "basicts held-out (training-external; Electricity/BeijingAirQuality excluded)",
+  "validation_source": "basicts held-out (excluded: Electricity/BeijingAirQuality in Chronos pretraining; Traffic/ExchangeRate overlap discovery training subset)",
   "config": {
     "windows_per_dataset": 200,
     "val_windows_per_dataset": 150,
@@ -27,11 +27,13 @@
     "max_per_domain": 400,
     "tsne_perplexity": 40.0,
     "out": "/data/junjieqiu/temporal-primitive/outputs/figures/bolt_main_figure",
-    "no_cache": false
+    "no_cache": false,
+    "min_patch_std": 0.0,
+    "out_suffix": "_nofilter"
   },
   "cards": {
     "layer_0": {
-      "output": "/data/junjieqiu/temporal-primitive/outputs/figures/bolt_main_figure/bolt_patch_stack_cards_layer0.png",
+      "output": "/data/junjieqiu/temporal-primitive/outputs/figures/bolt_main_figure/main_A_cards_layer1_nofilter.png",
       "clusters": [
         {
           "cluster": "C1",
@@ -134,7 +136,7 @@
       ]
     },
     "layer_11": {
-      "output": "/data/junjieqiu/temporal-primitive/outputs/figures/bolt_main_figure/bolt_patch_stack_cards_layer11.png",
+      "output": "/data/junjieqiu/temporal-primitive/outputs/figures/bolt_main_figure/main_A_cards_layer12_nofilter.png",
       "clusters": [
         {
           "cluster": "C1",
@@ -239,229 +241,238 @@
   },
   "prototype_panel": {
     "layer_0": {
-      "output": "/data/junjieqiu/temporal-primitive/outputs/figures/bolt_main_figure/bolt_cross_domain_prototype_panel_layer0.png",
+      "output": "/data/junjieqiu/temporal-primitive/outputs/figures/bolt_main_figure/main_C_prototype_crossdomain_layer1_nofilter.png",
       "clusters": [
         {
           "cluster": "C1",
           "size": 80,
-          "n_domains_present": 4,
-          "domains_shown": [
+          "domains_present": [
+            "Energy",
             "Environment",
             "Retail/Web",
-            "Energy",
             "Traffic"
           ]
         },
         {
           "cluster": "C2",
           "size": 497,
-          "n_domains_present": 7,
-          "domains_shown": [
-            "Finance",
-            "Health",
-            "Synthetic",
+          "domains_present": [
             "Energy",
             "Environment",
-            "Retail/Web"
+            "Finance",
+            "Health",
+            "Retail/Web",
+            "Synthetic",
+            "Traffic"
           ]
         },
         {
           "cluster": "C3",
           "size": 587,
-          "n_domains_present": 6,
-          "domains_shown": [
+          "domains_present": [
+            "Energy",
+            "Environment",
+            "Finance",
             "Retail/Web",
             "Synthetic",
-            "Environment",
-            "Traffic",
-            "Finance",
-            "Energy"
+            "Traffic"
           ]
         },
         {
           "cluster": "C4",
           "size": 625,
-          "n_domains_present": 7,
-          "domains_shown": [
-            "Health",
-            "Retail/Web",
+          "domains_present": [
             "Energy",
             "Environment",
             "Finance",
-            "Synthetic"
+            "Health",
+            "Retail/Web",
+            "Synthetic",
+            "Traffic"
           ]
         },
         {
           "cluster": "C5",
           "size": 211,
-          "n_domains_present": 6,
-          "domains_shown": [
-            "Traffic",
+          "domains_present": [
             "Energy",
-            "Synthetic",
-            "Retail/Web",
             "Environment",
-            "Finance"
+            "Finance",
+            "Retail/Web",
+            "Synthetic",
+            "Traffic"
           ]
         },
         {
           "cluster": "C6",
           "size": 283,
-          "n_domains_present": 7,
-          "domains_shown": [
+          "domains_present": [
+            "Energy",
+            "Environment",
             "Finance",
-            "Synthetic",
             "Health",
             "Retail/Web",
-            "Environment",
-            "Energy"
+            "Synthetic",
+            "Traffic"
           ]
         },
         {
           "cluster": "C7",
           "size": 299,
-          "n_domains_present": 6,
-          "domains_shown": [
-            "Traffic",
-            "Synthetic",
+          "domains_present": [
             "Energy",
+            "Environment",
             "Finance",
             "Retail/Web",
-            "Environment"
+            "Synthetic",
+            "Traffic"
           ]
         },
         {
           "cluster": "C8",
           "size": 218,
-          "n_domains_present": 7,
-          "domains_shown": [
-            "Traffic",
-            "Finance",
+          "domains_present": [
             "Energy",
-            "Retail/Web",
+            "Environment",
+            "Finance",
             "Health",
-            "Synthetic"
+            "Retail/Web",
+            "Synthetic",
+            "Traffic"
           ]
         }
+      ],
+      "domain_columns": [
+        "Traffic",
+        "Energy",
+        "Environment",
+        "Finance",
+        "Retail/Web",
+        "Health",
+        "Synthetic"
       ]
     },
     "layer_11": {
-      "output": "/data/junjieqiu/temporal-primitive/outputs/figures/bolt_main_figure/bolt_cross_domain_prototype_panel_layer11.png",
+      "output": "/data/junjieqiu/temporal-primitive/outputs/figures/bolt_main_figure/main_C_prototype_crossdomain_layer12_nofilter.png",
       "clusters": [
         {
           "cluster": "C1",
           "size": 339,
-          "n_domains_present": 6,
-          "domains_shown": [
-            "Health",
-            "Finance",
-            "Synthetic",
+          "domains_present": [
             "Energy",
             "Environment",
-            "Retail/Web"
+            "Finance",
+            "Health",
+            "Retail/Web",
+            "Synthetic"
           ]
         },
         {
           "cluster": "C2",
           "size": 312,
-          "n_domains_present": 6,
-          "domains_shown": [
-            "Finance",
+          "domains_present": [
             "Energy",
-            "Synthetic",
-            "Traffic",
             "Environment",
-            "Retail/Web"
+            "Finance",
+            "Retail/Web",
+            "Synthetic",
+            "Traffic"
           ]
         },
         {
           "cluster": "C3",
           "size": 388,
-          "n_domains_present": 7,
-          "domains_shown": [
+          "domains_present": [
             "Energy",
-            "Retail/Web",
-            "Traffic",
             "Environment",
+            "Finance",
             "Health",
-            "Finance"
+            "Retail/Web",
+            "Synthetic",
+            "Traffic"
           ]
         },
         {
           "cluster": "C4",
           "size": 109,
-          "n_domains_present": 5,
-          "domains_shown": [
-            "Environment",
-            "Retail/Web",
-            "Traffic",
+          "domains_present": [
             "Energy",
-            "Health"
+            "Environment",
+            "Health",
+            "Retail/Web",
+            "Traffic"
           ]
         },
         {
           "cluster": "C5",
           "size": 322,
-          "n_domains_present": 6,
-          "domains_shown": [
-            "Health",
-            "Finance",
+          "domains_present": [
             "Energy",
             "Environment",
-            "Synthetic",
-            "Retail/Web"
+            "Finance",
+            "Health",
+            "Retail/Web",
+            "Synthetic"
           ]
         },
         {
           "cluster": "C6",
           "size": 483,
-          "n_domains_present": 6,
-          "domains_shown": [
-            "Synthetic",
-            "Retail/Web",
+          "domains_present": [
+            "Energy",
             "Environment",
             "Finance",
-            "Traffic",
-            "Energy"
+            "Retail/Web",
+            "Synthetic",
+            "Traffic"
           ]
         },
         {
           "cluster": "C7",
           "size": 488,
-          "n_domains_present": 7,
-          "domains_shown": [
-            "Finance",
-            "Traffic",
+          "domains_present": [
             "Energy",
-            "Synthetic",
+            "Environment",
+            "Finance",
+            "Health",
             "Retail/Web",
-            "Environment"
+            "Synthetic",
+            "Traffic"
           ]
         },
         {
           "cluster": "C8",
           "size": 359,
-          "n_domains_present": 7,
-          "domains_shown": [
-            "Synthetic",
+          "domains_present": [
+            "Energy",
+            "Environment",
             "Finance",
             "Health",
-            "Environment",
             "Retail/Web",
-            "Energy"
+            "Synthetic",
+            "Traffic"
           ]
         }
+      ],
+      "domain_columns": [
+        "Traffic",
+        "Energy",
+        "Environment",
+        "Finance",
+        "Retail/Web",
+        "Health",
+        "Synthetic"
       ]
     }
   },
   "generalization": {
     "layer_0": {
-      "output": "/data/junjieqiu/temporal-primitive/outputs/figures/bolt_main_figure/bolt_generalization_panel_layer0.png",
-      "real_coherence": 0.339,
+      "output": "/data/junjieqiu/temporal-primitive/outputs/figures/bolt_main_figure/main_D_generalization_heldout_layer1_nofilter.png",
+      "real_coherence": 0.316,
       "noise_control_coherence": 0.008,
-      "cross_space_agreement_overall": 0.271,
+      "cross_space_agreement_overall": 0.249,
       "coherence_thresh": 0.6,
-      "n_val_patches": 24000,
+      "n_val_patches": 21600,
       "control_datasets": [
         "Gaussian",
         "Pulse"
@@ -491,11 +502,6 @@
           "n": 1200,
           "cross_space_agreement": 0.328,
           "shape_coherence": 0.28
-        },
-        "ExchangeRate": {
-          "n": 1200,
-          "cross_space_agreement": 0.215,
-          "shape_coherence": 0.372
         },
         "GBA": {
           "n": 1200,
@@ -557,11 +563,6 @@
           "cross_space_agreement": 0.191,
           "shape_coherence": 0.407
         },
-        "Traffic": {
-          "n": 1200,
-          "cross_space_agreement": 0.712,
-          "shape_coherence": 0.667
-        },
         "Weather": {
           "n": 1200,
           "cross_space_agreement": 0.143,
@@ -571,109 +572,97 @@
       "clusters": [
         {
           "cluster": "C1",
-          "n_assigned": 571,
-          "datasets_shown": [
-            "ETTh2",
-            "ExchangeRate",
-            "Pulse",
-            "Weather",
-            "CA",
-            "PEMS03"
+          "n_assigned": 554,
+          "domains_present": [
+            "Energy",
+            "Environment",
+            "Synthetic control",
+            "Traffic"
           ]
         },
         {
           "cluster": "C2",
-          "n_assigned": 6172,
-          "datasets_shown": [
-            "PEMS07",
-            "CA",
-            "PEMS-BAY",
-            "GLA",
-            "GBA",
-            "PEMS04"
+          "n_assigned": 5752,
+          "domains_present": [
+            "Energy",
+            "Environment",
+            "Health",
+            "Traffic"
           ]
         },
         {
           "cluster": "C3",
-          "n_assigned": 3412,
-          "datasets_shown": [
-            "PEMS08",
-            "PEMS04",
-            "METR-LA",
-            "PEMS03",
-            "PEMS07",
-            "PEMS-BAY"
+          "n_assigned": 3395,
+          "domains_present": [
+            "Energy",
+            "Environment",
+            "Health",
+            "Synthetic control",
+            "Traffic"
           ]
         },
         {
           "cluster": "C4",
-          "n_assigned": 5080,
-          "datasets_shown": [
-            "METR-LA",
-            "ETTh2",
-            "ETTm2",
-            "PEMS03",
-            "Weather",
-            "Illness"
+          "n_assigned": 4561,
+          "domains_present": [
+            "Energy",
+            "Environment",
+            "Health",
+            "Synthetic control",
+            "Traffic"
           ]
         },
         {
           "cluster": "C5",
-          "n_assigned": 1355,
-          "datasets_shown": [
-            "ETTh2",
-            "Illness",
-            "Weather",
-            "Traffic",
-            "ETTm1",
-            "ExchangeRate"
+          "n_assigned": 1048,
+          "domains_present": [
+            "Energy",
+            "Environment",
+            "Health",
+            "Synthetic control",
+            "Traffic"
           ]
         },
         {
           "cluster": "C6",
-          "n_assigned": 3819,
-          "datasets_shown": [
-            "PEMS07",
-            "PEMS08",
-            "Weather",
-            "ETTm2",
-            "ExchangeRate",
-            "METR-LA"
+          "n_assigned": 3557,
+          "domains_present": [
+            "Energy",
+            "Environment",
+            "Health",
+            "Traffic"
           ]
         },
         {
           "cluster": "C7",
-          "n_assigned": 2130,
-          "datasets_shown": [
-            "Traffic",
-            "CA",
-            "ETTh2",
-            "ETTh1",
-            "GBA",
-            "Illness"
+          "n_assigned": 1622,
+          "domains_present": [
+            "Energy",
+            "Environment",
+            "Health",
+            "Synthetic control",
+            "Traffic"
           ]
         },
         {
           "cluster": "C8",
-          "n_assigned": 1461,
-          "datasets_shown": [
-            "ETTh2",
-            "Traffic",
-            "ETTm1",
-            "SD",
-            "GBA",
-            "CA"
+          "n_assigned": 1111,
+          "domains_present": [
+            "Energy",
+            "Environment",
+            "Health",
+            "Traffic"
           ]
         }
       ]
     },
     "layer_11": {
-      "output": "/data/junjieqiu/temporal-primitive/outputs/figures/bolt_main_figure/bolt_generalization_panel_layer11.png",
-      "real_coherence": 0.286,
+      "output": "/data/junjieqiu/temporal-primitive/outputs/figures/bolt_main_figure/main_D_generalization_heldout_layer12_nofilter.png",
+      "real_coherence": 0.265,
       "noise_control_coherence": 0.007,
-      "cross_space_agreement_overall": 0.186,
+      "cross_space_agreement_overall": 0.166,
       "coherence_thresh": 0.6,
-      "n_val_patches": 24000,
+      "n_val_patches": 21600,
       "control_datasets": [
         "Gaussian",
         "Pulse"
@@ -703,11 +692,6 @@
           "n": 1200,
           "cross_space_agreement": 0.133,
           "shape_coherence": 0.172
-        },
-        "ExchangeRate": {
-          "n": 1200,
-          "cross_space_agreement": 0.174,
-          "shape_coherence": 0.328
         },
         "GBA": {
           "n": 1200,
@@ -769,11 +753,6 @@
           "cross_space_agreement": 0.171,
           "shape_coherence": 0.378
         },
-        "Traffic": {
-          "n": 1200,
-          "cross_space_agreement": 0.557,
-          "shape_coherence": 0.573
-        },
         "Weather": {
           "n": 1200,
           "cross_space_agreement": 0.15,
@@ -783,98 +762,85 @@
       "clusters": [
         {
           "cluster": "C1",
-          "n_assigned": 1709,
-          "datasets_shown": [
-            "ETTm2",
-            "ETTm1",
-            "Weather",
-            "Pulse",
-            "Traffic",
-            "ETTh2"
+          "n_assigned": 1375,
+          "domains_present": [
+            "Energy",
+            "Environment",
+            "Health",
+            "Synthetic control",
+            "Traffic"
           ]
         },
         {
           "cluster": "C2",
-          "n_assigned": 4222,
-          "datasets_shown": [
-            "ExchangeRate",
-            "ETTm1",
-            "ETTh1",
-            "Illness",
-            "Weather",
-            "GLA"
+          "n_assigned": 3596,
+          "domains_present": [
+            "Energy",
+            "Environment",
+            "Health",
+            "Traffic"
           ]
         },
         {
           "cluster": "C3",
-          "n_assigned": 6526,
-          "datasets_shown": [
-            "SD",
-            "PEMS-BAY",
-            "CA",
-            "ETTh2",
-            "GLA",
-            "GBA"
+          "n_assigned": 5753,
+          "domains_present": [
+            "Energy",
+            "Environment",
+            "Health",
+            "Traffic"
           ]
         },
         {
           "cluster": "C4",
-          "n_assigned": 751,
-          "datasets_shown": [
-            "Pulse",
-            "ETTh2",
-            "Weather",
-            "PEMS-BAY",
-            "PEMS03",
-            "ExchangeRate"
+          "n_assigned": 730,
+          "domains_present": [
+            "Energy",
+            "Environment",
+            "Health",
+            "Synthetic control",
+            "Traffic"
           ]
         },
         {
           "cluster": "C5",
-          "n_assigned": 1827,
-          "datasets_shown": [
-            "PEMS03",
-            "PEMS04",
-            "PEMS08",
-            "PEMS07",
-            "PEMS-BAY",
-            "Weather"
+          "n_assigned": 1682,
+          "domains_present": [
+            "Energy",
+            "Environment",
+            "Health",
+            "Traffic"
           ]
         },
         {
           "cluster": "C6",
-          "n_assigned": 3352,
-          "datasets_shown": [
-            "Gaussian",
-            "PEMS07",
-            "Weather",
-            "METR-LA",
-            "ETTm2",
-            "PEMS-BAY"
+          "n_assigned": 3339,
+          "domains_present": [
+            "Energy",
+            "Environment",
+            "Health",
+            "Synthetic control",
+            "Traffic"
           ]
         },
         {
           "cluster": "C7",
-          "n_assigned": 3617,
-          "datasets_shown": [
-            "PEMS-BAY",
-            "PEMS08",
-            "METR-LA",
-            "PEMS04",
-            "Weather",
-            "ETTm2"
+          "n_assigned": 3340,
+          "domains_present": [
+            "Energy",
+            "Environment",
+            "Health",
+            "Traffic"
           ]
         },
         {
           "cluster": "C8",
-          "n_assigned": 1996,
-          "datasets_shown": [
-            "PEMS07",
-            "PEMS04",
-            "Weather",
-            "PEMS08",
-            "PEMS03",
-            "ExchangeRate"
+          "n_assigned": 1785,
+          "domains_present": [
+            "Energy",
+            "Environment",
+            "Health",
+            "Traffic"
           ]
         }
       ]
@@ -882,7 +848,7 @@
   },
   "n_balanced_patches": 2800,
   "cluster_maps": {
-    "output": "/data/junjieqiu/temporal-primitive/outputs/figures/bolt_main_figure/bolt_cluster_maps.png",
+    "output": "/data/junjieqiu/temporal-primitive/outputs/figures/bolt_main_figure/main_B_cluster_maps_nofilter.png",
     "panels": {
       "layer 1": {
         "n_points": 2800
@@ -892,5 +858,99 @@
       }
     },
     "perplexity": 40.0
+  },
+  "nearest_panel": {
+    "layer_0": {
+      "output": "/data/junjieqiu/temporal-primitive/outputs/figures/bolt_main_figure/main_F_nearest_exemplars_layer1_nofilter.png",
+      "clusters": [
+        {
+          "cluster": "C1",
+          "n_train": 80,
+          "n_val_assigned": 554
+        },
+        {
+          "cluster": "C2",
+          "n_train": 497,
+          "n_val_assigned": 5752
+        },
+        {
+          "cluster": "C3",
+          "n_train": 587,
+          "n_val_assigned": 3395
+        },
+        {
+          "cluster": "C4",
+          "n_train": 625,
+          "n_val_assigned": 4561
+        },
+        {
+          "cluster": "C5",
+          "n_train": 211,
+          "n_val_assigned": 1048
+        },
+        {
+          "cluster": "C6",
+          "n_train": 283,
+          "n_val_assigned": 3557
+        },
+        {
+          "cluster": "C7",
+          "n_train": 299,
+          "n_val_assigned": 1622
+        },
+        {
+          "cluster": "C8",
+          "n_train": 218,
+          "n_val_assigned": 1111
+        }
+      ],
+      "n_each": 3
+    },
+    "layer_11": {
+      "output": "/data/junjieqiu/temporal-primitive/outputs/figures/bolt_main_figure/main_F_nearest_exemplars_layer12_nofilter.png",
+      "clusters": [
+        {
+          "cluster": "C1",
+          "n_train": 378,
+          "n_val_assigned": 1375
+        },
+        {
+          "cluster": "C2",
+          "n_train": 321,
+          "n_val_assigned": 3596
+        },
+        {
+          "cluster": "C3",
+          "n_train": 491,
+          "n_val_assigned": 5753
+        },
+        {
+          "cluster": "C4",
+          "n_train": 108,
+          "n_val_assigned": 730
+        },
+        {
+          "cluster": "C5",
+          "n_train": 331,
+          "n_val_assigned": 1682
+        },
+        {
+          "cluster": "C6",
+          "n_train": 492,
+          "n_val_assigned": 3339
+        },
+        {
+          "cluster": "C7",
+          "n_train": 354,
+          "n_val_assigned": 3340
+        },
+        {
+          "cluster": "C8",
+          "n_train": 325,
+          "n_val_assigned": 1785
+        }
+      ],
+      "n_each": 3
+    }
   }
 }

@@ -28,7 +28,7 @@ import matplotlib.pyplot as plt
 ROOT = Path(__file__).resolve().parents[1]
 FC_DIR = ROOT / "outputs" / "bolt_forecasting_probe"
 CTX_JSON = ROOT / "outputs" / "bolt_contextualization" / "bolt_contextualization_training_summary.json"
-OUT = ROOT / "outputs" / "figures" / "bolt_main_figure" / "bolt_combined_useful_contextualized_depth.png"
+OUT = ROOT / "outputs" / "figures" / "bolt_main_figure" / "main_E_useful_contextualized_depth.png"
 
 REP_ORDER = ["tokenizer", "layer_0", "layer_3", "layer_6", "layer_9", "layer_11"]
 REP_LABEL = {"tokenizer": "tokenizer\n(input embed)", "layer_0": "enc L1", "layer_3": "enc L4",

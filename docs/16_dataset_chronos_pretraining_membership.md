@@ -50,6 +50,12 @@ illness data / simulated Gaussian / simulated pulse）被归并进这 6 个：
   - 10 个时空交通（PEMS×4 / METR-LA / PEMS-BAY / CA / GBA / GLA / SD）、4 个 ETT、Weather（Jena）、
     Illness、2 个合成（Gaussian/Pulse）完全不在 Chronos 语料。
 - **写 zero-shot claim 时剔除 `Electricity` 和 `BeijingAirQuality`。**
+- **★ main figure generalization 还要额外剔除 `Traffic` 和 `ExchangeRate`**：它们虽是 Chronos zero-shot，但
+  与我们 discovery **训练子集**里的 `monash_traffic`（862 series / len 17544，逐一对应 basicts Traffic
+  [17544,862]）和 `exchange_rate`（8 series / len 7588 ↔ ExchangeRate [7588,8]）是**同一份数据**——若同时
+  出现在 discovery 和 validation 两侧就是**泄漏**。故 `build_bolt_main_figure.VALIDATION_EXCLUDE` =
+  {Electricity, BeijingAirQuality, Traffic, ExchangeRate, BLAST}。`Weather`（Jena 10-min, 21 var）≠
+  `monash_weather`（Monash, 3010 series），不重叠，保留。
 
 ## 4. 判定依据与 caveat
 

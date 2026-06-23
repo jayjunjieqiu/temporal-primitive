@@ -60,8 +60,12 @@ from scripts.run_second_pilot_discovery import (  # noqa: E402
 
 OUTPUT_DIR = ROOT / "outputs" / "figures" / "bolt_main_figure"
 
-# basicts 测试集里在 Chronos 训练集内的两个，validation 时剔除（见 docs/16）
-VALIDATION_EXCLUDE = {"Electricity", "BeijingAirQuality", "BLAST"}
+# validation 时必须剔除的 basicts 数据集，两类原因：
+#  (1) 在 Chronos 预训练集内（模型本就见过）：Electricity≈monash_electricity_hourly、
+#      BeijingAirQuality≈monash_kdd_cup_2018（见 docs/16）。
+#  (2) 与我们 discovery 训练子集**同一份数据**（泄漏）：Traffic≡monash_traffic（862 series/17544）、
+#      ExchangeRate≡exchange_rate（8 series/7588）。
+VALIDATION_EXCLUDE = {"Electricity", "BeijingAirQuality", "Traffic", "ExchangeRate", "BLAST"}
 
 
 def z_normalize(x: np.ndarray, eps: float = 1e-8) -> np.ndarray:
@@ -135,20 +139,31 @@ def render_raw_cards(
                           top=0.90, bottom=0.20)
     card_info = []
     seen_domains: set[str] = set()
+    # 先收集每簇 center-nearest 的 z-stack，求一个**共享** vmax，使所有卡片同一色标、colorbar 可读
+    per_cluster: list[tuple[np.ndarray, np.ndarray] | None] = []
+    all_abs: list[np.ndarray] = []
     for cid in range(k):
-        bar_ax = fig.add_subplot(gs[0, cid])
-        ax = fig.add_subplot(gs[1, cid])
         idx = np.where(labels == cid)[0]
         if len(idx) == 0:
-            bar_ax.axis("off")
-            ax.axis("off")
+            per_cluster.append(None)
             continue
         dist = np.linalg.norm(pca_coords[idx] - centers[cid], axis=1)
         order = np.argsort(dist)[: min(top_n, len(idx))]
-        chosen = idx[order]
-        z = np.stack([z_normalize(raw_patches[i]) for i in chosen])
-        vmax = float(np.percentile(np.abs(z), 97))
-        ax.imshow(z, aspect="auto", interpolation="nearest", cmap="RdBu_r", vmin=-vmax, vmax=vmax)
+        z = np.stack([z_normalize(raw_patches[i]) for i in idx[order]])
+        per_cluster.append((idx, z))
+        all_abs.append(np.abs(z).ravel())
+    vmax = float(np.percentile(np.concatenate(all_abs), 97)) if all_abs else 2.5
+
+    im = None
+    for cid in range(k):
+        bar_ax = fig.add_subplot(gs[0, cid])
+        ax = fig.add_subplot(gs[1, cid])
+        if per_cluster[cid] is None:
+            bar_ax.axis("off")
+            ax.axis("off")
+            continue
+        idx, z = per_cluster[cid]
+        im = ax.imshow(z, aspect="auto", interpolation="nearest", cmap="RdBu_r", vmin=-vmax, vmax=vmax)
         ax.set_xticks([0, 7, 15])
         ax.set_yticks([])
         ax.tick_params(labelsize=6, length=2)
@@ -178,6 +193,13 @@ def render_raw_cards(
             {"cluster": f"C{cid + 1}", "size": int(len(idx)),
              "domain_composition": {d: round(c / total, 3) for d, c in ordered}}
         )
+
+    # 颜色条：告诉读者颜色代表多少数值。每个 patch 单独 z-normalize（均值0、单位σ），色标统一为 ±vmax σ
+    if im is not None:
+        cax = fig.add_axes((0.915, 0.30, 0.008, 0.45))
+        cbar = fig.colorbar(im, cax=cax)
+        cbar.set_label("z-normalized value (per patch, σ)", fontsize=7.5)
+        cbar.ax.tick_params(labelsize=7)
 
     handles = [
         Line2D([0], [0], marker="s", ls="", ms=7, color=DOMAIN_COLORS[d], label=d)
@@ -261,26 +283,33 @@ def render_cluster_maps(
                 sp.set_linewidth(0.8)
         info[name] = {"n_points": int(len(labels))}
 
+    def _pretty(lab: Any) -> str:  # 去掉粗糙的下划线命名（flat_low_information -> flat low information）
+        return str(lab).replace("_", " ")
+
     clu_handles = [
         Line2D([0], [0], marker="o", ls="", ms=6, color=clu_cmap(c % (10 if k <= 10 else 20)), label=f"C{c + 1}")
         for c in range(k)
     ]
-    motif_handles = [Line2D([0], [0], marker="o", ls="", ms=6, color=motif_color[l], label=l) for l in MOTIF_LABELS]
-    dom_handles = [Line2D([0], [0], marker="o", ls="", ms=6, color=DOMAIN_COLORS[d], label=d) for d in seen_domains]
-    leg1 = fig.legend(handles=clu_handles, loc="upper left", bbox_to_anchor=(0.875, 0.90), fontsize=8,
-                      title="model cluster (col 1)", title_fontsize=9)
-    fig.add_artist(leg1)
-    leg2 = fig.legend(handles=motif_handles, loc="upper left", bbox_to_anchor=(0.875, 0.66), fontsize=8,
-                      title="human motif v0 (col 2)", title_fontsize=9)
-    fig.add_artist(leg2)
-    fig.legend(handles=dom_handles, loc="upper left", bbox_to_anchor=(0.875, 0.33), fontsize=8,
-               title="macro domain (col 3)", title_fontsize=9)
+    motif_handles = [Line2D([0], [0], marker="o", ls="", ms=6, color=motif_color[l], label=_pretty(l)) for l in MOTIF_LABELS]
+    dom_handles = [Line2D([0], [0], marker="o", ls="", ms=6, color=DOMAIN_COLORS[d], label=_pretty(d)) for d in seen_domains]
+    # 每组 legend 放在对应列的正下方，双列排版省高度
+    col_legends = [
+        (0, clu_handles, f"model cluster (k={k})"),
+        (1, motif_handles, "human motif v0 (probe)"),
+        (2, dom_handles, "macro domain (confounder)"),
+    ]
+    for col, handles, title in col_legends:
+        axes[-1, col].legend(
+            handles=handles, loc="upper center", bbox_to_anchor=(0.5, -0.16), ncol=2,
+            fontsize=7.5, title=title, title_fontsize=8.5, frameon=False,
+            columnspacing=1.1, handletextpad=0.4, labelspacing=0.3,
+        )
     fig.suptitle(
         "Representation atlas across depth — model clusters vs human motif taxonomy v0 vs macro domain\n"
         "(KMeans in PCA space; t-SNE for visualization only; v0 = shapelet-inspired probe, not ground truth)",
         fontsize=11,
     )
-    fig.tight_layout(rect=(0, 0, 0.865, 0.94))
+    fig.tight_layout(rect=(0, 0, 1, 0.94))
     fig.savefig(out_path, dpi=220, bbox_inches="tight", facecolor="white")
     plt.close(fig)
     return {"output": str(out_path), "panels": info, "perplexity": perplexity}
@@ -302,50 +331,63 @@ def render_prototype_panel(
     """
     sel = select_domain_balanced_indices(meta, max_per_domain=max_per_domain, seed=seed)
     labels, centers, pca_coords = cluster_pca(emb[sel], k, seed)
+    raw_sel = raw_patches[sel]
 
-    fig, axes = plt.subplots(k, proto_per_cluster, figsize=(2.0 * proto_per_cluster, 1.3 * k), squeeze=False)
+    # 固定列：col0 = cluster prototype（与 generalization 图统一）；其后每列一个 macro domain
+    present = {meta[int(sel[li])]["macro_domain"] for li in range(len(sel))}
+    domain_order = [d for d in DOMAIN_COLORS if d != "Other" and d in present]
+    ncol = 1 + len(domain_order)
+
+    proto = np.zeros((k, raw_sel.shape[1]), dtype=np.float64)
+    for c in range(k):
+        m = labels == c
+        if m.any():
+            proto[c] = np.mean(np.stack([z_normalize(raw_sel[i]) for i in np.where(m)[0]]), axis=0)
+
+    fig, axes = plt.subplots(k, ncol, figsize=(2.0 * ncol, 1.45 * k), squeeze=False)
     panel_info = []
-    for row, cid in enumerate(range(k)):
+    for cid in range(k):
         idx_local = np.where(labels == cid)[0]
-        if len(idx_local) == 0:
-            for col in range(proto_per_cluster):
-                axes[row, col].axis("off")
-            continue
-        dist = np.linalg.norm(pca_coords[idx_local] - centers[cid], axis=1)
-        # 每个 macro domain 取该域里离中心最近的代表，再按距离排序取前 proto_per_cluster 个不同域
-        best_by_dom: dict[str, tuple[float, int]] = {}
-        for j, li in enumerate(idx_local):
-            g = int(sel[li])
-            dom = meta[g]["macro_domain"]
-            if dom not in best_by_dom or dist[j] < best_by_dom[dom][0]:
-                best_by_dom[dom] = (float(dist[j]), g)
-        ranked = sorted(best_by_dom.items(), key=lambda kv: kv[1][0])[:proto_per_cluster]
-        panel_info.append(
-            {"cluster": f"C{cid + 1}", "size": int(len(idx_local)),
-             "n_domains_present": len(best_by_dom), "domains_shown": [d for d, _ in ranked]}
-        )
-        for col in range(proto_per_cluster):
-            ax = axes[row, col]
-            if col >= len(ranked):
-                ax.axis("off")
+        best_by_dom: dict[str, int] = {}
+        if len(idx_local) > 0:
+            dist = np.linalg.norm(pca_coords[idx_local] - centers[cid], axis=1)
+            best_dist: dict[str, float] = {}
+            for j, li in enumerate(idx_local):
+                g = int(sel[li])
+                dom = meta[g]["macro_domain"]
+                if dom not in best_dist or dist[j] < best_dist[dom]:
+                    best_dist[dom] = float(dist[j])
+                    best_by_dom[dom] = g
+        panel_info.append({"cluster": f"C{cid + 1}", "size": int(len(idx_local)),
+                           "domains_present": sorted(best_by_dom.keys())})
+        # col0 = cluster prototype（红，与 main_D 一致）
+        ax = axes[cid, 0]
+        ax.set_xticks([]); ax.set_yticks([])
+        ax.plot(proto[cid], lw=1.6, color="#c0392b")
+        ax.set_facecolor("#fbecea")
+        ax.set_ylabel(f"C{cid + 1}", fontsize=9, rotation=0, labelpad=12, va="center")
+        if cid == 0:
+            ax.set_title("train prototype", fontsize=7, color="#c0392b", fontweight="bold")
+        # domain 列：黑线 + 彩色 domain 表头（与 main_D 统一）
+        for j, dom in enumerate(domain_order):
+            ax = axes[cid, j + 1]
+            ax.set_xticks([]); ax.set_yticks([])
+            if cid == 0:
+                ax.set_title(dom, fontsize=7, color=DOMAIN_COLORS[dom], fontweight="bold")
+            if dom not in best_by_dom:
+                ax.set_facecolor("#f6f6f6")
                 continue
-            dom, (_dist, item) = ranked[col]
-            m = meta[item]
-            ax.plot(robust_z(raw_patches[item]), lw=1.3, color="#1f2933")
-            ax.set_title(f"{dom[:14]} p{m['patch_index']}", fontsize=6)
-            ax.set_xticks([])
-            ax.set_yticks([])
-            if col == 0:
-                ax.set_ylabel(f"C{cid + 1}", fontsize=9, rotation=0, labelpad=12, va="center")
+            ax.plot(z_normalize(raw_patches[best_by_dom[dom]]), lw=1.2, color="#1f2933")
     fig.suptitle(
-        f"Chronos-Bolt {layer_name} — cross-domain prototype examples "
-        f"(k={k}, best per distinct macro-domain, center-nearest)",
-        fontsize=10,
+        f"Chronos-Bolt {layer_name} — cross-domain prototypes (training)\n"
+        f"(k={k}; col 0 = cluster prototype; columns = macro domain, center-nearest training patch per domain; "
+        "blank = domain absent in cluster)",
+        fontsize=9.5,
     )
     fig.tight_layout(rect=(0, 0, 1, 0.95))
     fig.savefig(out_path, dpi=220, bbox_inches="tight", facecolor="white")
     plt.close(fig)
-    return {"output": str(out_path), "clusters": panel_info}
+    return {"output": str(out_path), "clusters": panel_info, "domain_columns": domain_order}
 
 
 def _zcorr(a: np.ndarray, b: np.ndarray) -> float:
@@ -422,42 +464,42 @@ def render_generalization_panel(
     real_coh = float(np.mean(is_coh[real_mask])) if real_mask.any() else 0.0
     noise_coh = per_dataset.get(noise_control, {}).get("shape_coherence")
 
-    # 渲染：每簇取 rep-NN==该簇、来自不同数据集、离中心最近的 patch
-    fig, axes = plt.subplots(k, proto_per_cluster, figsize=(2.0 * proto_per_cluster, 1.3 * k), squeeze=False)
+    # 渲染：col 0 = 训练 prototype；其后**固定每列一个 held-out macro domain**，取该簇内该域里
+    # rep-NN 离中心最近的 unseen patch。同一 domain 永远在同一列。
+    val_domains = {m["macro_domain"] for m in val_meta}
+    domain_order = [d for d in DOMAIN_COLORS if d != "Other" and d in val_domains]
+    ncol = 1 + len(domain_order)
+    fig, axes = plt.subplots(k, ncol, figsize=(2.0 * ncol, 1.45 * k), squeeze=False)
     panel_info = []
     for c in range(k):
         cand = np.where(rep_assign == c)[0]
-        cand = cand[np.argsort(rep_dist[cand])]
-        chosen, seen_ds = [], set()
+        cand = cand[np.argsort(rep_dist[cand])]  # 按到中心距离升序
+        best_by_dom: dict[str, int] = {}
         for i in cand:
-            ds = val_meta[i]["dataset"]
-            if ds in seen_ds:
-                continue
-            seen_ds.add(ds)
-            chosen.append(i)
-            if len(chosen) >= proto_per_cluster:
-                break
+            d = val_meta[int(i)]["macro_domain"]
+            if d not in best_by_dom:  # cand 已排序 → 第一个即该域最近
+                best_by_dom[d] = int(i)
         panel_info.append({"cluster": f"C{c + 1}", "n_assigned": int(len(cand)),
-                           "datasets_shown": [val_meta[i]["dataset"] for i in chosen]})
-        for col in range(proto_per_cluster):
-            ax = axes[c, col]
-            ax.set_xticks([])
-            ax.set_yticks([])
-            if col == 0:
-                ax.plot(proto_shapes[c], lw=1.6, color="#c0392b", zorder=3)  # 红=训练 prototype
-                ax.set_ylabel(f"C{c + 1}", fontsize=9, rotation=0, labelpad=12, va="center")
-                ax.set_facecolor("#fbecea")
-                if c == 0:
-                    ax.set_title("train prototype", fontsize=6.5, color="#c0392b")
+                           "domains_present": sorted(best_by_dom.keys())})
+        # col 0：训练 prototype
+        ax = axes[c, 0]
+        ax.set_xticks([]); ax.set_yticks([])
+        ax.plot(proto_shapes[c], lw=1.6, color="#c0392b", zorder=3)
+        ax.set_ylabel(f"C{c + 1}", fontsize=9, rotation=0, labelpad=12, va="center")
+        ax.set_facecolor("#fbecea")
+        if c == 0:
+            ax.set_title("train prototype", fontsize=7, color="#c0392b", fontweight="bold")
+        # 其后各列：固定 domain
+        for j, dom in enumerate(domain_order):
+            ax = axes[c, j + 1]
+            ax.set_xticks([]); ax.set_yticks([])
+            if c == 0:
+                ax.set_title(dom, fontsize=7, color=DOMAIN_COLORS[dom], fontweight="bold")
+            if dom not in best_by_dom:
+                ax.set_facecolor("#f6f6f6")
                 continue
-            j = col - 1
-            if j >= len(chosen):
-                ax.axis("off")
-                continue
-            i = chosen[j]
-            ax.plot(proto_shapes[c], lw=1.0, color="#cccccc", zorder=1)  # 灰=prototype 参照
+            i = best_by_dom[dom]
             ax.plot(zval[i], lw=1.2, color="#1f2933", zorder=2)
-            ax.set_title(f"{val_meta[i]['dataset'][:12]}", fontsize=6)
 
     noise_txt = f"{noise_coh:.0%}" if noise_coh is not None else "n/a"
     fig.suptitle(
@@ -476,6 +518,84 @@ def render_generalization_panel(
             "coherence_thresh": coh_thresh, "n_val_patches": int(len(zval)),
             "control_datasets": list(control_datasets),
             "per_dataset": per_dataset, "clusters": panel_info}
+
+
+def render_nearest_panel(
+    layer_name: str,
+    scaler: Any,
+    pca: Any,
+    centers: np.ndarray,
+    disc_labels: np.ndarray,
+    disc_pca_coords: np.ndarray,
+    disc_raw: np.ndarray,
+    val_emb: np.ndarray,
+    val_raw: np.ndarray,
+    k: int,
+    out_path: Path,
+    n_each: int = 3,
+) -> dict[str, Any]:
+    """不走 cross-domain、只按距离：每簇一行 = [聚类中心原型 | n 个最近**训练** patch | n 个最近
+    **held-out** patch]（都按 representation-space 到 cluster 中心的距离取最近）。蓝=训练、绿=held-out。
+    """
+    proto = np.zeros((k, disc_raw.shape[1]), dtype=np.float64)
+    for c in range(k):
+        idx = np.where(disc_labels == c)[0]
+        if len(idx):
+            proto[c] = np.mean(np.stack([z_normalize(disc_raw[i]) for i in idx]), axis=0)
+
+    Xv = pca.transform(scaler.transform(val_emb))
+    d_rep = np.linalg.norm(Xv[:, None, :] - centers[None, :, :], axis=2)
+    rep_assign = d_rep.argmin(axis=1)
+    rep_dist = d_rep.min(axis=1)
+    zval = np.stack([z_normalize(val_raw[i]) for i in range(len(val_raw))])
+
+    ncol = 1 + 2 * n_each
+    fig, axes = plt.subplots(k, ncol, figsize=(2.0 * ncol, 1.45 * k), squeeze=False)
+    info = []
+    for c in range(k):
+        didx = np.where(disc_labels == c)[0]
+        dnear = didx[np.argsort(np.linalg.norm(disc_pca_coords[didx] - centers[c], axis=1))[:n_each]] if len(didx) else np.array([], int)
+        vidx = np.where(rep_assign == c)[0]
+        vnear = vidx[np.argsort(rep_dist[vidx])[:n_each]] if len(vidx) else np.array([], int)
+        info.append({"cluster": f"C{c + 1}", "n_train": int(len(didx)), "n_val_assigned": int(len(vidx))})
+
+        ax = axes[c, 0]
+        ax.set_xticks([]); ax.set_yticks([])
+        ax.plot(proto[c], lw=1.6, color="#c0392b")
+        ax.set_facecolor("#fbecea")
+        ax.set_ylabel(f"C{c + 1}", fontsize=9, rotation=0, labelpad=12, va="center")
+        if c == 0:
+            ax.set_title("cluster center", fontsize=7, color="#c0392b", fontweight="bold")
+        for j in range(n_each):
+            ax = axes[c, 1 + j]
+            ax.set_xticks([]); ax.set_yticks([])
+            if c == 0:
+                ax.set_title(f"train #{j + 1}", fontsize=7, color="#1f3a93", fontweight="bold")
+            if j < len(dnear):
+                ax.plot(z_normalize(disc_raw[dnear[j]]), lw=1.2, color="#1f3a93", zorder=2)
+            else:
+                ax.set_facecolor("#f6f6f6")
+        for j in range(n_each):
+            ax = axes[c, 1 + n_each + j]
+            ax.set_xticks([]); ax.set_yticks([])
+            if c == 0:
+                ax.set_title(f"held-out #{j + 1}", fontsize=7, color="#117a65", fontweight="bold")
+            if j < len(vnear):
+                ax.plot(proto[c], lw=0.9, color="#dddddd", zorder=1)
+                ax.plot(zval[vnear[j]], lw=1.2, color="#117a65", zorder=2)
+            else:
+                ax.set_facecolor("#f6f6f6")
+
+    fig.suptitle(
+        f"Chronos-Bolt {layer_name} — by-distance nearest exemplars "
+        f"(center | {n_each} nearest train | {n_each} nearest held-out)\n"
+        "blue = training patches, green = held-out patches, grey = cluster-center reference",
+        fontsize=9.5,
+    )
+    fig.tight_layout(rect=(0, 0, 1, 0.93))
+    fig.savefig(out_path, dpi=220, bbox_inches="tight", facecolor="white")
+    plt.close(fig)
+    return {"output": str(out_path), "clusters": info, "n_each": n_each}
 
 
 def _extract(windows_raw, window_meta, layers, batch_size, pipe):
@@ -508,8 +628,15 @@ def main() -> None:
     parser.add_argument("--tsne-perplexity", type=float, default=40.0, help="cluster-map t-SNE perplexity (viz only)")
     parser.add_argument("--out", type=Path, default=OUTPUT_DIR)
     parser.add_argument("--no-cache", action="store_true", help="忽略提取缓存，强制重新跑 GPU 提取")
+    parser.add_argument("--min-patch-std", type=float, default=0.15,
+                        help="筛去近平直 patch：robust-z 窗口内 std < 此阈值的 patch 丢弃。"
+                             "默认 0.15（开启，去掉 flat_low_information / 常数段的平直直线）；设 0 关闭。"
+                             "论文须写明此预处理（见 docs/15 §5）。")
+    parser.add_argument("--out-suffix", type=str, default="",
+                        help="输出文件名后缀，用于临时对比版本（如 _nofilter），避免覆盖 canonical 图")
     args = parser.parse_args()
     args.out.mkdir(parents=True, exist_ok=True)
+    sfx = args.out_suffix
 
     layers = sorted(set(args.card_layers) | set(args.prototype_layers) | set(args.generalization_layers))
     # 提取缓存：纯图形微调时跳过 GPU。key 跟"采样 + 提取"有关（与 k / 配色 / 版式无关）
@@ -560,14 +687,42 @@ def main() -> None:
     summary: dict[str, Any] = {
         "model": "chronos-bolt-base", "patch_len": patch_len,
         "discovery_source": "chronos in-distribution training subset (16 datasets)",
-        "validation_source": "basicts held-out (training-external; Electricity/BeijingAirQuality excluded)",
+        "validation_source": ("basicts held-out (excluded: Electricity/BeijingAirQuality in Chronos "
+                              "pretraining; Traffic/ExchangeRate overlap discovery training subset)"),
         "config": vars(args) | {"out": str(args.out)},
         "cards": {}, "prototype_panel": {}, "generalization": {},
     }
 
+    # 强制应用 VALIDATION_EXCLUDE（即使来自旧缓存）：剔除在 Chronos 预训练内 / 与 discovery 训练子集
+    # 重叠的 basicts 数据集，避免泄漏。（缓存可能用旧的 exclude 采的，这里再过滤一次。）
+    vkeep = [i for i, m in enumerate(val_meta_w) if m["dataset"] not in VALIDATION_EXCLUDE]
+    if len(vkeep) < len(val_meta_w):
+        dropped = sorted({m["dataset"] for m in val_meta_w if m["dataset"] in VALIDATION_EXCLUDE})
+        val_z = val_z[vkeep]
+        val_meta_w = [val_meta_w[i] for i in vkeep]
+        val_reps = {kk: vv[vkeep] for kk, vv in val_reps.items()}
+        print(f"[main-fig] validation exclude (post-cache) dropped {dropped}; "
+              f"kept {len(vkeep)} windows from {len({m['dataset'] for m in val_meta_w})} datasets")
+
     # 各层 flatten（raw patch / meta 不随层变）
     disc_flat: dict[int, tuple] = {L: flatten_patches(disc_reps[f"layer_{L}"], disc_z, disc_meta, patch_len) for L in layers}
     val_flat: dict[int, tuple] = {L: flatten_patches(val_reps[f"layer_{L}"], val_z, val_meta_w, patch_len) for L in layers}
+
+    # 可选：筛去近平直 patch（robust-z 窗口内 std < 阈值 = 几乎水平直线，flat_low_information / 常数段）
+    if args.min_patch_std > 0:
+        def _drop_flat(flat_by_layer):
+            raw0 = flat_by_layer[layers[0]][1]
+            keep = np.array([float(np.std(raw0[i])) >= args.min_patch_std for i in range(len(raw0))])
+            out = {L: (e[keep], r[keep], [m[i] for i in range(len(m)) if keep[i]])
+                   for L, (e, r, m) in flat_by_layer.items()}
+            return out, keep
+        disc_flat, keep_d = _drop_flat(disc_flat)
+        val_flat, keep_v = _drop_flat(val_flat)
+        summary["flat_filter"] = {"min_patch_std": args.min_patch_std,
+                                  "disc_kept": int(keep_d.sum()), "disc_total": int(len(keep_d)),
+                                  "val_kept": int(keep_v.sum()), "val_total": int(len(keep_v))}
+        print(f"[main-fig] flat-filter std>={args.min_patch_std}: kept "
+              f"{int(keep_d.sum())}/{len(keep_d)} disc, {int(keep_v.sum())}/{len(keep_v)} val patches")
 
     # discovery domain-balanced 子集（避免 Traffic 等高频域主导）
     meta0 = disc_flat[layers[0]][2]
@@ -590,7 +745,7 @@ def main() -> None:
         f = fitted[L]
         # 图里显示 1-based layer 号（Nature 习惯）= encoder block 索引 L + 1；代码/CLI/文件名仍 0-based
         layer_clusters[f"layer {L + 1}"] = (f["labels"], f["pca_coords"])
-        out = args.out / f"bolt_patch_stack_cards_layer{L}.png"
+        out = args.out / f"main_A_cards_layer{L + 1}{sfx}.png"
         print(f"[main-fig] layer_{L}: rendering raw-only cards -> {out.name}")
         summary["cards"][f"layer_{L}"] = render_raw_cards(
             f"layer {L + 1}", f["labels"], f["centers"], f["pca_coords"], f["raw_b"], meta_b, args.k, args.top_n, out
@@ -601,7 +756,7 @@ def main() -> None:
     v0_labels = np.array([label_patch(raw_b0[i], patch_len).label for i in range(len(sel))])
     domain_labels = np.array([disc_flat[layers[0]][2][i]["macro_domain"] for i in sel])
 
-    cmap_out = args.out / "bolt_cluster_maps.png"
+    cmap_out = args.out / f"main_B_cluster_maps{sfx}.png"
     print(f"[main-fig] rendering cluster maps (cluster|motif v0|domain) ({list(layer_clusters)}) -> {cmap_out.name}")
     summary["cluster_maps"] = render_cluster_maps(
         layer_clusters, v0_labels, domain_labels, args.k, args.seed, args.tsne_perplexity, cmap_out
@@ -610,7 +765,7 @@ def main() -> None:
     # cross-domain prototype（discovery 内，跨训练域）
     for Lp in args.prototype_layers:
         emb, raw_patches, meta = disc_flat[Lp]
-        out = args.out / f"bolt_cross_domain_prototype_panel_layer{Lp}.png"
+        out = args.out / f"main_C_prototype_crossdomain_layer{Lp + 1}{sfx}.png"
         print(f"[main-fig] layer_{Lp}: rendering cross-domain prototype panel -> {out.name}")
         summary["prototype_panel"][f"layer_{Lp}"] = render_prototype_panel(
             emb, raw_patches, meta, args.k, args.seed, args.proto_per_cluster,
@@ -621,13 +776,25 @@ def main() -> None:
     for Lg in args.generalization_layers:
         f = fitted[Lg]
         v_emb, v_raw, v_meta = val_flat[Lg]
-        out = args.out / f"bolt_generalization_panel_layer{Lg}.png"
+        out = args.out / f"main_D_generalization_heldout_layer{Lg + 1}{sfx}.png"
         print(f"[main-fig] layer_{Lg}: rendering generalization panel (unseen retrieval) -> {out.name}")
         info = render_generalization_panel(
             f"layer {Lg + 1}", f["scaler"], f["pca"], f["centers"], f["labels"], f["raw_b"],
             v_emb, v_raw, v_meta, args.k, args.proto_per_cluster, out,
         )
         summary["generalization"][f"layer_{Lg}"] = info
+
+    # main_F：不走 cross-domain、只按距离的 nearest exemplars（center | 最近训练 | 最近 held-out）
+    summary["nearest_panel"] = {}
+    for Lg in args.generalization_layers:
+        f = fitted[Lg]
+        v_emb, v_raw, _vm = val_flat[Lg]
+        out = args.out / f"main_F_nearest_exemplars_layer{Lg + 1}{sfx}.png"
+        print(f"[main-fig] layer_{Lg}: rendering by-distance nearest panel -> {out.name}")
+        summary["nearest_panel"][f"layer_{Lg}"] = render_nearest_panel(
+            f"layer {Lg + 1}", f["scaler"], f["pca"], f["centers"], f["labels"],
+            f["pca_coords"], f["raw_b"], v_emb, v_raw, args.k, out,
+        )
         nc = info["noise_control_coherence"]
         nc_txt = f" vs noise control {nc:.0%}" if nc is not None else ""
         print(f"[main-fig]   layer_{Lg} held-out shape coherence = {info['real_coherence']:.0%}{nc_txt}")

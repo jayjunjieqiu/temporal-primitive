@@ -47,17 +47,25 @@ Illness（Health，discovery 侧没有的域 → 纯泛化），外加自制 **G
 
 ## 3. 产出（modular PNG，用户偏好手动拼接）
 
+命名规则：交付图统一 `main_X_...png`（文件夹与 advisor zip 同名，由 `scripts/assemble_main_figure_zip.py`
+打包；带 `_FILTERED` 后缀的是临时对比图，不进 zip）。layer 号 1-based 显示（= encoder block + 1）。
 都在 `outputs/figures/bolt_main_figure/`：
 
-- `bolt_patch_stack_cards_layer{0,11}.png` —— **discovery cards**：每簇 center-nearest top-24 raw patch 堆叠
-  （z-normalized imshow），标题下一根 100% **domain-composition 横条**反映整簇 macro_domain 构成（跨域混合）。
-- `bolt_cluster_maps.png` —— **representation atlas**（2×3）：每行一个 depth，三列同一套 t-SNE 点、不同着色：
+- `main_A_cards_layer{1,12}.png` —— **discovery cards**：每簇 center-nearest top-24 raw patch 堆叠
+  （z-normalized imshow，右侧 colorbar 标 ±σ 色标），标题下一根 100% **domain-composition 横条**反映整簇
+  macro_domain 构成（跨域混合）。
+- `main_B_cluster_maps.png` —— **representation atlas**（2×3）：每行一个 depth，三列同一套 t-SNE 点、不同着色：
   模型 KMeans cluster | human motif taxonomy v0（shapelet probe，*非* ground truth）| macro domain（confounder
-  audit）。KMeans 在 PCA(30) space，t-SNE 仅可视化。
-- `bolt_cross_domain_prototype_panel_layer{0,11}.png` —— **cross-domain prototype**：行=cluster，列=不同训练
+  audit）。每列下方各自 2 列 legend。KMeans 在 PCA(30) space，t-SNE 仅可视化。
+- `main_C_prototype_crossdomain_layer{1,12}.png` —— **cross-domain prototype**：行=cluster，列=不同训练
   域里离中心最近的最佳代表，强调同一 shape family 跨域复用。
-- `bolt_generalization_panel_layer{0,11}.png` —— **★ 泛化检验**：行=训练发现的 prototype（第 1 列红=prototype
+- `main_D_generalization_heldout_layer{1,12}.png` —— **★ 泛化检验**：行=训练发现的 prototype（第 1 列红=prototype
   形状），后续列=被分配进该簇、来自**不同 held-out 数据集**的 unseen patch（黑），灰线=prototype 参照。
+- `main_E_useful_contextualized_depth.png` —— **useful & contextualized**（合并图，3 等分面板）：forecast skill
+  （RelMAE）| confounder decodability | within-context similarity，共享深度横轴。脚本
+  `scripts/plot_bolt_combined_depth.py`。
+
+可选筛除近平直 patch：`--min-patch-std 0.15 --out-suffix _FILTERED`（cards/prototype 的临时对比版）。
 
 `k=8`，seed=47，context=128，patch_len=16。discovery 每数据集 200 窗口（domain-balanced ≤400/域，约 2800 patch），
 validation 每数据集 150 窗口（20 数据集，约 24000 patch）。
@@ -113,3 +121,44 @@ family，generalization 提供了 controlled-retrieval + negative-control 证据
 ```
 
 GPU 提取结果缓存在 `.cache/extract_train_*.pkl`（纯改图/改指标时命中缓存，跳过 GPU）；`--no-cache` 强制重提。
+交付图打包：`.venv/bin/python scripts/assemble_main_figure_zip.py`（folder 与 zip 同名 `main_*.png`）。
+
+## 7. 预处理与 caveats（**论文须写明**）
+
+1. **平直直线筛除（默认开启）**：聚类/卡片/prototype/generalization **默认丢弃近平直 patch**——robust-z
+   窗口内 std < **0.15** 的 patch（`flat_low_information` / 常数段，画出来是无信息的水平直线）。约丢弃
+   ~13% discovery patch。**论文方法部分必须写明这一筛除规则**（它会影响 cluster 组成与覆盖率）。
+   未筛除的对照快照在 `outputs/figures/bolt_main_figure_archive/`（`--min-patch-std 0` 复现）。
+2. **validation 泄漏剔除**：basicts 测试集里剔除了 4 个数据集——`Electricity`/`BeijingAirQuality`（在 Chronos
+   预训练集内）、`Traffic`/`ExchangeRate`（与 discovery 训练子集 monash_traffic/exchange_rate **同一份数据**，
+   见 docs/16）。剔除后 held-out coherence 33%→（仍远高于噪声 1%）。
+3. **prototype(main_C) 与 generalization(main_D) 已统一版式**：col 0 = cluster prototype（红），其后**每列固定一个
+   macro domain**（同域永远同列、彩色表头），main_C 列内是训练代表、main_D 是 held-out 代表。
+4. **main_F（by-distance nearest）**：col0 聚类中心 | 3 最近训练 patch（蓝）| 3 最近 held-out patch（绿），
+   只按距离、不强制跨域。
+
+层号显示 1-based（layer N = encoder block N−1）；交付图统一 `main_X_...png`（A cards / B cluster-maps /
+C prototype / D generalization / E useful+contextualized / F nearest-exemplars）。
+
+## 8. OOD transfer 案例研究（见 `scripts/run_bolt_ood_transfer.py`、`outputs/figures/bolt_ood_transfer/`）
+
+"可迁移泛化"：离 train(≈pretraining) 分布最远（OOD）的 held-out patch 也能被训练发现的 primitive 解释。
+OOD 分 = kNN 距离(test→train) ÷ train 自身典型近邻距离（每层各自归一化）。产出 overlap t-SNE、OOD 排名
+（Gaussian/Pulse 最 OOD，作 sanity）、case study、归属饼图（OOD patch 的最近 prototype 跨全部 cluster/domain；
+top-25%-OOD patch 中 27% 仍有 shape-corr≥0.6 的 training prototype）。
+
+**层深解读**：OOD 排名在浅层(L1) vs 深层(L12) 呈"两头向中间挤"——真实 held-out（交通 SD/GLA/CA/GBA、
+Weather）**深层更 OOD**，合成 Gaussian/Pulse **深层更不 OOD**。原因是浅层表征 ≈ 通用形状（跨数据集共享 →
+held-out 不 OOD）、深层表征 ≈ 数据集/context 身份（held-out 是新身份 → 更 OOD）；噪声在深层抓不到 context、
+塌向 bulk → 变不 OOD。这与"浅层 reusable primitive / 深层 contextualized"一致。
+
+**★ caveat（必须写明，且是真实局限）**：OOD 是相对**我们 16 个 discovery 数据集**算的，**不是相对 Chronos
+全量预训练分布**。16 个数据集**稀疏覆盖**深层的 context 流形，深层"洞"多，会让 held-out 的深层 OOD 被**抬高**
+——所以"深层更 OOD"里**有相当一部分是参照欠采样 artifact，而非纯内禀 contextualization**，二者用当前稀疏参照
+分不开。**因此 OOD-transfer 的可迁移结论锚定在浅层(L1，primitive 所在、欠采样影响最小)更稳；深层 OOD 升高
+不单独当 contextualization 证据**（contextualization 已有直接证据：docs/14 的 domain decodability / within-context
+similarity / 本文 generalization coherence 0.34→0.29）。要把 OOD 当 headline，需先把 train 参照扩到接近预训练
+覆盖度（更多 chronos_datasets）再重算，见 §8 末。
+
+若要消除欠采样混淆：把 OOD 的 train 参照从 16 个扩到 chronos_datasets 里尽量多的 named 数据集（仅 train 侧多做
+一次 GPU 提取），重算排名；深层 OOD 升高若明显缩小则证实为欠采样所致。本轮未做（OOD 为支撑性分析，非 main claim）。
