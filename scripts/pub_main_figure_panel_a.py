@@ -63,14 +63,13 @@ def main() -> None:
     xs = list(range(len(REP_ORDER)))
     xlabels = [REP_LABEL[r] for r in REP_ORDER]
     tok_x = 0
-    fig, axes = plt.subplots(1, 3, figsize=(17.5, 4.4))
+    fig, axes = plt.subplots(1, 3, figsize=(17.5, 3.8))
 
     # --- 左：forecast skill (RelMAE) ---
     ax = axes[0]
     ax.plot(xs, relmae(fc16), "-o", color="#1f77b4", lw=2.4, ms=7, label="H = 16")
     ax.plot(xs, relmae(fc64), "-o", color="#d62728", lw=2.4, ms=7, label="H = 64")
     ax.set_ylabel("Prediction error  ↓", fontsize=FS_LABEL)
-    ax.set_title("Forecastability", fontsize=FS_TITLE)
     ax.legend(fontsize=FS_LEGEND, title="Forecast horizon", title_fontsize=FS_LEGEND,
               loc="upper right", framealpha=0.9)
 
@@ -80,7 +79,6 @@ def main() -> None:
         ys = [ctx["results"][r]["knn_probe_acc"][conf] for r in REP_ORDER]
         ax.plot(xs, ys, "-o", color=CONF_COLOR[conf], lw=2.4, ms=7, label=conf.capitalize())
     ax.set_ylabel("k-NN probe accuracy  ↑", fontsize=FS_LABEL)
-    ax.set_title("Contextualization", fontsize=FS_TITLE)
     ax.legend(fontsize=FS_LEGEND, title="Attribute", title_fontsize=FS_LEGEND,
               loc="lower right", framealpha=0.9)
 
@@ -102,7 +100,6 @@ def main() -> None:
     ax2.spines["right"].set_color(DIFF_C)
     ax2.spines["left"].set_visible(False)
     ax2.grid(False)
-    ax.set_title("Within-context coherence", fontsize=FS_TITLE)
     # 不再需要 legend：左右 y 轴已用对应线的颜色标注（红=same、灰=different）
 
     for ax in axes:

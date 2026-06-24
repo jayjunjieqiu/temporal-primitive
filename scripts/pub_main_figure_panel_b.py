@@ -133,7 +133,7 @@ def main() -> None:
                         + [m for m in MOTIF_LABELS if m not in DIM_MOTIFS])
     seen_domains = [d for d in DOMAIN_COLORS if d in set(domain_labels.tolist())]
 
-    fig, axes = plt.subplots(len(LAYERS), 3, figsize=(15.5, 7.6), squeeze=False)
+    fig, axes = plt.subplots(len(LAYERS), 3, figsize=(15.5, 7.0), squeeze=False)
     for row, L in enumerate(LAYERS):
         labels, xy = labels_by_layer[L], xy_by_layer[L]
 
