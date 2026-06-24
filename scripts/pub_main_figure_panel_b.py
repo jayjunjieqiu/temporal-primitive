@@ -56,7 +56,7 @@ FS_AXIS = 12
 FS_LEG = 14
 
 # 列标题（结合论文叙事）
-COL_TITLES = ["Learned primitives", "Predefined motifs", "Domain"]
+COL_TITLES = ["Domain", "Predefined motifs", "Learned primitives"]
 DIM_MOTIFS = {"mixed_uncertain": "#cfcfcf"}
 # motif 标签缩写 + 首字母大写（与 cluster C1.. / domain Traffic.. 统一）
 MOTIF_SHORT = {
@@ -137,10 +137,11 @@ def main() -> None:
     for row, L in enumerate(LAYERS):
         labels, xy = labels_by_layer[L], xy_by_layer[L]
 
+        # 列序：col0 = Domain，col1 = Predefined motifs，col2 = Learned primitives
         ax = axes[row, 0]
-        for cid in range(K):
-            m = labels == cid
-            ax.scatter(xy[m, 0], xy[m, 1], s=6, color=clu_cmap(cid % 10), alpha=0.65)
+        for dom in seen_domains:
+            m = domain_labels == dom
+            ax.scatter(xy[m, 0], xy[m, 1], s=6, color=DOMAIN_COLORS[dom], alpha=0.65)
 
         ax = axes[row, 1]
         for lab in motif_draw_order:
@@ -153,9 +154,9 @@ def main() -> None:
                        zorder=1 if dim else 2)
 
         ax = axes[row, 2]
-        for dom in seen_domains:
-            m = domain_labels == dom
-            ax.scatter(xy[m, 0], xy[m, 1], s=6, color=DOMAIN_COLORS[dom], alpha=0.65)
+        for cid in range(K):
+            m = labels == cid
+            ax.scatter(xy[m, 0], xy[m, 1], s=6, color=clu_cmap(cid % 10), alpha=0.65)
 
         for col, ax in enumerate(axes[row]):
             ax.set_xticks([]); ax.set_yticks([])
@@ -185,7 +186,7 @@ def main() -> None:
     # 三组统一 ncol=3（各 3 行）+ mode="expand" 固定等宽 → 三个 legend 框完全等大
     LEG_W = 0.30
     LEG_Y = 0.135
-    for handles, col in [(clu_handles, 0), (motif_handles, 1), (dom_handles, 2)]:
+    for handles, col in [(dom_handles, 0), (motif_handles, 1), (clu_handles, 2)]:
         pos = axes[-1, col].get_position()
         xc = 0.5 * (pos.x0 + pos.x1)
         leg = fig.legend(
@@ -193,12 +194,10 @@ def main() -> None:
             bbox_to_anchor=(xc - LEG_W / 2, LEG_Y, LEG_W, 0.0),
             mode="expand", ncol=3, fontsize=FS_LEG - 1, frameon=True,
             columnspacing=0.5, handletextpad=0.3, labelspacing=0.7,
-            borderpad=0.8,
+            borderpad=0.8, fancybox=False, edgecolor="0.7", facecolor="white",
+            framealpha=1.0,
         )
-        fr = leg.get_frame()           # 等大边框，把三组 legend 视觉隔开
-        fr.set_edgecolor("#9aa3ab")
-        fr.set_linewidth(0.8)
-        fr.set_facecolor("white")
+        leg.get_frame().set_linewidth(0.6)   # Nature 风格：方角、细灰边、等大三框
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     svg = OUT_DIR / "panel_b_cluster_maps.svg"
     png = OUT_DIR / "panel_b_cluster_maps.png"

@@ -116,9 +116,9 @@ def main() -> None:
         ax.set_xticks(xt)
         ax.set_yticks([])
         ax.tick_params(labelsize=FS_AXIS - 3, length=2)
-        ax.set_xlabel("time", fontsize=FS_AXIS)
+        # x 轴含义相同（patch 内时间步），整行底部只写一次 "Time"，不在每张卡重复
         if cid == 0:
-            ax.set_ylabel("patches (near → far)", fontsize=FS_AXIS)
+            ax.set_ylabel("Patches (near → far)", fontsize=FS_AXIS)
         for sp in ax.spines.values():
             sp.set_color("#1f2933"); sp.set_linewidth(0.8)
 
@@ -137,19 +137,33 @@ def main() -> None:
     if im is not None:
         cax = fig.add_axes((0.92, 0.30, 0.008, 0.45))
         cbar = fig.colorbar(im, cax=cax)
-        cbar.set_label("z-norm. value (σ)", fontsize=FS_CBAR)
+        cbar.set_label("Z-norm. value (σ)", fontsize=FS_CBAR)
         cbar.ax.tick_params(labelsize=FS_CBAR - 2)
 
-    # legend 居中于卡片块（first→last card）的中点——它描述的是卡片，不应被右侧 colorbar 拉偏
     fig.canvas.draw()
-    x_left = first_ax.get_position().x0 if first_ax is not None else 0.05
-    x_right = last_ax.get_position().x1 if last_ax is not None else 0.9
-    xc = 0.5 * (x_left + x_right)
+    rend = fig.canvas.get_renderer()
+    inv = fig.transFigure.inverted()
+    # 单个 "Time"：居中于卡片块（first→last card）下方、紧贴刻度数字下沿，替代每张卡重复的 x 标签
+    card_xc = 0.5 * ((first_ax.get_position().x0 if first_ax is not None else 0.05)
+                     + (last_ax.get_position().x1 if last_ax is not None else 0.9))
+    card_bottom = first_ax.get_tightbbox(rend).transformed(inv).y0  # 含刻度数字的底沿
+    fig.text(card_xc, card_bottom - 0.015, "Time", ha="center", va="top", fontsize=FS_AXIS)
+
+    # Domain legend 居中于"全图"——含左侧 ylabel 与右侧 colorbar 的内容真实中心
+    # （图用 bbox_inches=tight 裁剪保存，故内容中心 = 成图的视觉中心）
+    xs0, xs1 = [], []
+    for a in fig.axes:
+        tb = a.get_tightbbox(rend).transformed(inv)
+        xs0.append(tb.x0); xs1.append(tb.x1)
+    xc = 0.5 * (min(xs0) + max(xs1))
     handles = [Line2D([0], [0], marker="s", ls="", ms=9, color=DOMAIN_COLORS[d], label=d)
                for d in DOMAIN_COLORS if d in seen_domains]
-    fig.legend(handles=handles, loc="upper center", ncol=len(handles), fontsize=FS_LEG,
-               frameon=False, bbox_to_anchor=(xc, 0.13), title="domain composition (per cluster)",
-               title_fontsize=FS_LEGTITLE, columnspacing=1.5, handletextpad=0.5)
+    leg = fig.legend(handles=handles, loc="upper center", ncol=len(handles), fontsize=FS_LEG,
+                     bbox_to_anchor=(xc, 0.13), title="Domain composition (per cluster)",
+                     title_fontsize=FS_LEGTITLE, columnspacing=1.5, handletextpad=0.5,
+                     frameon=True, fancybox=False, edgecolor="0.7", facecolor="white",
+                     framealpha=1.0, borderpad=0.7)
+    leg.get_frame().set_linewidth(0.6)
 
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     svg = OUT_DIR / "panel_c_cards_layer12.svg"

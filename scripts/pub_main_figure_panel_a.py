@@ -32,7 +32,7 @@ CTX_JSON = ROOT / "outputs" / "bolt_contextualization" / "bolt_contextualization
 OUT_DIR = ROOT / "figure_projects" / "pub_main_figure"
 
 REP_ORDER = ["tokenizer", "layer_0", "layer_3", "layer_6", "layer_9", "layer_11"]
-REP_LABEL = {"tokenizer": "tokenizer", "layer_0": "L1", "layer_3": "L4",
+REP_LABEL = {"tokenizer": "Tokenizer", "layer_0": "L1", "layer_3": "L4",
              "layer_6": "L7", "layer_9": "L10", "layer_11": "L12"}
 CONF_COLOR = {"domain": "#1f77b4", "frequency": "#ff7f0e", "position": "#2ca02c"}
 
@@ -69,23 +69,23 @@ def main() -> None:
     ax = axes[0]
     ax.plot(xs, relmae(fc16), "-o", color="#1f77b4", lw=2.4, ms=7, label="H = 16")
     ax.plot(xs, relmae(fc64), "-o", color="#d62728", lw=2.4, ms=7, label="H = 64")
-    ax.set_ylabel("prediction error  ↓", fontsize=FS_LABEL)
+    ax.set_ylabel("Prediction error  ↓", fontsize=FS_LABEL)
     ax.set_title("Forecastability", fontsize=FS_TITLE)
-    ax.legend(fontsize=FS_LEGEND, title="forecast horizon", title_fontsize=FS_LEGEND,
+    ax.legend(fontsize=FS_LEGEND, title="Forecast horizon", title_fontsize=FS_LEGEND,
               loc="upper right", framealpha=0.9)
 
-    # --- 右：confounder decodability (probe accuracy) ---
-    ax = axes[2]
+    # --- 中：confounder decodability (probe accuracy) ---
+    ax = axes[1]
     for conf in ["domain", "frequency", "position"]:
         ys = [ctx["results"][r]["knn_probe_acc"][conf] for r in REP_ORDER]
         ax.plot(xs, ys, "-o", color=CONF_COLOR[conf], lw=2.4, ms=7, label=conf.capitalize())
     ax.set_ylabel("k-NN probe accuracy  ↑", fontsize=FS_LABEL)
     ax.set_title("Contextualization", fontsize=FS_TITLE)
-    ax.legend(fontsize=FS_LEGEND, title="attribute", title_fontsize=FS_LEGEND,
+    ax.legend(fontsize=FS_LEGEND, title="Attribute", title_fontsize=FS_LEGEND,
               loc="lower right", framealpha=0.9)
 
-    # --- 中：within-context similarity（双 y 轴：同/异上下文各自刻度，便于各看各的趋势）---
-    ax = axes[1]
+    # --- 右：within-context similarity（双 y 轴：同/异上下文各自刻度，便于各看各的趋势）---
+    ax = axes[2]
     same = [ctx["results"][r]["within_context_sim"]["same_context"] for r in REP_ORDER]
     diff = [ctx["results"][r]["within_context_sim"]["different_context"] for r in REP_ORDER]
     SAME_C, DIFF_C = "#d62728", "#595959"
@@ -94,8 +94,8 @@ def main() -> None:
     ax.plot(xs, same, "-o", color=SAME_C, lw=2.4, ms=7)
     ax2.plot(xs, diff, "--s", color=DIFF_C, lw=2.4, ms=6)
     # 两个 y 轴各用对应线的颜色标注，明确告诉读者这是两个不同刻度
-    ax.set_ylabel("same-context similarity", fontsize=FS_LABEL, color=SAME_C)
-    ax2.set_ylabel("different-context similarity", fontsize=FS_LABEL, color=DIFF_C)
+    ax.set_ylabel("Same-context similarity", fontsize=FS_LABEL, color=SAME_C)
+    ax2.set_ylabel("Different-context similarity", fontsize=FS_LABEL, color=DIFF_C)
     ax.tick_params(axis="y", labelcolor=SAME_C)
     ax2.tick_params(axis="y", labelcolor=DIFF_C, labelsize=FS_TICK)
     ax.spines["left"].set_color(SAME_C)
@@ -113,28 +113,10 @@ def main() -> None:
         ax.axvspan(tok_x + 0.5, len(REP_ORDER) - 0.5, color="#2ca02c", alpha=0.06)
         ax.grid(True, axis="y", alpha=0.25)
 
-    # 三联横轴含义相同，整行底部只写一次（各子图刻度保留）。
-    fig.tight_layout(rect=(0, 0.075, 1, 1), w_pad=0.4)
-    # 中图是双 y 轴：tight_layout 让三个 plot 框等距，但中图右侧多一组刻度+标签，
-    # 使 1-2 之间留出大空白、2-3 之间几乎贴死，左右"空白"不对称。这里按 ink 间的实际空隙，
-    # 把中图（连同孪生右轴 ax2）左移到两侧空白相等的位置（实时测量，不写死）。
-    fig.canvas.draw()
-    rend = fig.canvas.get_renderer()
-
-    def _tb(a):  # tight bbox（含刻度/标签）→ figure 坐标
-        return a.get_tightbbox(rend).transformed(fig.transFigure.inverted())
-
-    empty_left = _tb(axes[1]).x0 - _tb(axes[0]).x1   # 1-2 之间的空白
-    empty_right = _tb(axes[2]).x0 - _tb(ax2).x1       # 2-3 之间的空白
-    # BALANCE: 1=两侧空白完全相等(中图离左图偏近)；0=三图框等距(1-2 空白偏大)。0.5=折中。
-    BALANCE = 0.5
-    delta = BALANCE * 0.5 * (empty_left - empty_right)
-    for a in (axes[1], ax2):
-        bb = a.get_position()
-        a.set_position((bb.x0 - delta, bb.y0, bb.width, bb.height))
-    mid = axes[1].get_position()
-    fig.supxlabel("depth   (tokenizer → encoder layer)", fontsize=FS_LABEL, y=0.03,
-                  x=0.5 * (mid.x0 + mid.x1))
+    # 三联横轴含义相同，整行底部只写一次（各子图刻度保留）。双轴图在右端，右标签贴图边、
+    # 不占图间空隙，三联用默认 tight_layout 即均匀，无需额外补偿。
+    fig.tight_layout(rect=(0, 0.075, 1, 1))
+    fig.supxlabel("Depth   (Tokenizer → encoder layer)", fontsize=FS_LABEL, y=0.03)
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     svg = OUT_DIR / "panel_a_depth.svg"
     png = OUT_DIR / "panel_a_depth.png"   # 仅供肉眼校对
