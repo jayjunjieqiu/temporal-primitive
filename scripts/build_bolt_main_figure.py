@@ -106,13 +106,22 @@ def cluster_pca(emb: np.ndarray, k: int, seed: int) -> tuple[np.ndarray, np.ndar
     return km.labels_, km.cluster_centers_, Xp
 
 
-def cluster_pca_fit(emb: np.ndarray, k: int, seed: int):
+def cluster_pca_fit(emb: np.ndarray, k: int, seed: int, pca_dim: int | None = 30):
     """同 cluster_pca，但额外返回 fit 好的 (scaler, pca, km)，供把 validation patch 投到同一
-    discovery 空间做 cross-space 泛化检验。返回 (labels, centers, pca_coords, scaler, pca, km)。"""
+    discovery 空间做 cross-space 泛化检验。返回 (labels, centers, coords, scaler, pca, km)。
+
+    pca_dim=30（默认）：StandardScaler → PCA(30) → KMeans，coords/centers 在 PCA 空间（现状）。
+    pca_dim=None：跳过 PCA，直接在标准化后的**完整 representation**（d_model 维）上 KMeans，
+                  coords/centers 即标准化后的全维特征（pca 返回 None）。
+    """
     scaler = StandardScaler().fit(emb)
     Xs = scaler.transform(emb)
-    pca = PCA(n_components=min(30, Xs.shape[1]), random_state=seed).fit(Xs)
-    Xp = pca.transform(Xs)
+    if pca_dim is None:
+        pca = None
+        Xp = Xs
+    else:
+        pca = PCA(n_components=min(pca_dim, Xs.shape[1]), random_state=seed).fit(Xs)
+        Xp = pca.transform(Xs)
     km = KMeans(n_clusters=k, n_init=10, random_state=seed).fit(Xp)
     return km.labels_, km.cluster_centers_, Xp, scaler, pca, km
 

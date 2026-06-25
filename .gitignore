@@ -92,5 +92,5 @@ outputs/**
 !outputs/figures/training_preview/
 !outputs/figures/training_preview/training_dataset_samples.png
 
-# pub_main_figure 可再生的 t-SNE 坐标缓存（勿提交）
-figure_projects/pub_main_figure/.panel_*_tsne_cache.npz
+# pub_main_figure / _fullrep 可再生的 t-SNE 坐标缓存（勿提交）
+figure_projects/pub_main_figure*/.panel_*_tsne_cache*.npz

@@ -14,6 +14,7 @@
 """
 from __future__ import annotations
 
+import argparse
 import json
 import os
 from pathlib import Path
@@ -48,7 +49,23 @@ def relmae(summary: dict) -> list[float]:
     return [summary["results"][r].get("relmae", summary["results"][r].get("mase")) for r in REP_ORDER]
 
 
+PANEL_H = {"pca": 3.8, "full": round(3.8 * 3.3 / 4, 2)}  # full 版高度压到原来的 3.3/4
+
+
 def main() -> None:
+    global OUT_DIR
+    ap = argparse.ArgumentParser(description="panel a depth 三联（不依赖聚类；--cluster-space 仅切换输出目录/高度）")
+    ap.add_argument("--cluster-space", choices=["pca", "full"], default="pca",
+                    help="full=输出到 pub_main_figure_fullrep 且高度再压 1/3；内容与 pca 版一致")
+    args = ap.parse_args()
+    fig_h = PANEL_H[args.cluster_space]
+    # full 版高度压了 1/3，右轴竖排长标签放不下 → 缩短（caption 解释是 centered-cosine similarity）
+    same_lbl, diff_lbl = (("Same context", "Different context") if args.cluster_space == "full"
+                          else ("Same-context similarity", "Different-context similarity"))
+    if args.cluster_space == "full":
+        OUT_DIR = ROOT / "figure_projects" / "pub_main_figure_fullrep"
+    print(f"[panel a] variant={args.cluster_space}  height={fig_h} -> {OUT_DIR.name}")
+
     plt.rcParams.update({
         "font.family": "sans-serif",
         "font.sans-serif": ["Arial", "Helvetica", "DejaVu Sans"],
@@ -63,7 +80,7 @@ def main() -> None:
     xs = list(range(len(REP_ORDER)))
     xlabels = [REP_LABEL[r] for r in REP_ORDER]
     tok_x = 0
-    fig, axes = plt.subplots(1, 3, figsize=(17.5, 3.8))
+    fig, axes = plt.subplots(1, 3, figsize=(17.5, fig_h))
 
     # --- 左：forecast skill (RelMAE) ---
     ax = axes[0]
@@ -92,8 +109,8 @@ def main() -> None:
     ax.plot(xs, same, "-o", color=SAME_C, lw=2.4, ms=7)
     ax2.plot(xs, diff, "--s", color=DIFF_C, lw=2.4, ms=6)
     # 两个 y 轴各用对应线的颜色标注，明确告诉读者这是两个不同刻度
-    ax.set_ylabel("Same-context similarity", fontsize=FS_LABEL, color=SAME_C)
-    ax2.set_ylabel("Different-context similarity", fontsize=FS_LABEL, color=DIFF_C)
+    ax.set_ylabel(same_lbl, fontsize=FS_LABEL, color=SAME_C)
+    ax2.set_ylabel(diff_lbl, fontsize=FS_LABEL, color=DIFF_C)
     ax.tick_params(axis="y", labelcolor=SAME_C)
     ax2.tick_params(axis="y", labelcolor=DIFF_C, labelsize=FS_TICK)
     ax.spines["left"].set_color(SAME_C)
