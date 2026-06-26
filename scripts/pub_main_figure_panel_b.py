@@ -57,8 +57,8 @@ FS_ROWLABEL = 18
 FS_AXIS = 12
 FS_LEG = 14
 
-# 列标题（结合论文叙事）
-COL_TITLES = ["Domain", "Predefined motifs", "Learned primitives"]
+# 列标题（结合论文叙事）——放进各 legend 框作标题，首字母大写（sentence case）
+COL_TITLES = ["Training data domains", "Predefined motif labels", "Learned temporal primitives"]
 DIM_MOTIFS = {"mixed_uncertain": "#cfcfcf"}
 # motif 标签缩写 + 首字母大写（与 cluster C1.. / domain Traffic.. 统一）
 MOTIF_SHORT = {
@@ -111,13 +111,13 @@ def main() -> None:
         PCA_DIM = None
         OUT_DIR = ROOT / "figure_projects" / "pub_main_figure_fullrep"
         TSNE_CACHE = OUT_DIR / f".panel_b_tsne_cache_full_k{K}.npz"
-        fig_h = round(7.0 * 3.3 / 4, 2)   # full 版高度压到原来的 3.3/4
+        fig_h = round(7.0 * 3.3 / 4, 2) + 0.7   # full 版散点压到 3.3/4，再加顶部 legend 带
     else:
         PCA_DIM = 30
         OUT_DIR = ROOT / "figure_projects" / "pub_main_figure"
         TSNE_CACHE = OUT_DIR / (".panel_b_tsne_cache.npz" if K == 8
                                 else f".panel_b_tsne_cache_pca_k{K}.npz")
-        fig_h = 7.0
+        fig_h = 7.0 + 0.7                        # 加顶部 legend 带
     print(f"[panel b] cluster-space={args.cluster_space} (pca_dim={PCA_DIM}) k={K} h={fig_h} -> {OUT_DIR.name}")
 
     plt.rcParams.update({
@@ -184,8 +184,7 @@ def main() -> None:
             ax.set_xticks([]); ax.set_yticks([])
             for sp in ax.spines.values():
                 sp.set_color("#1f2933"); sp.set_linewidth(0.8)
-            if row == 0:
-                ax.set_title(COL_TITLES[col], fontsize=FS_COLTITLE, pad=10)
+            # 列标题不再写在散点上方——改放进每列 legend 框的标题里（见下）
         # 行标签：Layer N（最左，竖排粗体）
         axes[row, 0].set_ylabel(f"Layer {L + 1}", fontsize=FS_ROWLABEL, fontweight="bold", labelpad=12)
 
@@ -202,25 +201,36 @@ def main() -> None:
                      for l in motif_order]
     dom_handles = [Line2D([0], [0], marker="o", ls="", ms=8, color=DOMAIN_COLORS[d], label=_pretty(d))
                    for d in seen_domains]
-    # 图例中心对齐各列真实中心；内部收紧（小 columnspacing/handletextpad）腾出列间空白
-    fig.subplots_adjust(left=0.05, right=0.985, top=0.95, bottom=0.14, wspace=0.04, hspace=0.06)
+    # 图例放到全图最上方（列标题作为各 legend 框标题，类似 panel c）；先用占位 top 取列中心，
+    # 建好 legend 后量出其真实底边，再把散点网格顶 snap 到其正下方（留极小间隙）——既不空旷也不重叠
+    fig.subplots_adjust(left=0.05, right=0.985, top=0.80, bottom=0.02, wspace=0.04, hspace=0.06)
     fig.canvas.draw()
-    # 三组统一 ncol=3（各 3 行）+ mode="expand" 固定等宽 → 三个 legend 框完全等大
+    # 三组统一 ncol=3（3 排）+ mode="expand" 固定等宽 → 三框等大、不裁末列（Nature 细灰方框）；
+    # 顶端对齐、向下展开；列标题进框作为加粗 legend title。
     LEG_W = 0.30
-    LEG_Y = 0.135
-    # 三组统一 ncol=3（3 排）+ mode="expand" 固定等宽 → 三框等大、不裁末列（Nature 细灰方框）
+    LEG_Y = 0.995
+    legs = []
     for handles, col in [(dom_handles, 0), (motif_handles, 1), (clu_handles, 2)]:
-        pos = axes[-1, col].get_position()
+        pos = axes[0, col].get_position()
         xc = 0.5 * (pos.x0 + pos.x1)
         leg = fig.legend(
             handles=handles, loc="upper left",
             bbox_to_anchor=(xc - LEG_W / 2, LEG_Y, LEG_W, 0.0),
             mode="expand", ncol=3, fontsize=FS_LEG - 1, frameon=True,
+            title=COL_TITLES[col], title_fontsize=FS_COLTITLE - 2,
             columnspacing=0.5, handletextpad=0.3, labelspacing=0.7,
             borderpad=0.8, fancybox=False, edgecolor="0.7", facecolor="white",
             framealpha=1.0,
         )
         leg.get_frame().set_linewidth(0.6)   # Nature 风格：方角、细灰边、等大三框
+        leg.get_title().set_fontweight("bold")
+        leg.set_alignment("center")          # 标题框在 legend 内居中（PNG）
+        leg.get_title().set_horizontalalignment("center")  # SVG：标题用 text-anchor:middle → 换字体也居中（否则只有 PNG 居中）
+        legs.append(leg)
+    fig.canvas.draw()
+    inv = fig.transFigure.inverted()
+    lb = min(leg.get_window_extent().transformed(inv).y0 for leg in legs)
+    fig.subplots_adjust(top=lb - 0.018)   # 散点顶贴 legend 底，仅留极小间隙
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     svg = OUT_DIR / "panel_b_cluster_maps.svg"
     png = OUT_DIR / "panel_b_cluster_maps.png"

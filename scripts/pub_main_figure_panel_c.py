@@ -27,6 +27,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.lines import Line2D
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -53,6 +54,11 @@ FS_AXIS = 13
 FS_CBAR = 12
 FS_LEG = 13
 FS_LEGTITLE = 14
+
+# 与 a/b/d 同家族的克制 diverging heatmap（muted blue–warm white–brick red），
+# 红端 = panel d 的 ACCENT_RED 同族，比默认 RdBu_r 更"高级"、和 seaborn-deep 调性一致。
+MUTED_DIV = LinearSegmentedColormap.from_list(
+    "muted_div", ["#355C8A", "#88A6C4", "#F3F1EC", "#CD8F7E", "#B23B3A"])
 
 
 def build_cards_data():
@@ -93,9 +99,28 @@ def main() -> None:
     })
     labels, centers, pca_coords, raw_patches, meta, patch_len = build_cards_data()
 
-    fig = plt.figure(figsize=(2.15 * K, 3.7))
-    gs = fig.add_gridspec(2, K, height_ratios=[0.085, 1.0], hspace=0.05, wspace=0.16,
-                          top=0.92, bottom=0.26)
+    # 2 行网格（row-major：C1..C3 上、C4..C6 下），版式更方正，便于和较宽的 panel d 同排放。
+    NROWS = 2
+    NCOLS = (K + NROWS - 1) // NROWS
+    fig = plt.figure(figsize=(2.4 * NCOLS + 0.9, 2.75 * NROWS + 0.9))
+    inv = fig.transFigure.inverted()
+
+    # —— legend 放全图最上方；先量出它（含加粗标题）的真实高度，再把卡片网格 top 精确放到其正下方：
+    #    既不被 legend 盖住（重叠），也不留大片空白 ——
+    present = [d for d in DOMAIN_COLORS if any(m["macro_domain"] == d for m in meta)]
+    handles = [Line2D([0], [0], marker="s", ls="", ms=9, color=DOMAIN_COLORS[d], label=d) for d in present]
+    LEG_TOP = 0.985
+    leg_kw = dict(handles=handles, loc="upper center", ncol=(len(handles) + 1) // 2, fontsize=FS_LEG,
+                  title="Domain composition (per cluster)", title_fontsize=FS_LEGTITLE,
+                  columnspacing=1.5, handletextpad=0.5, frameon=True, fancybox=False,
+                  edgecolor="0.7", facecolor="white", framealpha=1.0, borderpad=0.7)
+    _tmp = fig.legend(bbox_to_anchor=(0.5, LEG_TOP), **leg_kw)
+    _tmp.get_title().set_fontweight("bold")
+    fig.canvas.draw()
+    leg_h = _tmp.get_window_extent().transformed(inv).height
+    _tmp.remove()
+    top = LEG_TOP - leg_h - 0.055          # 0.055 = 小间隙 + C1 卡片标题余量
+    outer = fig.add_gridspec(NROWS, 1, hspace=0.34, left=0.075, right=0.895, top=top, bottom=0.10)
 
     # 共享 vmax，使所有卡同色标
     per_cluster, all_abs = [], []
@@ -113,71 +138,70 @@ def main() -> None:
 
     xt = [0, patch_len // 2 - 1, patch_len - 1]
     im = None
-    first_ax = last_ax = None
-    seen_domains: set[str] = set()
-    for cid in range(K):
-        bar_ax = fig.add_subplot(gs[0, cid])
-        ax = fig.add_subplot(gs[1, cid])
-        if cid == 0:
-            first_ax = ax
-        if cid == K - 1:
-            last_ax = ax
-        if per_cluster[cid] is None:
-            bar_ax.axis("off"); ax.axis("off")
-            continue
-        idx, z = per_cluster[cid]
-        im = ax.imshow(z, aspect="auto", interpolation="nearest", cmap="RdBu_r", vmin=-vmax, vmax=vmax)
-        ax.set_xticks(xt)
-        ax.set_yticks([])
-        ax.tick_params(labelsize=FS_AXIS - 3, length=2)
-        # x 轴含义相同（patch 内时间步），整行底部只写一次 "Time"，不在每张卡重复
-        if cid == 0:
-            ax.set_ylabel("Patches (near → far)", fontsize=FS_AXIS)
-        for sp in ax.spines.values():
-            sp.set_color("#1f2933"); sp.set_linewidth(0.8)
+    bottom_axes, heat_axes = [], []     # 底部行 heatmap（放 "Time"）+ 全部 heatmap（对齐 colorbar）
+    for r in range(NROWS):
+        # 每个卡片行内：thin domain bar + heatmap，行内小间距；行间由 outer.hspace 控制
+        inner = outer[r, 0].subgridspec(2, NCOLS, height_ratios=[0.10, 1.0], hspace=0.06, wspace=0.16)
+        for col in range(NCOLS):
+            cid = r * NCOLS + col
+            bar_ax = fig.add_subplot(inner[0, col])
+            ax = fig.add_subplot(inner[1, col])
+            if cid >= K or per_cluster[cid] is None:
+                bar_ax.axis("off"); ax.axis("off")
+                continue
+            idx, z = per_cluster[cid]
+            im = ax.imshow(z, aspect="auto", interpolation="nearest", cmap=MUTED_DIV, vmin=-vmax, vmax=vmax)
+            ax.set_yticks([]); heat_axes.append(ax)
+            # x 轴含义相同（patch 内时间步）：只在最底行标刻度 + 整行底部写一次 "Time"
+            if r == NROWS - 1:
+                ax.set_xticks(xt)
+                ax.tick_params(labelsize=FS_AXIS - 3, length=2)
+                bottom_axes.append(ax)
+            else:
+                ax.set_xticks([])
+            if col == 0:
+                ax.set_ylabel("Patches (near → far)", fontsize=FS_AXIS)
+            for sp in ax.spines.values():
+                sp.set_color("#9aa1ab"); sp.set_linewidth(0.6)   # 轻描边，去掉原来偏重的近黑边
 
-        comp = Counter(meta[i]["macro_domain"] for i in idx)
-        total = sum(comp.values())
-        left = 0.0
-        for dom, cnt in sorted(comp.items(), key=lambda kv: -kv[1]):
-            bar_ax.barh(0, cnt / total, left=left, height=1.0,
-                        color=DOMAIN_COLORS.get(dom, DOMAIN_COLORS["Other"]), edgecolor="white", lw=0.3)
-            left += cnt / total
-            seen_domains.add(dom)
-        bar_ax.set_xlim(0, 1); bar_ax.set_ylim(-0.5, 0.5); bar_ax.axis("off")
-        bar_ax.set_title(f"C{cid + 1}", fontsize=FS_CARD, pad=3)
+            comp = Counter(meta[i]["macro_domain"] for i in idx)
+            total = sum(comp.values())
+            left = 0.0
+            for dom, cnt in sorted(comp.items(), key=lambda kv: -kv[1]):
+                bar_ax.barh(0, cnt / total, left=left, height=1.0,
+                            color=DOMAIN_COLORS.get(dom, DOMAIN_COLORS["Other"]), edgecolor="white", lw=0.3)
+                left += cnt / total
+            bar_ax.set_xlim(0, 1); bar_ax.set_ylim(-0.5, 0.5); bar_ax.axis("off")
+            bar_ax.set_title(f"C{cid + 1}", fontsize=FS_CARD, pad=3)
 
-    cax = None
     if im is not None:
-        cax = fig.add_axes((0.92, 0.30, 0.008, 0.45))
+        cb_y0 = min(a.get_position().y0 for a in heat_axes)   # colorbar 对齐 heatmap 块
+        cb_y1 = max(a.get_position().y1 for a in heat_axes)
+        cax = fig.add_axes((0.915, cb_y0, 0.011, cb_y1 - cb_y0))
         cbar = fig.colorbar(im, cax=cax)
         cbar.set_label("Z-norm. value (σ)", fontsize=FS_CBAR)
         cbar.ax.tick_params(labelsize=FS_CBAR - 2)
 
     fig.canvas.draw()
     rend = fig.canvas.get_renderer()
-    inv = fig.transFigure.inverted()
-    # 单个 "Time"：居中于卡片块（first→last card）下方、紧贴刻度数字下沿，替代每张卡重复的 x 标签
-    card_xc = 0.5 * ((first_ax.get_position().x0 if first_ax is not None else 0.05)
-                     + (last_ax.get_position().x1 if last_ax is not None else 0.9))
-    card_bottom = first_ax.get_tightbbox(rend).transformed(inv).y0  # 含刻度数字的底沿
-    fig.text(card_xc, card_bottom - 0.015, "Time", ha="center", va="top", fontsize=FS_AXIS)
+    # 单个 "Time"：居中于底部卡片行下方、紧贴刻度数字下沿，替代每张卡重复的 x 标签
+    card_xc = 0.5 * (min(a.get_position().x0 for a in bottom_axes)
+                     + max(a.get_position().x1 for a in bottom_axes)) if bottom_axes else 0.5
+    card_bottom = (min(a.get_tightbbox(rend).transformed(inv).y0 for a in bottom_axes)
+                   if bottom_axes else 0.2)
+    fig.text(card_xc, card_bottom - 0.012, "Time", ha="center", va="top", fontsize=FS_AXIS)
 
-    # Domain legend 居中于"全图"——含左侧 ylabel 与右侧 colorbar 的内容真实中心
-    # （图用 bbox_inches=tight 裁剪保存，故内容中心 = 成图的视觉中心）
+    # 真正的 legend：居中于"全图"内容真实中心（含左 ylabel 与右 colorbar），顶端贴 LEG_TOP
     xs0, xs1 = [], []
     for a in fig.axes:
         tb = a.get_tightbbox(rend).transformed(inv)
         xs0.append(tb.x0); xs1.append(tb.x1)
     xc = 0.5 * (min(xs0) + max(xs1))
-    handles = [Line2D([0], [0], marker="s", ls="", ms=9, color=DOMAIN_COLORS[d], label=d)
-               for d in DOMAIN_COLORS if d in seen_domains]
-    leg = fig.legend(handles=handles, loc="upper center", ncol=len(handles), fontsize=FS_LEG,
-                     bbox_to_anchor=(xc, 0.13), title="Domain composition (per cluster)",
-                     title_fontsize=FS_LEGTITLE, columnspacing=1.5, handletextpad=0.5,
-                     frameon=True, fancybox=False, edgecolor="0.7", facecolor="white",
-                     framealpha=1.0, borderpad=0.7)
+    leg = fig.legend(bbox_to_anchor=(xc, LEG_TOP), **leg_kw)
     leg.get_frame().set_linewidth(0.6)
+    leg.get_title().set_fontweight("bold")   # 标题加粗，放最上方便于阅读
+    leg.set_alignment("center")
+    leg.get_title().set_horizontalalignment("center")   # SVG 也居中（text-anchor:middle，换字体不漂移）
 
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     svg = OUT_DIR / "panel_c_cards_layer12.svg"

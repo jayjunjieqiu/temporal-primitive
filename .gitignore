@@ -94,3 +94,5 @@ outputs/**
 
 # pub_main_figure / _fullrep 可再生的 t-SNE 坐标缓存（勿提交）
 figure_projects/pub_main_figure*/.panel_*_tsne_cache*.npz
+# pub_ood_figure / _fullrep 可再生的 t-SNE 坐标缓存（勿提交）
+figure_projects/pub_ood_figure*/.ood_tsne_*.npz

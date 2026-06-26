@@ -17,6 +17,14 @@
 - [12_distance_metric_ablation_report.md](12_distance_metric_ablation_report.md)  
   已归档的方法补充报告。说明 two-space distance principle：`representation space` 用 Euclidean/KMeans 做 candidate discovery，`original time-series space` 用 DTW 做 prototype validation 和 controlled retrieval audit。该方法原则保留，但 Chronos-2 结果不再作为主线。
 
+## Publication Figures
+
+- [17_publication_figures.md](17_publication_figures.md)  
+  NC 子刊投稿用的发布级 figure（main figure + OOD figure，fullrep 变体）。记录每个 panel 的内容、
+  PPT 排版、统一的 muted 暖色配色系统，以及必须写进 caption 的 narrative-rules 要点（synthetic
+  control = `*`、OOD 相对 discovery 子集而非全量预训练、near-unseen domain = Illness、coverage ≈ 0.31）。
+  脚本：`scripts/pub_main_figure_panel_{a,b,c,d}.py` · `scripts/pub_ood_figure.py`。
+
 ## Project Setup And Rules
 
 - [00_narrative_rules.md](00_narrative_rules.md)  
@@ -104,6 +112,7 @@
 - `02_*`: feasibility
 - `03_*` to `10_*`: discovery and validation history
 - `11_*` to `12_*`: archived Chronos-2 main evidence and method ablation
+- `13_*` to `17_*`: Chronos-Bolt clean-route reports (forecasting probe, contextualization, main figure, dataset membership, publication figures)
 - `80_*`: appendix / weak-label sanity checks
 - `90_*`: meeting and PPT materials
 - `99_*`: route pivot / archive decisions
