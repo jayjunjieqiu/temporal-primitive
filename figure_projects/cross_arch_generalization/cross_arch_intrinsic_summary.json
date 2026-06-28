@@ -1,0 +1,637 @@
+{
+  "experiment": "cross-architecture intrinsic contextualization signatures (step 3)",
+  "shared_pool": {
+    "window_len": 512,
+    "n_windows": 4400,
+    "domains": [
+      "Beijing air quality",
+      "electricity consumption",
+      "electricity transformer temperature",
+      "exchange rate",
+      "illness data",
+      "road occupancy rates",
+      "simulated Gaussian data",
+      "simulated pulse data",
+      "traffic flow",
+      "traffic speed",
+      "weather"
+    ],
+    "windows_per_dataset": 200,
+    "seed": 13
+  },
+  "models": {
+    "chronos_bolt": {
+      "family": "encoder-decoder",
+      "objective": "autoregressive token",
+      "patch_len": 16,
+      "num_patches": 32,
+      "probe_layers": [
+        0,
+        3,
+        6,
+        8,
+        11
+      ]
+    },
+    "timesfm_2_5": {
+      "family": "decoder-only",
+      "objective": "autoregressive",
+      "patch_len": 32,
+      "num_patches": 16,
+      "probe_layers": [
+        0,
+        5,
+        10,
+        14,
+        19
+      ]
+    },
+    "moment_1_large": {
+      "family": "encoder-only",
+      "objective": "masked reconstruction",
+      "patch_len": 8,
+      "num_patches": 64,
+      "probe_layers": [
+        0,
+        6,
+        12,
+        17,
+        23
+      ]
+    }
+  },
+  "method_note": "Shared 512-point pool; each model patchifies natively (32/16/64). 10-NN probe accuracy (PCA-30 + StandardScaler, patch-level domain-balanced) for domain/frequency/position; within-context centered-cosine gap for selective convergence. Compare qualitative depth-trend shape across families, NOT absolute values. Pool overlaps each model's pretraining (esp. MOMENT) — no OOD claim.",
+  "config": {
+    "windows_per_dataset": 200,
+    "seed": 13,
+    "batch_size": 64,
+    "max_per_domain": 400,
+    "knn": 10,
+    "global_pairs": 400000,
+    "max_per_domain_pool": null
+  },
+  "per_model": {
+    "chronos_bolt": {
+      "rep_order": [
+        "tokenizer",
+        "layer_0",
+        "layer_3",
+        "layer_6",
+        "layer_8",
+        "layer_11"
+      ],
+      "num_patches": 32,
+      "chance": {
+        "domain": 0.09090909090909091,
+        "frequency": 0.38666666666666666,
+        "position": 0.03125
+      },
+      "results": {
+        "tokenizer": {
+          "rel_depth": 0.0,
+          "knn_probe_acc": {
+            "domain": 0.5032,
+            "frequency": 0.5214,
+            "position": 0.042
+          },
+          "within_context_sim": {
+            "same_context": 0.08242112398147583,
+            "different_context": 0.020506156608462334,
+            "gap": 0.06191496551036835
+          }
+        },
+        "layer_0": {
+          "rel_depth": 0.0833,
+          "knn_probe_acc": {
+            "domain": 0.5961,
+            "frequency": 0.5983,
+            "position": 0.0586
+          },
+          "within_context_sim": {
+            "same_context": 0.1361255943775177,
+            "different_context": 0.014743287116289139,
+            "gap": 0.12138231098651886
+          }
+        },
+        "layer_3": {
+          "rel_depth": 0.3333,
+          "knn_probe_acc": {
+            "domain": 0.738,
+            "frequency": 0.7692,
+            "position": 0.0625
+          },
+          "within_context_sim": {
+            "same_context": 0.18382145464420319,
+            "different_context": 0.00455520348623395,
+            "gap": 0.17926624417304993
+          }
+        },
+        "layer_6": {
+          "rel_depth": 0.5833,
+          "knn_probe_acc": {
+            "domain": 0.7657,
+            "frequency": 0.8097,
+            "position": 0.1
+          },
+          "within_context_sim": {
+            "same_context": 0.164298877120018,
+            "different_context": 0.0014724951470270753,
+            "gap": 0.16282638907432556
+          }
+        },
+        "layer_8": {
+          "rel_depth": 0.75,
+          "knn_probe_acc": {
+            "domain": 0.7689,
+            "frequency": 0.8194,
+            "position": 0.1527
+          },
+          "within_context_sim": {
+            "same_context": 0.16305552423000336,
+            "different_context": 0.0007957066409289837,
+            "gap": 0.16225981712341309
+          }
+        },
+        "layer_11": {
+          "rel_depth": 1.0,
+          "knn_probe_acc": {
+            "domain": 0.7043,
+            "frequency": 0.7667,
+            "position": 0.4052
+          },
+          "within_context_sim": {
+            "same_context": 0.1491738110780716,
+            "different_context": 0.00041510461596772075,
+            "gap": 0.14875870943069458
+          }
+        }
+      }
+    },
+    "timesfm_2_5": {
+      "rep_order": [
+        "layer_0",
+        "layer_5",
+        "layer_10",
+        "layer_14",
+        "layer_19"
+      ],
+      "num_patches": 16,
+      "chance": {
+        "domain": 0.09090909090909091,
+        "frequency": 0.38861111111111113,
+        "position": 0.0625
+      },
+      "results": {
+        "layer_0": {
+          "rel_depth": 0.05,
+          "knn_probe_acc": {
+            "domain": 0.4182,
+            "frequency": 0.5242,
+            "position": 0.1198
+          },
+          "within_context_sim": {
+            "same_context": 0.09905227273702621,
+            "different_context": 0.008440736681222916,
+            "gap": 0.090611532330513
+          }
+        },
+        "layer_5": {
+          "rel_depth": 0.3,
+          "knn_probe_acc": {
+            "domain": 0.838,
+            "frequency": 0.865,
+            "position": 0.2414
+          },
+          "within_context_sim": {
+            "same_context": 0.289738267660141,
+            "different_context": 0.002562768291682005,
+            "gap": 0.2871755063533783
+          }
+        },
+        "layer_10": {
+          "rel_depth": 0.55,
+          "knn_probe_acc": {
+            "domain": 0.8557,
+            "frequency": 0.8772,
+            "position": 0.28
+          },
+          "within_context_sim": {
+            "same_context": 0.3088136911392212,
+            "different_context": 0.0016213735798373818,
+            "gap": 0.307192325592041
+          }
+        },
+        "layer_14": {
+          "rel_depth": 0.75,
+          "knn_probe_acc": {
+            "domain": 0.8582,
+            "frequency": 0.8886,
+            "position": 0.2714
+          },
+          "within_context_sim": {
+            "same_context": 0.2740180790424347,
+            "different_context": 0.001516062067821622,
+            "gap": 0.27250200510025024
+          }
+        },
+        "layer_19": {
+          "rel_depth": 1.0,
+          "knn_probe_acc": {
+            "domain": 0.6627,
+            "frequency": 0.7194,
+            "position": 0.1707
+          },
+          "within_context_sim": {
+            "same_context": 0.1567165106534958,
+            "different_context": 0.011954558081924915,
+            "gap": 0.14476194977760315
+          }
+        }
+      }
+    },
+    "moment_1_large": {
+      "rep_order": [
+        "tokenizer",
+        "layer_0",
+        "layer_6",
+        "layer_12",
+        "layer_17",
+        "layer_23"
+      ],
+      "num_patches": 64,
+      "chance": {
+        "domain": 0.09090909090909091,
+        "frequency": 0.38861111111111113,
+        "position": 0.015625
+      },
+      "results": {
+        "tokenizer": {
+          "rel_depth": 0.0,
+          "knn_probe_acc": {
+            "domain": 0.2936,
+            "frequency": 0.3808,
+            "position": 0.7466
+          },
+          "within_context_sim": {
+            "same_context": -0.007358502596616745,
+            "different_context": 0.0011609019711613655,
+            "gap": -0.00851940456777811
+          }
+        },
+        "layer_0": {
+          "rel_depth": 0.0417,
+          "knn_probe_acc": {
+            "domain": 0.3559,
+            "frequency": 0.42,
+            "position": 0.478
+          },
+          "within_context_sim": {
+            "same_context": 0.05160059034824371,
+            "different_context": 0.00993841141462326,
+            "gap": 0.04166217893362045
+          }
+        },
+        "layer_6": {
+          "rel_depth": 0.2917,
+          "knn_probe_acc": {
+            "domain": 0.6077,
+            "frequency": 0.6769,
+            "position": 0.252
+          },
+          "within_context_sim": {
+            "same_context": 0.15233775973320007,
+            "different_context": 0.00451780715957284,
+            "gap": 0.14781995117664337
+          }
+        },
+        "layer_12": {
+          "rel_depth": 0.5417,
+          "knn_probe_acc": {
+            "domain": 0.7107,
+            "frequency": 0.7647,
+            "position": 0.0993
+          },
+          "within_context_sim": {
+            "same_context": 0.15364579856395721,
+            "different_context": 0.0008199390722438693,
+            "gap": 0.15282586216926575
+          }
+        },
+        "layer_17": {
+          "rel_depth": 0.75,
+          "knn_probe_acc": {
+            "domain": 0.7298,
+            "frequency": 0.7781,
+            "position": 0.0639
+          },
+          "within_context_sim": {
+            "same_context": 0.1800682246685028,
+            "different_context": 0.0010561019880697131,
+            "gap": 0.17901211977005005
+          }
+        },
+        "layer_23": {
+          "rel_depth": 1.0,
+          "knn_probe_acc": {
+            "domain": 0.6957,
+            "frequency": 0.7378,
+            "position": 0.0532
+          },
+          "within_context_sim": {
+            "same_context": 0.21663236618041992,
+            "different_context": 0.000934303505346179,
+            "gap": 0.21569806337356567
+          }
+        }
+      }
+    }
+  },
+  "dataset_summary": [
+    {
+      "dataset": "BeijingAirQuality",
+      "domain": "Beijing air quality",
+      "frequency_minutes": 60,
+      "shape": [
+        36000,
+        7,
+        3
+      ],
+      "accepted_windows": 200,
+      "attempts": 200,
+      "status": "ok"
+    },
+    {
+      "dataset": "CA",
+      "domain": "traffic flow",
+      "frequency_minutes": 15,
+      "shape": [
+        35040,
+        8600,
+        3
+      ],
+      "accepted_windows": 200,
+      "attempts": 205,
+      "status": "ok"
+    },
+    {
+      "dataset": "ETTh1",
+      "domain": "electricity transformer temperature",
+      "frequency_minutes": 60,
+      "shape": [
+        14400,
+        7,
+        5
+      ],
+      "accepted_windows": 200,
+      "attempts": 201,
+      "status": "ok"
+    },
+    {
+      "dataset": "ETTh2",
+      "domain": "electricity transformer temperature",
+      "frequency_minutes": 60,
+      "shape": [
+        14400,
+        7,
+        5
+      ],
+      "accepted_windows": 200,
+      "attempts": 200,
+      "status": "ok"
+    },
+    {
+      "dataset": "ETTm1",
+      "domain": "electricity transformer temperature",
+      "frequency_minutes": 15,
+      "shape": [
+        57600,
+        7,
+        5
+      ],
+      "accepted_windows": 200,
+      "attempts": 200,
+      "status": "ok"
+    },
+    {
+      "dataset": "ETTm2",
+      "domain": "electricity transformer temperature",
+      "frequency_minutes": 15,
+      "shape": [
+        57600,
+        7,
+        5
+      ],
+      "accepted_windows": 200,
+      "attempts": 204,
+      "status": "ok"
+    },
+    {
+      "dataset": "Electricity",
+      "domain": "electricity consumption",
+      "frequency_minutes": 60,
+      "shape": [
+        26304,
+        321,
+        5
+      ],
+      "accepted_windows": 200,
+      "attempts": 202,
+      "status": "ok"
+    },
+    {
+      "dataset": "ExchangeRate",
+      "domain": "exchange rate",
+      "frequency_minutes": 1440,
+      "shape": [
+        7588,
+        8,
+        5
+      ],
+      "accepted_windows": 200,
+      "attempts": 200,
+      "status": "ok"
+    },
+    {
+      "dataset": "GBA",
+      "domain": "traffic flow",
+      "frequency_minutes": 15,
+      "shape": [
+        35040,
+        2352,
+        3
+      ],
+      "accepted_windows": 200,
+      "attempts": 201,
+      "status": "ok"
+    },
+    {
+      "dataset": "GLA",
+      "domain": "traffic flow",
+      "frequency_minutes": 15,
+      "shape": [
+        35040,
+        3834,
+        3
+      ],
+      "accepted_windows": 200,
+      "attempts": 200,
+      "status": "ok"
+    },
+    {
+      "dataset": "Gaussian",
+      "domain": "simulated Gaussian data",
+      "frequency_minutes": null,
+      "shape": [
+        10000,
+        1,
+        1
+      ],
+      "accepted_windows": 200,
+      "attempts": 202,
+      "status": "ok"
+    },
+    {
+      "dataset": "Illness",
+      "domain": "illness data",
+      "frequency_minutes": 10080.0,
+      "shape": [
+        966,
+        7,
+        5
+      ],
+      "accepted_windows": 200,
+      "attempts": 208,
+      "status": "ok"
+    },
+    {
+      "dataset": "METR-LA",
+      "domain": "traffic speed",
+      "frequency_minutes": 5,
+      "shape": [
+        34272,
+        207,
+        3
+      ],
+      "accepted_windows": 200,
+      "attempts": 200,
+      "status": "ok"
+    },
+    {
+      "dataset": "PEMS-BAY",
+      "domain": "traffic speed",
+      "frequency_minutes": 5,
+      "shape": [
+        52116,
+        325,
+        3
+      ],
+      "accepted_windows": 200,
+      "attempts": 200,
+      "status": "ok"
+    },
+    {
+      "dataset": "PEMS03",
+      "domain": "traffic flow",
+      "frequency_minutes": 5,
+      "shape": [
+        26208,
+        358,
+        3
+      ],
+      "accepted_windows": 200,
+      "attempts": 200,
+      "status": "ok"
+    },
+    {
+      "dataset": "PEMS04",
+      "domain": "traffic flow",
+      "frequency_minutes": 5,
+      "shape": [
+        16992,
+        307,
+        3
+      ],
+      "accepted_windows": 200,
+      "attempts": 200,
+      "status": "ok"
+    },
+    {
+      "dataset": "PEMS07",
+      "domain": "traffic flow",
+      "frequency_minutes": 5,
+      "shape": [
+        28224,
+        883,
+        3
+      ],
+      "accepted_windows": 200,
+      "attempts": 200,
+      "status": "ok"
+    },
+    {
+      "dataset": "PEMS08",
+      "domain": "traffic flow",
+      "frequency_minutes": 5,
+      "shape": [
+        17856,
+        170,
+        3
+      ],
+      "accepted_windows": 200,
+      "attempts": 200,
+      "status": "ok"
+    },
+    {
+      "dataset": "Pulse",
+      "domain": "simulated pulse data",
+      "frequency_minutes": null,
+      "shape": [
+        20000,
+        1,
+        1
+      ],
+      "accepted_windows": 200,
+      "attempts": 200,
+      "status": "ok"
+    },
+    {
+      "dataset": "SD",
+      "domain": "traffic flow",
+      "frequency_minutes": 15,
+      "shape": [
+        35040,
+        716,
+        3
+      ],
+      "accepted_windows": 200,
+      "attempts": 204,
+      "status": "ok"
+    },
+    {
+      "dataset": "Traffic",
+      "domain": "road occupancy rates",
+      "frequency_minutes": 60,
+      "shape": [
+        17544,
+        862,
+        5
+      ],
+      "accepted_windows": 200,
+      "attempts": 200,
+      "status": "ok"
+    },
+    {
+      "dataset": "Weather",
+      "domain": "weather",
+      "frequency_minutes": 10,
+      "shape": [
+        52696,
+        21,
+        5
+      ],
+      "accepted_windows": 200,
+      "attempts": 205,
+      "status": "ok"
+    }
+  ]
+}

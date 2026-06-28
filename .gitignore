@@ -11,6 +11,7 @@ chronos-2/
 chronos-2-small/
 chronos-bolt-base/
 timesfm-2.5-200m-pytorch/
+moment-1-large/
 *.safetensors
 *.bin
 *.pt
@@ -96,3 +97,6 @@ outputs/**
 figure_projects/pub_main_figure*/.panel_*_tsne_cache*.npz
 # pub_ood_figure / _fullrep 可再生的 t-SNE 坐标缓存（勿提交）
 figure_projects/pub_ood_figure*/.ood_tsne_*.npz
+
+# Figure-project recompute caches (regenerable)
+figure_projects/cross_arch_generalization/.cache/

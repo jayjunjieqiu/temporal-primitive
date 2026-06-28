@@ -41,6 +41,36 @@ env -u http_proxy -u https_proxy -u HTTP_PROXY -u HTTPS_PROXY -u ALL_PROXY -u al
 
 注意：`Chronos-2-small` 的 Hugging Face repo id 是 `autogluon/chronos-2-small`，不是 `amazon/chronos-2-small`。
 
+### 2.05 MOMENT-1-large（跨架构泛化附录 · encoder-only 代表）
+
+跨架构泛化实验需要一个 encoder-only TSFM。MOMENT-1-large（`google/flan-t5-large`
+encoder，24 层，`d_model=1024`，`patch_len=8`，定长 `seq_len=512`，masked-reconstruction
+预训练）repo id 是 `AutonLab/MOMENT-1-large`：
+
+```bash
+env -u http_proxy -u https_proxy -u HTTP_PROXY -u HTTPS_PROXY -u ALL_PROXY -u all_proxy \
+  HF_ENDPOINT=https://hf-mirror.com \
+  /tmp/hfd.sh AutonLab/MOMENT-1-large \
+  --local-dir moment-1-large \
+  --tool aria2c -x 8 -j 4
+```
+
+参考大小：`moment-1-large/`: 约 2.6G（`model.safetensors` + `pytorch_model.bin`）。
+
+**⚠️ momentfm 必须用 `--no-deps` 安装。** 加载 MOMENT 权重要官方 `momentfm` 包（权重是它
+自定义的 patch-embedding + T5-encoder 格式，裸 transformers T5 加载不上）。但
+`momentfm==0.1.4` 死锁了 `numpy==1.25.2`，在 Python 3.13 上编译不了。复用 venv 现有的
+numpy/torch/transformers 即可：
+
+```bash
+env -u http_proxy -u https_proxy -u HTTP_PROXY -u HTTPS_PROXY -u ALL_PROXY -u all_proxy \
+  UV_DEFAULT_INDEX=https://pypi.tuna.tsinghua.edu.cn/simple \
+  uv pip install --no-deps momentfm
+```
+
+注意：momentfm 不在 `pyproject.toml` 里，`uv sync` 不会带它，需单独 `--no-deps` 装。
+抽取入口见 `scripts/moment_backbone.py`，跨架构共享池见 `scripts/cross_arch_shared_pool.py`。
+
 ### 2.1 Chronos-Bolt（clean 路线默认模型）
 
 自 2026-05-20 路线转向起，clean analysis 默认模型是 **Chronos-Bolt**（见

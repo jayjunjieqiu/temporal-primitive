@@ -1,0 +1,215 @@
+{
+  "experiment": "cross-architecture cluster coherence + cross-domain retrieval (step 3b)",
+  "method_note": "Late-layer patch reps per model -> PCA(30)+KMeans(k); validate in original space: cluster shape-coherence lift over random, cluster domain-entropy, cross-domain retrieval fraction & shape-corr. Shared 512 pool, patch-level domain-balanced. PATCH-LENGTH-FAIR: raw patches (8/16/32) linearly resampled to L=32 before any shape-correlation (coherence & retrieval shape-corr), so the metric is not biased toward longer patches; visual cluster cards keep native patch length. Coherence uses the DEEPEST layer — for Chronos-Bolt the final layer reorganizes by forecasting role (paper Fig.4), so its shape-coherence is partial by design, not a defect. Pool overlaps each model's pretraining (esp. MOMENT) — retrieval = 'representation supports cross-domain retrieval', NOT OOD generalization.",
+  "config": {
+    "windows_per_dataset": 200,
+    "seed": 13,
+    "batch_size": 64,
+    "max_per_domain": 600,
+    "k": 6,
+    "card_n": 16,
+    "n_cards": 2,
+    "knn": 10,
+    "n_queries": 300,
+    "retr_show": 6,
+    "tsne_n": 3000,
+    "replot": true
+  },
+  "models": {
+    "chronos_bolt": {
+      "family": "encoder-decoder",
+      "metrics": {
+        "mean_coherence_lift": -0.020326487174808224,
+        "mean_domain_entropy": 0.6937419327909735,
+        "retrieval_cross_domain_fraction": 0.28600000000000003,
+        "retrieval_cross_domain_shape_corr": 0.2691235942677759
+      },
+      "per_cluster": [
+        {
+          "cluster": 0,
+          "size": 175,
+          "coherence": 0.060548562723256885,
+          "baseline": 0.22224620685183183,
+          "coherence_lift": -0.16169764412857496,
+          "domain_entropy": 0.31537278161528776,
+          "n_domains": 5
+        },
+        {
+          "cluster": 1,
+          "size": 512,
+          "coherence": 0.1245485250535031,
+          "baseline": -0.0010223006042896303,
+          "coherence_lift": 0.12557082565779273,
+          "domain_entropy": 0.9206819225889564,
+          "n_domains": 5
+        },
+        {
+          "cluster": 2,
+          "size": 968,
+          "coherence": -0.058625616312929174,
+          "baseline": -0.014047169530289469,
+          "coherence_lift": -0.044578446782639704,
+          "domain_entropy": 0.9613773542718765,
+          "n_domains": 5
+        },
+        {
+          "cluster": 3,
+          "size": 1351,
+          "coherence": -0.010312794787836624,
+          "baseline": -0.04846635028152545,
+          "coherence_lift": 0.038153555493688825,
+          "domain_entropy": 0.9863580136561959,
+          "n_domains": 5
+        },
+        {
+          "cluster": 4,
+          "size": 206,
+          "coherence": 0.0,
+          "baseline": -0.04068163718692503,
+          "coherence_lift": 0.04068163718692503,
+          "domain_entropy": 0.5235321640158949,
+          "n_domains": 6
+        },
+        {
+          "cluster": 5,
+          "size": 388,
+          "coherence": -0.01078160714052625,
+          "baseline": 0.10930724333551502,
+          "coherence_lift": -0.12008885047604127,
+          "domain_entropy": 0.4551293605976292,
+          "n_domains": 6
+        }
+      ]
+    },
+    "timesfm_2_5": {
+      "family": "decoder-only",
+      "metrics": {
+        "mean_coherence_lift": 0.5063838723945893,
+        "mean_domain_entropy": 0.37179440826918525,
+        "retrieval_cross_domain_fraction": 0.30066666666666664,
+        "retrieval_cross_domain_shape_corr": 0.19444282792191986
+      },
+      "per_cluster": [
+        {
+          "cluster": 0,
+          "size": 2565,
+          "coherence": -0.012629477282921213,
+          "baseline": 0.041832128830579886,
+          "coherence_lift": -0.0544616061135011,
+          "domain_entropy": 0.9474071580342056,
+          "n_domains": 6
+        },
+        {
+          "cluster": 1,
+          "size": 289,
+          "coherence": 0.33662928086673793,
+          "baseline": -0.023833024276320548,
+          "coherence_lift": 0.3604623051430585,
+          "domain_entropy": 0.3748163853591229,
+          "n_domains": 3
+        },
+        {
+          "cluster": 2,
+          "size": 232,
+          "coherence": 0.6369635691122397,
+          "baseline": 0.047389538592613335,
+          "coherence_lift": 0.5895740305196264,
+          "domain_entropy": 0.08980645851520852,
+          "n_domains": 4
+        },
+        {
+          "cluster": 3,
+          "size": 495,
+          "coherence": 0.1268162684880003,
+          "baseline": 0.022240617305846068,
+          "coherence_lift": 0.10457565118215423,
+          "domain_entropy": 0.8187364477065745,
+          "n_domains": 5
+        },
+        {
+          "cluster": 4,
+          "size": 10,
+          "coherence": 1.0,
+          "baseline": -0.025770220627185154,
+          "coherence_lift": 1.0257702206271853,
+          "domain_entropy": 0.0,
+          "n_domains": 1
+        },
+        {
+          "cluster": 5,
+          "size": 9,
+          "coherence": 1.0,
+          "baseline": -0.012382633009012345,
+          "coherence_lift": 1.0123826330090124,
+          "domain_entropy": 0.0,
+          "n_domains": 1
+        }
+      ]
+    },
+    "moment_1_large": {
+      "family": "encoder-only",
+      "metrics": {
+        "mean_coherence_lift": 0.11993165789498461,
+        "mean_domain_entropy": 0.6647597331181504,
+        "retrieval_cross_domain_fraction": 0.33066666666666666,
+        "retrieval_cross_domain_shape_corr": 0.2466165788868869
+      },
+      "per_cluster": [
+        {
+          "cluster": 0,
+          "size": 458,
+          "coherence": 0.6622229145616452,
+          "baseline": -0.03846152619748173,
+          "coherence_lift": 0.700684440759127,
+          "domain_entropy": 0.8147683167469385,
+          "n_domains": 6
+        },
+        {
+          "cluster": 1,
+          "size": 721,
+          "coherence": -0.02631474731707728,
+          "baseline": -0.056282655041277864,
+          "coherence_lift": 0.029967907724200583,
+          "domain_entropy": 0.9507531054214597,
+          "n_domains": 5
+        },
+        {
+          "cluster": 2,
+          "size": 971,
+          "coherence": -0.04088791913775315,
+          "baseline": 0.025639119232956527,
+          "coherence_lift": -0.06652703837070968,
+          "domain_entropy": 0.994291141558561,
+          "n_domains": 5
+        },
+        {
+          "cluster": 3,
+          "size": 564,
+          "coherence": -0.030806073163679584,
+          "baseline": -0.024347454657854792,
+          "coherence_lift": -0.006458618505824791,
+          "domain_entropy": 0.23298280458714074,
+          "n_domains": 5
+        },
+        {
+          "cluster": 4,
+          "size": 77,
+          "coherence": 0.06633280128081791,
+          "baseline": 0.20557942677242386,
+          "coherence_lift": -0.13924662549160594,
+          "domain_entropy": 0.0,
+          "n_domains": 1
+        },
+        {
+          "cluster": 5,
+          "size": 809,
+          "coherence": 0.16500091066716113,
+          "baseline": -0.036168970587559406,
+          "coherence_lift": 0.20116988125472055,
+          "domain_entropy": 0.9957630303948024,
+          "n_domains": 5
+        }
+      ]
+    }
+  }
+}
