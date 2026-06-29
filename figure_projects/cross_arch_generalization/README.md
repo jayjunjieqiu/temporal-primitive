@@ -5,7 +5,7 @@
 
 | 模型 | 架构族 | 预训练目标 | patch_len | num_patches(512) | d_model | layers |
 |---|---|---|---|---|---|---|
-| Chronos-Bolt | encoder-decoder | autoregressive token | 16 | 32 | 768 | 0,6,11 |
+| Chronos-Bolt | encoder-decoder | direct multi-step forecast | 16 | 32 | 768 | 0,6,11 |
 | TimesFM-2.5 | decoder-only | autoregressive | 32 | 16 | 1280 | 0,10,19 |
 | MOMENT-1-large | encoder-only | masked reconstruction | 8 | 64 | 1024 | 0,12,23 |
 
