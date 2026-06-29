@@ -1,0 +1,53 @@
+{
+  "model": "chronos-bolt-base",
+  "note": "Aggregate retrieval statistics over real held-out patches (synthetic controls excluded), same discovery/held-out split and PCA(30) space as Supplementary Fig. 2. Coherence = Pearson corr of z-normalised patch shape; transition = corr of first differences. Random baseline = random (held-out query, training patch) pairs.",
+  "config": {
+    "layers": [
+      0,
+      11
+    ],
+    "k": 8,
+    "min_patch_std": 0.15,
+    "max_per_domain": 400,
+    "seed": 47,
+    "knn": 10,
+    "topn": 50,
+    "rand_pairs": 40000
+  },
+  "by_layer": {
+    "layer 1": {
+      "n_query_patches": 16453,
+      "cross_domain_retrieval_rate_top1": 0.923,
+      "cross_domain_any_in_topk": 0.998,
+      "mean_cross_domain_fraction_topk": 0.916,
+      "knn": 10,
+      "coherence_retrieved_top1": 0.685,
+      "coherence_retrieved_top1_transition": 0.288,
+      "coherence_cross_domain_neighbour": 0.684,
+      "coherence_cross_domain_neighbour_transition": 0.283,
+      "coherence_within_cluster_cross_domain": 0.674,
+      "coherence_within_cluster_cross_domain_transition": 0.269,
+      "queries_with_within_cluster_cross_domain": 1.0,
+      "coherence_random_baseline": -0.005,
+      "coherence_random_baseline_transition": 0.001,
+      "queries_with_cross_domain_neighbour": 1.0
+    },
+    "layer 12": {
+      "n_query_patches": 16453,
+      "cross_domain_retrieval_rate_top1": 0.933,
+      "cross_domain_any_in_topk": 0.999,
+      "mean_cross_domain_fraction_topk": 0.931,
+      "knn": 10,
+      "coherence_retrieved_top1": 0.392,
+      "coherence_retrieved_top1_transition": 0.078,
+      "coherence_cross_domain_neighbour": 0.388,
+      "coherence_cross_domain_neighbour_transition": 0.076,
+      "coherence_within_cluster_cross_domain": 0.37,
+      "coherence_within_cluster_cross_domain_transition": 0.071,
+      "queries_with_within_cluster_cross_domain": 1.0,
+      "coherence_random_baseline": -0.005,
+      "coherence_random_baseline_transition": 0.001,
+      "queries_with_cross_domain_neighbour": 1.0
+    }
+  }
+}
