@@ -2,12 +2,12 @@
 
 把 run_bolt_ood_transfer.py 的研究图重画成出版级、模块化 SVG，配色/字号与 main figure 统一。
 故事（主线 3 的深化 = transferable generalization）：离 pretraining 分布最远（OOD）的 held-out
-test patch，依然能被预训练发现的 primitive 词表解释。
+test patch，依然能被预训练发现的 model-derived pattern group 词表解释。
 
 四个独立 panel（用户在 PPT 里左 a/b/c、右 d 拼）：
   a  panel_a_overlap      Layer 1 / Layer 12：训练(灰) vs held-out(按 OOD 着色) 的 t-SNE 重合
-  b  panel_b_attribution  最 OOD 的 held-out patch 的「最近训练 primitive(cluster)」+「最近训练 domain」环图
-  c  panel_c_casestudy    最 OOD 的 held-out patch → 各自最近的训练 primitive（filled sparkline）
+  b  panel_b_attribution  最 OOD 的 held-out patch 的「最近训练 pattern group(cluster)」+「最近训练 domain」环图
+  c  panel_c_casestudy    最 OOD 的 held-out patch → 各自最近的训练 pattern group（filled sparkline）
   d  panel_d_ranking      各 held-out 数据集按 OOD 程度排名（Layer 1 vs Layer 12，全幅底部条带）
 
 聚类/OOD 空间：--cluster-space full = 标准化后的完整 768 维（k 默认随 main fullrep 用 6）；
@@ -203,7 +203,7 @@ def render_attribution(fit, k, ood_quantile, coh_thresh, out_dir):
 
     cc = Counter(clu); corder = sorted(cc)
     _donut(axes[0], cc, corder, [SNS_DEEP[c % 10] for c in corder],
-           [f"C{c + 1}" for c in corder], "Nearest training primitive")
+           [f"C{c + 1}" for c in corder], "Nearest training group")
     dc = Counter(dom); dorder = [d for d in DOMAIN_COLORS if d in dc]
     _donut(axes[1], dc, dorder, [DOMAIN_COLORS[d] for d in dorder], dorder, "Nearest training domain")
     fig.subplots_adjust(left=0.05, right=0.95, top=0.88, bottom=0.04, wspace=0.30)
@@ -262,7 +262,7 @@ def render_casestudy(fit, n_samples, n_proto, out_dir):
     nn3 = NearestNeighbors(n_neighbors=n_proto).fit(fit["train_coords"])
     _, proto_idx = nn3.kneighbors(fit["val_coords"][order])
 
-    ncol = 2 + n_proto                      # OOD patch | arrow | n_proto primitives
+    ncol = 2 + n_proto                      # OOD patch | arrow | n_proto pattern groups
     # 版式 3：c 移到底部全幅，左列只剩 a+b；d 高度 ≈ a+b 堆叠高度（同一 pt 字号在拼版下视觉一致）
     fig_w = 1.25 * (1.3 + n_proto) + 1.4
     fig_h = 1.0 * n_samples + 0.8
@@ -305,7 +305,7 @@ def render_casestudy(fit, n_samples, n_proto, out_dir):
                          color=DOMAIN_COLORS.get(dom, INK), fontweight="bold", pad=5)
 
     # 右侧块顶部统一标头（用循环里记下的行 0 proto 单元位置，避免再 add_subplot 盖出多余坐标轴）
-    fig.text(0.5 * (head_x0 + head_x1), 0.965, "→  Nearest training primitives", ha="center",
+    fig.text(0.5 * (head_x0 + head_x1), 0.965, "→  Nearest training groups", ha="center",
              va="bottom", fontsize=FS_LABEL, fontweight="bold", color="#1f2933")
     _save(fig, out_dir, "panel_c_casestudy")
 
