@@ -16,16 +16,18 @@
 
 ## 1. Main figure（`figure_projects/pub_main_figure_fullrep/`）
 
-脚本：`scripts/pub_main_figure_panel_a.py` · `_panel_b.py` · `_panel_c.py` · `_panel_d.py`
+脚本：`scripts/pub_main_figure_panel_b.py`（输出 panel **a** 图）· `_panel_c.py`（→ panel **b**）· `_panel_d.py`（→ panel **c**）。原 `_panel_a.py`（深度三联）已停用 —— 上下文化分析迁至 supplement §1 + 跨架构 3×3 附录。
 
 | panel | 文件 | 内容 |
 | --- | --- | --- |
-| a | `panel_a_depth.*` | 三联深度曲线：forecast skill（RelMAE，H=16/64）· confounder probe accuracy（domain/frequency/position）· within-context similarity（same vs different context 双轴） |
-| b | `panel_b_cluster_maps.*` | representation atlas（Layer 1 / Layer 12 两行 × 三列 t-SNE）：列 = Training data domains / Predefined motif labels / Learned temporal primitives；三个 legend 统一放到**图最上方**、列标题作为各 legend 框的**居中加粗标题** |
-| c | `panel_c_cards_layer12.*` | Layer 12 的 6 个 candidate primitive family 的 patch-stack cluster cards（2 行 × 3 列，muted diverging heatmap `MUTED_DIV`），顶部 domain-composition legend |
-| d | `panel_d_retrieval.*` | held-out → training retrieval：5 个代表性 **unseen test patch**（红 filled sparkline）→ 各自所在 cluster 的最近训练 patch（跨 domain，domain-colored 标签） |
+| a | `panel_a_cluster_maps.*` | representation atlas（Layer 1 / Layer 12 两行 × 三列 t-SNE）：列 = Training data domains / Predefined motif labels / Model-derived pattern groups；三个 legend 统一放到**图最上方**、列标题作为各 legend 框的**居中加粗标题** |
+| b | `panel_b_cards_layer12.*` | Layer 12 的 6 个 cluster 的 patch-stack cards（2 行 × 3 列，muted diverging heatmap `MUTED_DIV`），顶部 domain-composition legend |
+| c | `panel_c_retrieval.*` | held-out → training retrieval：5 个代表性 **unseen test patch**（红 filled sparkline）→ 各自所在 cluster 的最近训练 patch（跨 domain，domain-colored 标签） |
 
-排版（PPT）：a 通栏在最上，b 在中、c+d 同排（c 左较窄、d 右较宽）。
+> 原 panel a 三联深度曲线（forecast / probe / within-context）已移出主图：上下文化分析进 supplement §1，
+> 跨架构 3×3 版见 `figure_projects/cross_arch_generalization/run_cross_arch_panel_a_grid.py`。
+
+排版（PPT）：a（atlas）在最上，b（cards）+ c（retrieval）同排（b 左较窄、c 右较宽）。
 
 ### panel d 行标约定
 每行左侧两行右对齐：**shape 名**（粗体，如 *Gradual rise*）+ 下方分层标注 —— 极小号浅灰

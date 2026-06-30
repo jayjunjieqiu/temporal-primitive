@@ -58,7 +58,7 @@ FS_AXIS = 12
 FS_LEG = 14
 
 # 列标题（结合论文叙事）——放进各 legend 框作标题，首字母大写（sentence case）
-COL_TITLES = ["Training data domains", "Predefined motif labels", "Learned temporal primitives"]
+COL_TITLES = ["Training data domains", "Predefined motif labels", "Model-derived pattern groups"]
 DIM_MOTIFS = {"mixed_uncertain": "#cfcfcf"}
 # motif 标签缩写 + 首字母大写（与 cluster C1.. / domain Traffic.. 统一）
 MOTIF_SHORT = {
@@ -232,8 +232,8 @@ def main() -> None:
     lb = min(leg.get_window_extent().transformed(inv).y0 for leg in legs)
     fig.subplots_adjust(top=lb - 0.018)   # 散点顶贴 legend 底，仅留极小间隙
     OUT_DIR.mkdir(parents=True, exist_ok=True)
-    svg = OUT_DIR / "panel_b_cluster_maps.svg"
-    png = OUT_DIR / "panel_b_cluster_maps.png"
+    svg = OUT_DIR / "panel_a_cluster_maps.svg"  # figure panel a (former panel-a depth curves moved to the cross-arch appendix)
+    png = OUT_DIR / "panel_a_cluster_maps.png"
     fig.savefig(svg, bbox_inches="tight", pad_inches=0.12)
     fig.savefig(png, dpi=150, bbox_inches="tight", pad_inches=0.12)
     plt.close(fig)

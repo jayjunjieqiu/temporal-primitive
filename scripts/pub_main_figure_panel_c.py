@@ -204,8 +204,8 @@ def main() -> None:
     leg.get_title().set_horizontalalignment("center")   # SVG 也居中（text-anchor:middle，换字体不漂移）
 
     OUT_DIR.mkdir(parents=True, exist_ok=True)
-    svg = OUT_DIR / "panel_c_cards_layer12.svg"
-    png = OUT_DIR / "panel_c_cards_layer12.png"
+    svg = OUT_DIR / "panel_b_cards_layer12.svg"  # figure panel b
+    png = OUT_DIR / "panel_b_cards_layer12.png"
     fig.savefig(svg, bbox_inches="tight", pad_inches=0.1)
     fig.savefig(png, dpi=200, bbox_inches="tight", pad_inches=0.1)
     plt.close(fig)

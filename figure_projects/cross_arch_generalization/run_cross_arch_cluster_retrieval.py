@@ -271,7 +271,7 @@ def fig_repmaps(per_model: dict[str, dict[str, Any]], out_svg: Path, n_cards: in
         # 顶行写一次列标题(术语对齐主图 panel b)
         if r == 0:
             axes[r, 0].set_title("Training data domains", fontsize=FS_TITLE - 4)
-            axes[r, 1].set_title("Learned temporal primitives", fontsize=FS_TITLE - 4)
+            axes[r, 1].set_title("Model-derived pattern groups", fontsize=FS_TITLE - 4)
             axr.set_title("Cross-domain retrieval", fontsize=FS_TITLE - 4)
         # 行标签(最左,旋转):模型 + 聚类所用的最深层(1-based,与 cross_arch_style 守则一致)
         final_layer = MODELS[mk]["layers"][-1] + 1
@@ -291,9 +291,11 @@ def fig_repmaps(per_model: dict[str, dict[str, Any]], out_svg: Path, n_cards: in
     fig.legend(handles=line_handles, loc="lower center", ncol=1, fontsize=FS_LEGEND - 2,
                frameon=False, bbox_to_anchor=(0.5, -0.004))
     out_png = out_svg.with_suffix(".png")
+    out_pdf = out_svg.with_suffix(".pdf")  # vector PDF for direct paper inclusion (fig_cross_arch)
     fig.savefig(out_svg, bbox_inches="tight", pad_inches=0.12)
     fig.savefig(out_png, dpi=180, bbox_inches="tight", pad_inches=0.12)
-    print(f"[xarch-cr] saved -> {out_svg}")
+    fig.savefig(out_pdf, bbox_inches="tight", pad_inches=0.12)
+    print(f"[xarch-cr] saved -> {out_svg} (+ .png, .pdf)")
 
 
 def main() -> None:

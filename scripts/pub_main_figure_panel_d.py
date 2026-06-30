@@ -266,8 +266,8 @@ def main() -> None:
                          fontweight="bold", pad=6)
 
     OUT_DIR.mkdir(parents=True, exist_ok=True)
-    svg = OUT_DIR / "panel_d_retrieval.svg"
-    png = OUT_DIR / "panel_d_retrieval.png"
+    svg = OUT_DIR / "panel_c_retrieval.svg"  # figure panel c
+    png = OUT_DIR / "panel_c_retrieval.png"
     fig.savefig(svg, bbox_inches="tight", pad_inches=0.1)
     fig.savefig(png, dpi=200, bbox_inches="tight", pad_inches=0.1)
     plt.close(fig)
