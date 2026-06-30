@@ -1,6 +1,6 @@
 {
   "model": "chronos-bolt-base",
-  "note": "Aggregate retrieval statistics over real held-out patches (synthetic controls excluded), same discovery/held-out split and PCA(30) space as Supplementary Fig. 2. Coherence = Pearson corr of z-normalised patch shape; transition = corr of first differences. Random baseline = random (held-out query, training patch) pairs.",
+  "note": "Aggregate retrieval statistics over real held-out patches (synthetic controls excluded), same discovery/held-out split and PCA(30) space as Supplementary Fig. 2. Coherence = Pearson corr of z-normalised patch shape; transition = corr of first differences. Random baseline = random (held-out query, training patch) pairs. coherence_raw_patch_ceiling_top1 = nearest neighbour retrieved directly in z-normalised raw-patch space (the shape ceiling); representation retrieval is read against this, not only random. dispersion = mean/std/bootstrap-95%CI over per-query coherence; significance = Wilcoxon signed-rank p-values (representation vs random; representation vs raw ceiling).",
   "config": {
     "layers": [
       0,
@@ -30,7 +30,53 @@
       "queries_with_within_cluster_cross_domain": 1.0,
       "coherence_random_baseline": -0.005,
       "coherence_random_baseline_transition": 0.001,
-      "queries_with_cross_domain_neighbour": 1.0
+      "queries_with_cross_domain_neighbour": 1.0,
+      "coherence_raw_patch_ceiling_top1": 0.877,
+      "dispersion": {
+        "representation_retrieval_top1": {
+          "mean": 0.685,
+          "std": 0.294,
+          "ci95_low": 0.681,
+          "ci95_high": 0.69,
+          "n": 16453
+        },
+        "raw_patch_retrieval_top1": {
+          "mean": 0.877,
+          "std": 0.1,
+          "ci95_low": 0.876,
+          "ci95_high": 0.879,
+          "n": 16453
+        },
+        "random_paired": {
+          "mean": -0.005,
+          "std": 0.467,
+          "ci95_low": -0.012,
+          "ci95_high": 0.002,
+          "n": 16453
+        }
+      },
+      "significance_wilcoxon_pvalue": {
+        "representation_vs_random": 0.0,
+        "representation_vs_raw_ceiling": 0.0
+      },
+      "per_query_domain_coherence": {
+        "Energy": {
+          "n": 4456,
+          "mean_coherence_retrieved_top1": 0.707
+        },
+        "Environment": {
+          "n": 815,
+          "mean_coherence_retrieved_top1": 0.787
+        },
+        "Health": {
+          "n": 1102,
+          "mean_coherence_retrieved_top1": 0.847
+        },
+        "Traffic": {
+          "n": 10080,
+          "mean_coherence_retrieved_top1": 0.649
+        }
+      }
     },
     "layer 12": {
       "n_query_patches": 16453,
@@ -47,7 +93,53 @@
       "queries_with_within_cluster_cross_domain": 1.0,
       "coherence_random_baseline": -0.005,
       "coherence_random_baseline_transition": 0.001,
-      "queries_with_cross_domain_neighbour": 1.0
+      "queries_with_cross_domain_neighbour": 1.0,
+      "coherence_raw_patch_ceiling_top1": 0.877,
+      "dispersion": {
+        "representation_retrieval_top1": {
+          "mean": 0.392,
+          "std": 0.434,
+          "ci95_low": 0.386,
+          "ci95_high": 0.399,
+          "n": 16453
+        },
+        "raw_patch_retrieval_top1": {
+          "mean": 0.877,
+          "std": 0.1,
+          "ci95_low": 0.876,
+          "ci95_high": 0.879,
+          "n": 16453
+        },
+        "random_paired": {
+          "mean": -0.005,
+          "std": 0.467,
+          "ci95_low": -0.012,
+          "ci95_high": 0.002,
+          "n": 16453
+        }
+      },
+      "significance_wilcoxon_pvalue": {
+        "representation_vs_random": 0.0,
+        "representation_vs_raw_ceiling": 0.0
+      },
+      "per_query_domain_coherence": {
+        "Energy": {
+          "n": 4456,
+          "mean_coherence_retrieved_top1": 0.386
+        },
+        "Environment": {
+          "n": 815,
+          "mean_coherence_retrieved_top1": 0.438
+        },
+        "Health": {
+          "n": 1102,
+          "mean_coherence_retrieved_top1": 0.578
+        },
+        "Traffic": {
+          "n": 10080,
+          "mean_coherence_retrieved_top1": 0.371
+        }
+      }
     }
   }
 }

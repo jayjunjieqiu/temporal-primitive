@@ -25,6 +25,7 @@ import sys
 from pathlib import Path
 
 import numpy as np
+from scipy.stats import wilcoxon
 from sklearn.neighbors import NearestNeighbors
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -45,6 +46,22 @@ def _diffcorr(a: np.ndarray, b: np.ndarray) -> float:
     if np.std(da) < 1e-8 or np.std(db) < 1e-8:
         return 0.0
     return float(np.corrcoef(da, db)[0, 1])
+
+
+def _summ(vals: np.ndarray, rng: np.random.Generator, n_boot: int = 2000) -> dict:
+    """mean / std / bootstrap 95% CI over the per-query coherence values."""
+    a = np.asarray(vals, dtype=float)
+    a = a[np.isfinite(a)]
+    nn = len(a)
+    mean = float(a.mean()) if nn else 0.0
+    std = float(a.std(ddof=1)) if nn > 1 else 0.0
+    if nn > 1:
+        boot = np.array([a[rng.integers(0, nn, nn)].mean() for _ in range(n_boot)])
+        lo, hi = (float(x) for x in np.percentile(boot, [2.5, 97.5]))
+    else:
+        lo = hi = mean
+    return {"mean": round(mean, 3), "std": round(std, 3),
+            "ci95_low": round(lo, 3), "ci95_high": round(hi, 3), "n": int(nn)}
 
 
 def retrieval_quant(layer: dict, seed: int, knn: int, topn: int, n_rand_pairs: int) -> dict:
@@ -107,6 +124,30 @@ def retrieval_quant(layer: dict, seed: int, knn: int, topn: int, n_rand_pairs: i
     rand_coh = float(np.mean([_zcorr(q_z[a], train_z[b]) for a, b in zip(qi, ti)]))
     rand_coh_diff = float(np.mean([_diffcorr(q_z[a], train_z[b]) for a, b in zip(qi, ti)]))
 
+    # ---- raw-patch-space retrieval ceiling: nearest neighbour directly in z-normalised
+    # patch space. Neighbours selected by raw shape maximise shape-correlation by
+    # construction, so this is the informative control (the "shape ceiling") that
+    # representation-space retrieval should be read against — random (≈0) is a trivial bar.
+    nn_raw = NearestNeighbors(n_neighbors=1).fit(train_z)
+    _, idx_raw = nn_raw.kneighbors(q_z)
+    coh_raw = np.array([_zcorr(q_z[i], train_z[idx_raw[i, 0]]) for i in range(n)])
+
+    # paired random baseline (one random training patch per query) so significance is paired
+    rand_ti = rng.integers(0, len(train_z), size=n)
+    coh_rand_paired = np.array([_zcorr(q_z[i], train_z[rand_ti[i]]) for i in range(n)])
+
+    coh_rep = np.asarray(coh_top1, dtype=float)
+    # Wilcoxon signed-rank: representation retrieval vs (a) random and (b) the raw-shape ceiling
+    p_rep_vs_rand = float(wilcoxon(coh_rep, coh_rand_paired).pvalue)
+    p_rep_vs_raw = float(wilcoxon(coh_rep, coh_raw).pvalue)
+
+    # per-query-domain breakdown of representation-retrieval coherence
+    per_dom = {}
+    for d in sorted(set(q_dom.tolist())):
+        m = q_dom == d
+        per_dom[d] = {"n": int(m.sum()),
+                      "mean_coherence_retrieved_top1": round(float(coh_rep[m].mean()), 3)}
+
     return {
         "n_query_patches": int(n),
         "cross_domain_retrieval_rate_top1": round(float(np.mean(top1_cross)), 3),
@@ -123,6 +164,17 @@ def retrieval_quant(layer: dict, seed: int, knn: int, topn: int, n_rand_pairs: i
         "coherence_random_baseline": round(rand_coh, 3),
         "coherence_random_baseline_transition": round(rand_coh_diff, 3),
         "queries_with_cross_domain_neighbour": round(has_xd / n, 3),
+        "coherence_raw_patch_ceiling_top1": round(float(coh_raw.mean()), 3),
+        "dispersion": {
+            "representation_retrieval_top1": _summ(coh_rep, rng),
+            "raw_patch_retrieval_top1": _summ(coh_raw, rng),
+            "random_paired": _summ(coh_rand_paired, rng),
+        },
+        "significance_wilcoxon_pvalue": {
+            "representation_vs_random": p_rep_vs_rand,
+            "representation_vs_raw_ceiling": p_rep_vs_raw,
+        },
+        "per_query_domain_coherence": per_dom,
     }
 
 
@@ -156,16 +208,22 @@ def main() -> None:
         out[f"layer {L + 1}"] = stats
         print(f"[retr-quant] layer {L + 1}: xd-rate(top1)={stats['cross_domain_retrieval_rate_top1']:.0%} "
               f"any-xd-in-top{args.knn}={stats['cross_domain_any_in_topk']:.0%} | "
-              f"coh retrieved={stats['coherence_retrieved_top1']:.3f} "
-              f"cross-dom={stats['coherence_cross_domain_neighbour']:.3f} "
-              f"random={stats['coherence_random_baseline']:.3f}")
+              f"coh rep={stats['coherence_retrieved_top1']:.3f} "
+              f"raw-ceiling={stats['coherence_raw_patch_ceiling_top1']:.3f} "
+              f"random={stats['coherence_random_baseline']:.3f} | "
+              f"p(rep>rand)={stats['significance_wilcoxon_pvalue']['representation_vs_random']:.1e} "
+              f"p(rep<ceil)={stats['significance_wilcoxon_pvalue']['representation_vs_raw_ceiling']:.1e}")
 
     summary = {
         "model": "chronos-bolt-base",
         "note": ("Aggregate retrieval statistics over real held-out patches (synthetic controls excluded), "
                  "same discovery/held-out split and PCA(30) space as Supplementary Fig. 2. "
                  "Coherence = Pearson corr of z-normalised patch shape; transition = corr of first differences. "
-                 "Random baseline = random (held-out query, training patch) pairs."),
+                 "Random baseline = random (held-out query, training patch) pairs. "
+                 "coherence_raw_patch_ceiling_top1 = nearest neighbour retrieved directly in z-normalised raw-patch "
+                 "space (the shape ceiling); representation retrieval is read against this, not only random. "
+                 "dispersion = mean/std/bootstrap-95%CI over per-query coherence; "
+                 "significance = Wilcoxon signed-rank p-values (representation vs random; representation vs raw ceiling)."),
         "config": vars(args),
         "by_layer": out,
     }
