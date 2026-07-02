@@ -25,6 +25,11 @@
   control = `*`、OOD 相对 discovery 子集而非全量预训练、near-unseen domain = Illness、coverage ≈ 0.31）。
   脚本：`scripts/pub_main_figure_panel_{a,b,c,d}.py` · `scripts/pub_ood_figure.py`。
 
+- [18_paper_reproduction.md](18_paper_reproduction.md)  
+  **论文结果复现指南**。把最终投稿版每个经验性 figure/table 映射到具体脚本 + 命令 + 产物路径
+  （正文 Fig.4、Supp Fig.1 cross-model、Supp Fig.2 motif、Supp Table 1/2/3），含共享 GPU 抽取缓存、
+  环境/权重依赖，以及 script 名与 Fig.4 panel 的一位偏移等坑。OOD analysis 已从最终论文移除。
+
 ## Project Setup And Rules
 
 - [00_narrative_rules.md](00_narrative_rules.md)  
@@ -112,7 +117,7 @@
 - `02_*`: feasibility
 - `03_*` to `10_*`: discovery and validation history
 - `11_*` to `12_*`: archived Chronos-2 main evidence and method ablation
-- `13_*` to `17_*`: Chronos-Bolt clean-route reports (forecasting probe, contextualization, main figure, dataset membership, publication figures)
+- `13_*` to `18_*`: Chronos-Bolt clean-route reports (forecasting probe, contextualization, main figure, dataset membership, publication figures, paper reproduction)
 - `80_*`: appendix / weak-label sanity checks
 - `90_*`: meeting and PPT materials
 - `99_*`: route pivot / archive decisions
